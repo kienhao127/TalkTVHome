@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.example.cpu11341_local.talktvhome.bannerview.CustomViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="115dp"/>
+
+    <LinearLayout
+        android:id="@+id/sliderDots"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true"
+        android:layout_alignBottom="@id/viewPager"
+        android:layout_marginBottom="10dp">
+    </LinearLayout>
+</RelativeLayout>

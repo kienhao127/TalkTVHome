@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.example.cpu11341_local.talktvhome.bannerview.BannerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bannerView"></com.example.cpu11341_local.talktvhome.bannerview.BannerView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewHorList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:layout_below="@+id/bannerView"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerViewDocGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/recyclerViewHorList"
+        android:layout_marginTop="10dp"
+        />
+</RelativeLayout>
