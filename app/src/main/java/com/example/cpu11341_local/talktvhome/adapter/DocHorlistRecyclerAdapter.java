@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
 import com.example.cpu11341_local.talktvhome.HorilistImageLoader;
+import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocHorizon;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
  */
 
 public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRecyclerAdapter.RecyclerViewHolder> {
-    private ArrayList<DocHorizon> arrHorList = new ArrayList<DocHorizon>();
+    private static ArrayList<DocHorizon> arrHorList = new ArrayList<DocHorizon>();
     private Context context;
 
     public DocHorlistRecyclerAdapter(Context context){
@@ -88,8 +89,16 @@ public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRe
 
         @Override
         public void onClick(View v) {
+            int pos = getAdapterPosition();
             Context context = v.getContext();
-            Intent intent = new Intent(context, CategoryDetailActivity.class);
+            Intent intent = new Intent();
+            if (arrHorList.get(pos).getAction_type() == 1){
+                intent = new Intent(context, OpenRoomActivity.class);
+                intent.putExtra("RoomID", arrHorList.get(pos).getRoomID());
+            } else {
+                intent = new Intent(context, CategoryDetailActivity.class);
+                intent.putExtra("CategoryID", arrHorList.get(pos).getCategoryID());
+            }
             context.startActivity(intent);
         }
     }

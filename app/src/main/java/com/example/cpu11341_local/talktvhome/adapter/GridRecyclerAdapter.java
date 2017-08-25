@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
+import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocGrid;
 import com.example.cpu11341_local.talktvhome.data.DocHorizon;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  */
 
 public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapter.RecyclerViewHolder> {
-    private ArrayList<DocGrid> arrGridItem = new ArrayList<DocGrid>();
+    private static ArrayList<DocGrid> arrGridItem = new ArrayList<DocGrid>();
     private Context context;
     private OnItemClickListener mItemClickListener;
 
@@ -84,8 +85,17 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
 
         @Override
         public void onClick(View v) {
+            int pos = getAdapterPosition();
             Context context = v.getContext();
-            Intent intent = new Intent(context, CategoryDetailActivity.class);
+            Intent intent = new Intent();
+            if (arrGridItem.get(pos).getAction_type() == 1){
+                intent = new Intent(context, OpenRoomActivity.class);
+                intent.putExtra("RoomID", arrGridItem.get(pos).getRoomID());
+            } else {
+                intent = new Intent(context, OpenRoomActivity.class);
+                intent.putExtra("OfflineVideoID", arrGridItem.get(pos).getOfflineVideoID());
+            }
+
             context.startActivity(intent);
         }
     }

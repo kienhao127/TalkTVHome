@@ -24,12 +24,12 @@ public class CategoryDetailActivity extends AppCompatActivity {
 
         String ImgURL = "http://i.imgur.com/XMhtBg0.png";
         arrDocGrid = new ArrayList<>();
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 50", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 52", 1));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 47, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 48, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 49, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 1", null, 1));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 51, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 2", null, 2));
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCatDetail);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));

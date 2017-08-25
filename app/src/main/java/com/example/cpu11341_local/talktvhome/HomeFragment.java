@@ -57,21 +57,21 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.home_fragment,container,false);
         String ImgURL = "http://i.imgur.com/BLwlT6v.png";
         arrHorList = new ArrayList<>();
-        arrHorList.add(new DocHorizon(ImgURL, 1, "LOL"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "88"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "CFM"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "99"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "Liên Quân"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "69"));
-        arrHorList.add(new DocHorizon(ImgURL, 1, "Khác"));
+        arrHorList.add(new DocHorizon(ImgURL, "LOL", null, 1));
+        arrHorList.add(new DocHorizon(ImgURL, "88", 88, null));
+        arrHorList.add(new DocHorizon(ImgURL, "CFM", null, 2));
+        arrHorList.add(new DocHorizon(ImgURL, "99", 99, null));
+        arrHorList.add(new DocHorizon(ImgURL, "Liên Quân", null, 3));
+        arrHorList.add(new DocHorizon(ImgURL, "69", 69, null));
+        arrHorList.add(new DocHorizon(ImgURL, "Khác", null, 4));
 
         arrDocGrid = new ArrayList<>();
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 50", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 52", 1));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 47, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 48, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 49, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 1", null, 1));
+        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 51, null));
+        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 2", null, 2));
 
         arrDocGridWithTitle = new ArrayList<>();
         arrDocGridWithTitle.add(new DocGridWithTitle("Nổi bật", arrDocGrid));

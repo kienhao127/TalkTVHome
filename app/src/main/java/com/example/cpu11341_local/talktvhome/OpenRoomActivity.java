@@ -18,8 +18,13 @@ public class OpenRoomActivity extends AppCompatActivity {
 
         TextView textView = (TextView) findViewById(R.id.textView);
         Intent intent = getIntent();
-        int roomID = intent.getIntExtra("RoomID", 0);
-        textView.setText("Room ID = " + String.valueOf(roomID));
+        int roomID = intent.getIntExtra("RoomID", -1);
+        if (roomID != -1){
+            textView.setText("Room ID = " + String.valueOf(roomID));
+        } else {
+            int offlineVideoID = intent.getIntExtra("OfflineVideoID", -1);
+            textView.setText("Offline Video ID = " + String.valueOf(offlineVideoID));
+        }
     }
 
 }
