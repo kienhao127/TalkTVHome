@@ -55,9 +55,9 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
     public void onBindViewHolder(GridRecyclerAdapter.RecyclerViewHolder holder, int position) {
         final DocGrid docGrid = arrGridItem.get(position);
 
-        ImageLoader.getInstance().displayImage(docGrid.getImageURL(), holder.imageViewThumb);
+        ImageLoader.getInstance().displayImage(docGrid.getThumbnail(), holder.imageViewThumb);
 
-        holder.textViewChannelName.setText(docGrid.getChannelName());
+        holder.textViewChannelName.setText(docGrid.getName());
     }
 
     public interface OnItemClickListener {
@@ -87,13 +87,13 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
         public void onClick(View v) {
             int pos = getAdapterPosition();
             Context context = v.getContext();
-            Intent intent = new Intent();
-            if (arrGridItem.get(pos).getAction_type() == 1){
+            Intent intent;
+            if (arrGridItem.get(pos).getActionType() == 1){
                 intent = new Intent(context, OpenRoomActivity.class);
-                intent.putExtra("RoomID", arrGridItem.get(pos).getRoomID());
+                intent.putExtra("RoomID", arrGridItem.get(pos).getRoomId());
             } else {
                 intent = new Intent(context, OpenRoomActivity.class);
-                intent.putExtra("OfflineVideoID", arrGridItem.get(pos).getOfflineVideoID());
+                intent.putExtra("OfflineVideoID", arrGridItem.get(pos).getRoomId());
             }
 
             context.startActivity(intent);

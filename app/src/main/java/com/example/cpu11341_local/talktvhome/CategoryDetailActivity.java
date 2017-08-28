@@ -1,5 +1,6 @@
 package com.example.cpu11341_local.talktvhome;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -16,20 +17,14 @@ public class CategoryDetailActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.Adapter adapter;
     ArrayList<DocGrid> arrDocGrid;
-    ArrayList<DocGridWithTitle> arrDocGridWithTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_detail);
-
-        String ImgURL = "http://i.imgur.com/XMhtBg0.png";
         arrDocGrid = new ArrayList<>();
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 47, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 48, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 49, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 1", null, 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 51, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 2", null, 2));
+        Intent intent = getIntent();
+        arrDocGrid = (ArrayList<DocGrid>) intent.getSerializableExtra("arrDocGrid");
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewCatDetail);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));

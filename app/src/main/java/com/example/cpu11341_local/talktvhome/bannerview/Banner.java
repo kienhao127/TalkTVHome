@@ -9,16 +9,19 @@ public class Banner {
     private int roomID;
     private int action_type;
     private String link;
+    private int adID;
 
-    public Banner(String imageURL, int roomID) {
+    public Banner(String imageURL, int roomID, int adID, int action_type) {
         this.imageURL = imageURL;
         this.roomID = roomID;
-        this.action_type = 1;
+        this.action_type = action_type;
+        this.adID = adID;
     }
-    public Banner(String imageURL, String link) {
+    public Banner(String imageURL, String link, int adID, int action_type) {
         this.imageURL = imageURL;
         this.link = link;
-        this.action_type = 2;
+        this.action_type = action_type;
+        this.adID = adID;
     }
 
     public String getImageURL() {

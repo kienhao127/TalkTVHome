@@ -21,7 +21,14 @@ import com.example.cpu11341_local.talktvhome.adapter.HomeRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.DocGrid;
 import com.example.cpu11341_local.talktvhome.data.DocGridWithTitle;
 import com.example.cpu11341_local.talktvhome.data.DocHorizon;
+import com.example.cpu11341_local.talktvhome.data.DocTitle;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
@@ -32,7 +39,7 @@ public class HomeFragment extends Fragment {
     ArrayList<DocHorizon> arrHorList;
     ArrayList<DocGrid> arrDocGrid;
     ArrayList<DocGridWithTitle> arrDocGridWithTitle;
-    ArrayList<Banner> arrBannerItems = new ArrayList<>();
+    ArrayList<Banner> arrBannerItems;
     Parcelable state;
 
     public static HomeFragment newInstance(int someInt) {
@@ -52,36 +59,87 @@ public class HomeFragment extends Fragment {
         tabID = getArguments().getInt("someInt");
     }
 
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = getActivity().getAssets().open("homeTest.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.home_fragment,container,false);
-        String ImgURL = "http://i.imgur.com/BLwlT6v.png";
+
         arrHorList = new ArrayList<>();
-        arrHorList.add(new DocHorizon(ImgURL, "LOL", null, 1));
-        arrHorList.add(new DocHorizon(ImgURL, "88", 88, null));
-        arrHorList.add(new DocHorizon(ImgURL, "CFM", null, 2));
-        arrHorList.add(new DocHorizon(ImgURL, "99", 99, null));
-        arrHorList.add(new DocHorizon(ImgURL, "Liên Quân", null, 3));
-        arrHorList.add(new DocHorizon(ImgURL, "69", 69, null));
-        arrHorList.add(new DocHorizon(ImgURL, "Khác", null, 4));
-
-        arrDocGrid = new ArrayList<>();
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 47", 47, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 48", 48, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 49", 49, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 1", null, 1));
-        arrDocGrid.add(new DocGrid(ImgURL, "TalkTV 51", 51, null));
-        arrDocGrid.add(new DocGrid(ImgURL, "Offine video 2", null, 2));
-
+        arrBannerItems = new ArrayList<>();
         arrDocGridWithTitle = new ArrayList<>();
-        arrDocGridWithTitle.add(new DocGridWithTitle("Nổi bật", arrDocGrid));
-        arrDocGridWithTitle.add(new DocGridWithTitle("Liên Quân", arrDocGrid));
-        arrDocGridWithTitle.add(new DocGridWithTitle("Liên Minh Huyền thoại", arrDocGrid));
+        arrDocGrid = new ArrayList<>();
 
-        arrBannerItems.add(new Banner("http://i.imgur.com/A8jcSkq.png", 69));
-        arrBannerItems.add(new Banner("http://i.imgur.com/hNZLvPT.png", "www.google.com"));
-        arrBannerItems.add(new Banner("http://i.imgur.com/XfoVEXv.png", 96));
-        arrBannerItems.add(new Banner("http://i.imgur.com/0IUuV4e.png", "www.facebook.com"));
+        String json = loadJSONFromAsset();
+        JSONObject jsonResponse;
+        try {
+            jsonResponse = new JSONObject(json);
+            JSONObject home = jsonResponse.getJSONObject("doc");
+            JSONArray homeItems = home.getJSONArray("child");
+            for(int i=0;i<homeItems.length();i++){
+                JSONObject homeItem = homeItems.getJSONObject(i);
+                switch (homeItem.getInt("type")){
+                    case 1:{
+                        JSONArray banners = homeItem.getJSONArray("child");
+                        for (int iBanner = 0; iBanner < banners.length(); iBanner++){
+                            JSONObject banner = banners.getJSONObject(iBanner);
+                            arrBannerItems.add(new Banner(banner.getString("thumbnail"), banner.getInt("roomId"), banner.getInt("adId"), banner.getInt("actionType")));
+                        }
+                        break;
+                    }
+                    case 2:{
+                        JSONArray HoriListItems = homeItem.getJSONArray("child");
+                        for (int iHori = 0; iHori < HoriListItems.length(); iHori++){
+                            JSONObject HoriListItem = HoriListItems.getJSONObject(iHori);
+                            if (HoriListItem.getInt("actionType") == 1){
+                                arrHorList.add(new DocHorizon(HoriListItem.getInt("actionType"), HoriListItem.getInt("backendId"), HoriListItem.getString("avatar"),
+                                        HoriListItem.getString("title"), HoriListItem.getInt("type"), HoriListItem.getInt("roomType"), HoriListItem.getInt("roomId")));
+                            } else {
+                                arrHorList.add(new DocHorizon(HoriListItem.getInt("actionType"),HoriListItem.getInt("backendId"), HoriListItem.getString("pageUrl"),
+                                        HoriListItem.getString("avatar"), HoriListItem.getString("title"), HoriListItem.getInt("type")));
+                            }
+                        }
+                        break;
+                    }
+                    case 3:{
+                        DocTitle docTitle = new DocTitle(homeItem.getInt("actionType"), homeItem.getInt("backendId"), homeItem.getString("pageUrl"),
+                                homeItem.getInt("type"), homeItem.getString("title"));
+                        i++;
+                        homeItem = homeItems.getJSONObject(i);
+                        while (homeItem.getInt("type") != 3 && i < homeItems.length()){
+                            arrDocGrid.add(new DocGrid(homeItem.getInt("actionType"), homeItem.getString("thumbnail"), homeItem.getInt("viewers"), homeItem.getString("name"),
+                                    homeItem.getInt("backendId"), homeItem.getString("title"), homeItem.getInt("type"), homeItem.getInt("roomType"),
+                                    homeItem.getInt("roomId")));
+                            i++;
+                            if (i != homeItems.length()){
+                                homeItem = homeItems.getJSONObject(i);
+                            }
+                        }
+                        arrDocGridWithTitle.add(new DocGridWithTitle(docTitle, new ArrayList<DocGrid>(arrDocGrid)));
+                        arrDocGrid.clear();
+                        i--;
+                        break;
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewHome);
         if (tabID == 0){

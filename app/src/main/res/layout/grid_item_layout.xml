@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="wrap_content"
-    android:layout_height="wrap_content" android:layout_margin="5dp">
-    <RelativeLayout
+    android:layout_height="wrap_content" android:layout_margin="5dp"
+    android:adjustViewBounds="true">
+    <ImageView
+        android:id="@+id/imageViewThumb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"/>
+    <ImageView
+        android:id="@+id/imageViewLive"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:id="@+id/imageViewThumb"
-            android:layout_width="170dp"
-            android:layout_height="170dp"
-            android:src="@drawable/grid_item"/>
-        <ImageView
-            android:id="@+id/imageViewLive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/live_icon" />
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:src="@drawable/live_icon" />
+
     <TextView
         android:id="@+id/textViewChannelName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageView"
+        android:layout_below="@+id/imageViewThumb"
         android:text="TalkTV 47 - Buôn Mê Thuột"
-        android:textSize="12dp"
-        android:textColor="#000000"/>
-</LinearLayout>
+        android:textColor="#000000"
+        android:textSize="12dp" />
+</RelativeLayout>

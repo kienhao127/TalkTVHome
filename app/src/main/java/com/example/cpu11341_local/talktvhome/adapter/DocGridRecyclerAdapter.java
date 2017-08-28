@@ -14,13 +14,14 @@ import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocGridWithTitle;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by CPU11341-local on 8/18/2017.
  */
 
-public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecyclerAdapter.RVHolder> {
+public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecyclerAdapter.RVHolder> implements Serializable {
     private static ArrayList<DocGridWithTitle> arrDocGrid = new ArrayList<DocGridWithTitle>();
     private static RecyclerView gridList;
 
@@ -38,16 +39,17 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
     }
 
     @Override
-    public void onBindViewHolder(DocGridRecyclerAdapter.RVHolder holder, int position) {
+    public void onBindViewHolder(DocGridRecyclerAdapter.RVHolder holder, final int position) {
         holder.gridRecyclerAdapter.setData(arrDocGrid.get(position).getarrDocGrid());
-        holder.textView.setText(arrDocGrid.get(position).getTitle());
-        if (arrDocGrid.get(position).getTitle() != "Nổi bật"){
+        holder.textView.setText(arrDocGrid.get(position).getDocTitle().getTitle());
+        if (!arrDocGrid.get(position).getDocTitle().getTitle().equals("Nổi bật")){
             holder.imageView.setImageResource(R.mipmap.ic_chervon_right);
             holder.textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, CategoryDetailActivity.class);
+                    intent.putExtra("arrDocGrid", arrDocGrid.get(position).getarrDocGrid());
                     context.startActivity(intent);
                 }
             });

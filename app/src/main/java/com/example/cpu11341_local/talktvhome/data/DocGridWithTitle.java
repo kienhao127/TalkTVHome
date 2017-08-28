@@ -7,16 +7,16 @@ import java.util.ArrayList;
  */
 
 public class DocGridWithTitle {
-    private String title;
+    private DocTitle docTitle;
     private ArrayList<DocGrid> arrDocGrid;
 
-    public DocGridWithTitle(String title, ArrayList<DocGrid> arrDocGrid) {
-        this.title = title;
+    public DocGridWithTitle(DocTitle docTitle, ArrayList<DocGrid> arrDocGrid) {
+        this.docTitle = docTitle;
         this.arrDocGrid = arrDocGrid;
     }
 
-    public String getTitle() {
-        return title;
+    public DocTitle getDocTitle() {
+        return docTitle;
     }
 
     public ArrayList<DocGrid> getarrDocGrid() {

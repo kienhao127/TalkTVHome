@@ -66,7 +66,7 @@ public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRe
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).defaultDisplayImageOptions(displayImageOptions).build();
         imageLoader.init(config);
 
-        imageLoader.displayImage(docHorizon.getImgURL(), holder.imageViewIcon);
+        imageLoader.displayImage(docHorizon.getAvatar(), holder.imageViewIcon);
 
         holder.textViewTitle.setText(docHorizon.getTitle());
     }
@@ -97,7 +97,7 @@ public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRe
                 intent.putExtra("RoomID", arrHorList.get(pos).getRoomID());
             } else {
                 intent = new Intent(context, CategoryDetailActivity.class);
-                intent.putExtra("CategoryID", arrHorList.get(pos).getCategoryID());
+                intent.putExtra("CategoryID", arrHorList.get(pos).getPageUrl());
             }
             context.startActivity(intent);
         }
