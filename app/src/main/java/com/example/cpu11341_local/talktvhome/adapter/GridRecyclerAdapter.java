@@ -10,18 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
 import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocGrid;
 import com.example.cpu11341_local.talktvhome.data.DocHorizon;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
-import com.nostra13.universalimageloader.core.display.CircleBitmapDisplayer;
-import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.util.ArrayList;
 
@@ -47,21 +42,25 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
     public GridRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_item_layout,parent,false);
 
-        GridRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new GridRecyclerAdapter.RecyclerViewHolder(view);
+        final GridRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new GridRecyclerAdapter.RecyclerViewHolder(view);
         return recyclerViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(GridRecyclerAdapter.RecyclerViewHolder holder, int position) {
+    public void onBindViewHolder(GridRecyclerAdapter.RecyclerViewHolder holder, final int position) {
         final DocGrid docGrid = arrGridItem.get(position);
 
-        ImageLoader.getInstance().displayImage(docGrid.getThumbnail(), holder.imageViewThumb);
-
-        holder.textViewChannelName.setText(docGrid.getName());
+        Glide.with(context)
+                .load(docGrid.getThumbnail())
+                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                .apply(RequestOptions.errorOf(R.drawable.grid_item
+                ))
+                .into(holder.imageViewThumb);
+        holder.textViewChannelName.setText(docGrid.getTitle());
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position, String id);
+        public void onItemClick(View view, int position);
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
@@ -73,7 +72,7 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
         return arrGridItem.size();
     }
 
-    public static class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageViewThumb;
         TextView textViewChannelName;
         public RecyclerViewHolder(View view){
@@ -85,25 +84,16 @@ public class GridRecyclerAdapter extends RecyclerView.Adapter<GridRecyclerAdapte
 
         @Override
         public void onClick(View v) {
-            int pos = getAdapterPosition();
-            Context context = v.getContext();
-            Intent intent;
-            if (arrGridItem.get(pos).getActionType() == 1){
-                intent = new Intent(context, OpenRoomActivity.class);
-                intent.putExtra("RoomID", arrGridItem.get(pos).getRoomId());
-            } else {
-                intent = new Intent(context, OpenRoomActivity.class);
-                intent.putExtra("OfflineVideoID", arrGridItem.get(pos).getRoomId());
+            if (mItemClickListener != null) {
+                mItemClickListener.onItemClick(v, getPosition());
             }
-
-            context.startActivity(intent);
         }
     }
 
     public void setData(ArrayList<DocGrid> data) {
         if (arrGridItem != data) {
             arrGridItem = data;
-            notifyDataSetChanged();
+//            notifyDataSetChanged();
         }
     }
 }

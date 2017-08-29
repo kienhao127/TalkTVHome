@@ -120,6 +120,7 @@ public class HomeFragment extends Fragment {
                                 homeItem.getInt("type"), homeItem.getString("title"));
                         i++;
                         homeItem = homeItems.getJSONObject(i);
+
                         while (homeItem.getInt("type") != 3 && i < homeItems.length()){
                             arrDocGrid.add(new DocGrid(homeItem.getInt("actionType"), homeItem.getString("thumbnail"), homeItem.getInt("viewers"), homeItem.getString("name"),
                                     homeItem.getInt("backendId"), homeItem.getString("title"), homeItem.getInt("type"), homeItem.getInt("roomType"),

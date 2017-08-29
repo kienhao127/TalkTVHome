@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
+import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocGridWithTitle;
 
@@ -61,11 +62,13 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
         return arrDocGrid.size();
     }
 
-    public static class RVHolder extends RecyclerView.ViewHolder{
+
+    public static class RVHolder extends RecyclerView.ViewHolder {
         private GridRecyclerAdapter gridRecyclerAdapter;
         private TextView textView;
         private ImageView imageView;
-        public RVHolder(View view){
+
+        public RVHolder(View view) {
             super(view);
             Context context = itemView.getContext();
 
@@ -75,6 +78,22 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
             gridList.setLayoutManager(new GridLayoutManager(context, 2));
             gridRecyclerAdapter = new GridRecyclerAdapter(context);
             gridList.setAdapter(gridRecyclerAdapter);
+
+            gridRecyclerAdapter.SetOnItemClickListener(new GridRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    Context context = itemView.getContext();
+                    Intent intent;
+                    if (arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getActionType() == 1) {
+                        intent = new Intent(context, OpenRoomActivity.class);
+                        intent.putExtra("RoomID", arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
+                    } else {
+                        intent = new Intent(context, OpenRoomActivity.class);
+                        intent.putExtra("OfflineVideoID", arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
+                    }
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 

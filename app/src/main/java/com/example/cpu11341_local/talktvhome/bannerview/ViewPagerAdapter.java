@@ -16,9 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
-import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 
@@ -62,12 +63,24 @@ public class ViewPagerAdapter extends PagerAdapter {
         ImageView imageView = (ImageView) view.findViewById(R.id.imageView);
 
         if (position == 0) {
-            ImageLoader.getInstance().displayImage(arrBannerItems.get(arrBannerItems.size() - 1).getImageURL(), imageView);
+            Glide.with(context)
+                    .load(arrBannerItems.get(arrBannerItems.size() - 1).getImageURL())
+                    .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
+                    .apply(RequestOptions.errorOf(R.drawable.nobanner))
+                    .into(imageView);
         } else {
             if (position == (arrBannerItems.size() + 1)) {
-                ImageLoader.getInstance().displayImage(arrBannerItems.get(0).getImageURL(), imageView);
+                Glide.with(context)
+                        .load(arrBannerItems.get(0).getImageURL())
+                        .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
+                        .apply(RequestOptions.errorOf(R.drawable.nobanner))
+                        .into(imageView);
             } else {
-                ImageLoader.getInstance().displayImage(arrBannerItems.get(position - 1).getImageURL(), imageView);
+                Glide.with(context)
+                        .load(arrBannerItems.get(position - 1).getImageURL())
+                        .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
+                        .apply(RequestOptions.errorOf(R.drawable.nobanner))
+                        .into(imageView);
             }
         }
 

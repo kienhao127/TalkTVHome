@@ -9,17 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.CategoryDetailActivity;
-import com.example.cpu11341_local.talktvhome.HorilistImageLoader;
 import com.example.cpu11341_local.talktvhome.OpenRoomActivity;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.DocHorizon;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import com.nostra13.universalimageloader.core.assist.ImageSize;
-import com.nostra13.universalimageloader.core.display.CircleBitmapDisplayer;
 
 import java.util.ArrayList;
 
@@ -48,25 +43,14 @@ public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRe
         return recyclerViewHolder;
     }
 
-    public static float pxFromDp(final Context context, final float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
-    }
-
     @Override
     public void onBindViewHolder(DocHorlistRecyclerAdapter.RecyclerViewHolder holder, int position) {
         final DocHorizon docHorizon = arrHorList.get(position);
 
-        HorilistImageLoader imageLoader = HorilistImageLoader.getInstance();
-
-        DisplayImageOptions displayImageOptions = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .displayer(new CircleBitmapDisplayer())
-                .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2)
-                .build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).defaultDisplayImageOptions(displayImageOptions).build();
-        imageLoader.init(config);
-
-        imageLoader.displayImage(docHorizon.getAvatar(), holder.imageViewIcon);
+        Glide.with(context)
+                .load(docHorizon.getAvatar())
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.imageViewIcon);
 
         holder.textViewTitle.setText(docHorizon.getTitle());
     }

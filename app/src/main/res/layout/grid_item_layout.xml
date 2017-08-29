@@ -21,5 +21,7 @@
         android:layout_below="@+id/imageViewThumb"
         android:text="TalkTV 47 - Buôn Mê Thuột"
         android:textColor="#000000"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="12dp" />
 </RelativeLayout>
