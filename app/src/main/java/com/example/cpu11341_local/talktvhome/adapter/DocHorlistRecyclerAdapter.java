@@ -81,7 +81,7 @@ public class DocHorlistRecyclerAdapter extends RecyclerView.Adapter<DocHorlistRe
                 intent.putExtra("RoomID", arrHorList.get(pos).getRoomID());
             } else {
                 intent = new Intent(context, CategoryDetailActivity.class);
-                intent.putExtra("CategoryID", arrHorList.get(pos).getPageUrl());
+                intent.putExtra("PageUrl", arrHorList.get(pos).getPageUrl());
             }
             context.startActivity(intent);
         }

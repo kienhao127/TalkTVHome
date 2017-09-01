@@ -23,11 +23,11 @@ import java.util.ArrayList;
  */
 
 public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecyclerAdapter.RVHolder> implements Serializable {
-    private static ArrayList<DocGridWithTitle> arrDocGrid = new ArrayList<DocGridWithTitle>();
+    private static ArrayList<DocGridWithTitle> arrDocGridWithTitle = new ArrayList<DocGridWithTitle>();
     private static RecyclerView gridList;
 
     public DocGridRecyclerAdapter(ArrayList<DocGridWithTitle> arrDocGrid){
-        this.arrDocGrid = arrDocGrid;
+        this.arrDocGridWithTitle = arrDocGrid;
     }
 
     public DocGridRecyclerAdapter() {
@@ -41,16 +41,16 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
 
     @Override
     public void onBindViewHolder(DocGridRecyclerAdapter.RVHolder holder, final int position) {
-        holder.gridRecyclerAdapter.setData(arrDocGrid.get(position).getarrDocGrid());
-        holder.textView.setText(arrDocGrid.get(position).getDocTitle().getTitle());
-        if (!arrDocGrid.get(position).getDocTitle().getTitle().equals("Nổi bật")){
+        holder.gridRecyclerAdapter.setData(arrDocGridWithTitle.get(position).getarrDocGrid());
+        holder.textView.setText(arrDocGridWithTitle.get(position).getDocTitle().getTitle());
+        if (!arrDocGridWithTitle.get(position).getDocTitle().getTitle().equals("Nổi bật")){
             holder.imageView.setImageResource(R.mipmap.ic_chervon_right);
             holder.textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, CategoryDetailActivity.class);
-                    intent.putExtra("arrDocGrid", arrDocGrid.get(position).getarrDocGrid());
+                    intent.putExtra("PageUrl", arrDocGridWithTitle.get(position).getDocTitle().getPageUrl());
                     context.startActivity(intent);
                 }
             });
@@ -59,7 +59,7 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
 
     @Override
     public int getItemCount() {
-        return arrDocGrid.size();
+        return arrDocGridWithTitle.size();
     }
 
 
@@ -84,12 +84,12 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
                 public void onItemClick(View view, int position) {
                     Context context = itemView.getContext();
                     Intent intent;
-                    if (arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getActionType() == 1) {
+                    if (arrDocGridWithTitle.get(getAdapterPosition()).getarrDocGrid().get(position).getActionType() == 1) {
                         intent = new Intent(context, OpenRoomActivity.class);
-                        intent.putExtra("RoomID", arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
+                        intent.putExtra("RoomID", arrDocGridWithTitle.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
                     } else {
                         intent = new Intent(context, OpenRoomActivity.class);
-                        intent.putExtra("OfflineVideoID", arrDocGrid.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
+                        intent.putExtra("OfflineVideoID", arrDocGridWithTitle.get(getAdapterPosition()).getarrDocGrid().get(position).getRoomId());
                     }
                     context.startActivity(intent);
                 }
@@ -98,8 +98,8 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
     }
 
     public void setData(ArrayList<DocGridWithTitle> data) {
-        if (arrDocGrid != data) {
-            arrDocGrid = data;
+        if (arrDocGridWithTitle != data) {
+            arrDocGridWithTitle = data;
             notifyDataSetChanged();
         }
     }

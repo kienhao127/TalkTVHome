@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.cpu11341_local.talktvhome.bannerview.OpenRoomActivity">
+    tools:context="com.example.cpu11341_local.talktvhome.OpenRoomActivity">
 
     <TextView
     android:id="@+id/textView"
@@ -13,5 +13,21 @@
     android:text="TextView"
     tools:layout_editor_absoluteX="163dp"
     tools:layout_editor_absoluteY="247dp" />
+
+    <ImageView android:id="@+id/messageShow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/message_icon"
+        android:background="#3555"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/textView"
+        android:layout_toEndOf="@+id/textView" />
+
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>
 

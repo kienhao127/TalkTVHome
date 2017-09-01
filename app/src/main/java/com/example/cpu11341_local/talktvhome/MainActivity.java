@@ -1,6 +1,7 @@
 package com.example.cpu11341_local.talktvhome;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -9,7 +10,13 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.bannerview.Banner;
 import com.example.cpu11341_local.talktvhome.bannerview.BannerView;
@@ -21,6 +28,8 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
+    Toolbar toolbar;
+    TextView mTitle;
     TabData tab[] = {new TabData(0, "Hot", new doctype[]{doctype.BANNER, doctype.HORIZONLIST, doctype.GRIDLIST}),
             new TabData(1, "Mobile", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST}),
             new TabData(2, "PC", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST}),
@@ -39,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        setSupportActionBar(toolbar);
+
+        mTitle.setText(toolbar.getTitle());
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 //        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 //            @Override
@@ -59,6 +74,26 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home_toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_message:
+                Intent intent = new Intent(this, MessageActivity.class);
+                this.startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private class CustomAdapter extends FragmentPagerAdapter {
 
