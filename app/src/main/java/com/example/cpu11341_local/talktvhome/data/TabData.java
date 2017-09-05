@@ -9,9 +9,9 @@ import java.util.ArrayList;
 public class TabData {
     private int tabID;
     private String title;
-    private doctype[] tabDocType;
+    private int[] tabDocType;
 
-    public TabData(int tabID, String title, doctype[] tabDocType) {
+    public TabData(int tabID, String title, int[] tabDocType) {
         this.tabID = tabID;
         this.title = title;
         this.tabDocType = tabDocType;
@@ -33,11 +33,11 @@ public class TabData {
         this.title = title;
     }
 
-    public doctype[] getTabDocType() {
+    public int[] getTabDocType() {
         return tabDocType;
     }
 
-    public void setTabDocType(doctype[] tabDocType) {
+    public void setTabDocType(int[] tabDocType) {
         this.tabDocType = tabDocType;
     }
 }

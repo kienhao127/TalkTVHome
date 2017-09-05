@@ -9,32 +9,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.cpu11341_local.talktvhome.bannerview.Banner;
-import com.example.cpu11341_local.talktvhome.bannerview.BannerView;
 import com.example.cpu11341_local.talktvhome.data.TabData;
-import com.example.cpu11341_local.talktvhome.data.doctype;
-
-import java.util.ArrayList;
+import com.example.cpu11341_local.talktvhome.fragment.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     Toolbar toolbar;
     TextView mTitle;
-    TabData tab[] = {new TabData(0, "Hot", new doctype[]{doctype.BANNER, doctype.HORIZONLIST, doctype.GRIDLIST}),
-            new TabData(1, "Mobile", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST}),
-            new TabData(2, "PC", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST}),
-            new TabData(3, "Show", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST}),
-            new TabData(4, "...", new doctype[]{doctype.HORIZONLIST, doctype.GRIDLIST})};
+    TabData tab[] = {new TabData(0, "Hot", new int[]{1, 2, 3}),
+            new TabData(1, "Mobile", new int[]{2, 3}),
+            new TabData(2, "PC", new int[]{2, 3}),
+            new TabData(3, "Show", new int[]{2, 3}),
+            new TabData(4, "...", new int[]{2, 3})};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

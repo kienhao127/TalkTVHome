@@ -2,8 +2,11 @@ package com.example.cpu11341_local.talktvhome;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.widget.TextView;
+
+import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
+
+import java.util.ArrayList;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -22,7 +25,7 @@ public class MessageActivity extends AppCompatActivity {
             }
 
             // Create a new Fragment to be placed in the activity layout
-            MessageFragment messFragment = new MessageFragment(true);
+            MessageFragment messFragment = new MessageFragment("Tin nhắn", 1);
 
             // In case this activity was started with special instructions from an
             // Intent, pass the Intent's extras to the fragment as arguments
@@ -30,7 +33,8 @@ public class MessageActivity extends AppCompatActivity {
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, messFragment).commit();
+                    .add(R.id.fragment_container, messFragment)
+                    .commit();
         }
     }
 }

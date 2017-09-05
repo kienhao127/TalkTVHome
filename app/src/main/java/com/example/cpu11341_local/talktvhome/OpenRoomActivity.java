@@ -1,21 +1,24 @@
 package com.example.cpu11341_local.talktvhome;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
+
+import java.util.ArrayList;
 
 public class OpenRoomActivity extends AppCompatActivity {
     ImageView imageView;
+    boolean isLayoutGone = true;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -36,9 +39,10 @@ public class OpenRoomActivity extends AppCompatActivity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isLayoutGone = false;
                 FrameLayout fl = (FrameLayout) findViewById(R.id.fragment_container);
                 fl.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2;
-
+                fl.setVisibility(fl.VISIBLE);
 
                 if (findViewById(R.id.fragment_container) != null) {
 
@@ -50,7 +54,7 @@ public class OpenRoomActivity extends AppCompatActivity {
                     }
 
                     // Create a new Fragment to be placed in the activity layout
-                    MessageFragment messFragment = new MessageFragment(false);
+                    MessageFragment messFragment = new MessageFragment("Tin nhắn", 1);
 
                     // In case this activity was started with special instructions from an
                     // Intent, pass the Intent's extras to the fragment as arguments
@@ -58,7 +62,9 @@ public class OpenRoomActivity extends AppCompatActivity {
 
                     // Add the fragment to the 'fragment_container' FrameLayout
                     getSupportFragmentManager().beginTransaction()
-                            .add(R.id.fragment_container, messFragment).commit();
+                            .add(R.id.fragment_container, messFragment)
+                            .addToBackStack(null)
+                            .commit();
                 }
             }
         });
@@ -66,10 +72,9 @@ public class OpenRoomActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        FrameLayout fl = (FrameLayout) findViewById(R.id.fragment_container);
-        if (fl.getLayoutParams().height != 0){
-            fl.getLayoutParams().height = 0;
-            getSupportFragmentManager().beginTransaction().commit();
+        FragmentManager fm = getFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStack();
         } else {
             super.onBackPressed();
         }

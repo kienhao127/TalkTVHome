@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.R;
+import com.example.cpu11341_local.talktvhome.data.Topic;
 
 import java.util.ArrayList;
 
@@ -22,9 +23,11 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
 
     private Context context;
     private OnItemClickListener mItemClickListener;
+    ArrayList<Topic> arrTopic = new ArrayList<>();
 
-    public MessageRecyclerAdapter(Context context){
+    public MessageRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
         this.context = context;
+        this.arrTopic = arrTopic;
     }
 
 
@@ -40,12 +43,16 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
     public void onBindViewHolder(MessageRecyclerAdapter.RecyclerViewHolder holder, final int position) {
 
         Glide.with(context)
-                .load("http://avatar1.cctalk.vn/csmtalk_room/88")
+                .load(arrTopic.get(position).getAvatar())
                 .apply(RequestOptions.circleCropTransform())
                 .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                 .apply(RequestOptions.errorOf(R.drawable.grid_item
                 ))
                 .into(holder.imageViewAvatar);
+
+        holder.textViewName.setText(arrTopic.get(position).getName());
+        holder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
+        holder.textViewDate.setText(arrTopic.get(position).getDate());
     }
 
     public interface OnItemClickListener {
@@ -58,20 +65,20 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
 
     @Override
     public int getItemCount() {
-        return 5;
+        return arrTopic.size();
     }
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageViewAvatar;
         TextView textViewName;
-        TextView textViewMessage;
+        TextView textViewLastMess;
         TextView textViewDate;
 
         public RecyclerViewHolder(View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewName = (TextView) view.findViewById(R.id.textViewName);
-            textViewMessage = (TextView) view.findViewById(R.id.textViewMessage);
+            textViewLastMess = (TextView) view.findViewById(R.id.textViewLastMess);
             textViewDate = (TextView) view.findViewById(R.id.textViewDate);
             view.setOnClickListener(this);
         }
