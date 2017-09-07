@@ -33,7 +33,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
 
     @Override
     public MessageRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_item_layout,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic_layout,parent,false);
 
         MessageRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new MessageRecyclerAdapter.RecyclerViewHolder(view);
         return recyclerViewHolder;
@@ -41,7 +41,6 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
 
     @Override
     public void onBindViewHolder(MessageRecyclerAdapter.RecyclerViewHolder holder, final int position) {
-
         Glide.with(context)
                 .load(arrTopic.get(position).getAvatar())
                 .apply(RequestOptions.circleCropTransform())

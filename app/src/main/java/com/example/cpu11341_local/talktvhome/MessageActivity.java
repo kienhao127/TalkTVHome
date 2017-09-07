@@ -25,7 +25,7 @@ public class MessageActivity extends AppCompatActivity {
             }
 
             // Create a new Fragment to be placed in the activity layout
-            MessageFragment messFragment = new MessageFragment("Tin nhắn", 1);
+            MessageFragment messFragment = new MessageFragment("Tin nhắn", true);
 
             // In case this activity was started with special instructions from an
             // Intent, pass the Intent's extras to the fragment as arguments
@@ -33,6 +33,7 @@ public class MessageActivity extends AppCompatActivity {
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
                     .add(R.id.fragment_container, messFragment)
                     .commit();
         }

@@ -10,13 +10,15 @@ public class Topic {
     String lastMess;
     String date;
     int action_type; //1: system, 2: not follow, 3: Chat
+    int userId;
 
-    public Topic(String avatar, String name, String lastMess, String date, int action_type) {
+    public Topic(String avatar, String name, String lastMess, String date, int action_type, int userId) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
         this.date = date;
         this.action_type = action_type;
+        this.userId = userId;
     }
 
     public String getAvatar() {
@@ -37,5 +39,9 @@ public class Topic {
 
     public int getAction_type() {
         return action_type;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 }

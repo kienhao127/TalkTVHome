@@ -5,43 +5,64 @@ package com.example.cpu11341_local.talktvhome.data;
  */
 
 public class MessageDetail {
-    String avatar;
+    int type; //1: event, 2: remind, 3: message
+    int id;
+    User user;
     String title;
     String datetime;
     String imageURL;
-    String Description;
+    String description;
+    int action_type; //1: go web, 2: go room
     String action_title;
-    int action_type;
     String action_extra;
     String message;
 
-    public MessageDetail(String title, String datetime, String imageURL, String description, String action_title, int action_type, String action_extra) {
+    public MessageDetail(){
+
+    }
+
+    //Event
+    public MessageDetail(int type, int id, User user, String title, String datetime, String imageURL, String description, int action_type, String action_title, String action_extra) {
+        this.id = id;
+        this.user = user;
         this.title = title;
         this.datetime = datetime;
         this.imageURL = imageURL;
-        Description = description;
-        this.action_title = action_title;
+        this.description = description;
         this.action_type = action_type;
+        this.action_title = action_title;
         this.action_extra = action_extra;
+        this.type = type;
     }
 
-    public MessageDetail(String avatar, String datetime, String message) {
-        this.avatar = avatar;
-        this.datetime = datetime;
-        this.message = message;
-    }
-
-    public MessageDetail(String title, String datetime, String description, String action_title, int action_type, String action_extra) {
+    //Remind
+    public MessageDetail(int type, int id, User user, String title, String datetime, String description, int action_type, String action_title, String action_extra) {
+        this.id = id;
+        this.user = user;
         this.title = title;
         this.datetime = datetime;
-        Description = description;
-        this.action_title = action_title;
+        this.description = description;
         this.action_type = action_type;
+        this.action_title = action_title;
         this.action_extra = action_extra;
+        this.type = type;
     }
 
-    public String getAvatar() {
-        return avatar;
+    //Message
+    public MessageDetail(int type, int id, User user, String datetime, String message) {
+        this.id = id;
+        this.user = user;
+        this.datetime = datetime;
+        this.message = message;
+        this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public String getTitle() {
@@ -57,15 +78,15 @@ public class MessageDetail {
     }
 
     public String getDescription() {
-        return Description;
-    }
-
-    public String getAction_title() {
-        return action_title;
+        return description;
     }
 
     public int getAction_type() {
         return action_type;
+    }
+
+    public String getAction_title() {
+        return action_title;
     }
 
     public String getAction_extra() {
@@ -74,5 +95,53 @@ public class MessageDetail {
 
     public String getMessage() {
         return message;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setAction_type(int action_type) {
+        this.action_type = action_type;
+    }
+
+    public void setAction_title(String action_title) {
+        this.action_title = action_title;
+    }
+
+    public void setAction_extra(String action_extra) {
+        this.action_extra = action_extra;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

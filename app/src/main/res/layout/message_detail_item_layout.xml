@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:orientation="vertical">
+    <TextView
+        android:gravity="center_horizontal"
+        android:id="@+id/textViewDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="17/08/25 09:47"
+        android:layout_margin="10dp"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp">
+
+        <ImageView
+            android:id="@+id/imageViewAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/horlist_item_logo" />
+
+        <TextView
+            android:id="@+id/textViewMessDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner"
+            android:text="Nội dung tin nhắn"
+            android:textColor="#000"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageViewAvatar"
+            android:layout_toEndOf="@+id/imageViewAvatar"
+            android:layout_marginLeft="5dp"
+            android:padding="7dp"/>
+    </RelativeLayout>
+</LinearLayout>

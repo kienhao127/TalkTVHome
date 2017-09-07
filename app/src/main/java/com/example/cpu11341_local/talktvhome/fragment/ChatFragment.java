@@ -1,5 +1,6 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -9,11 +10,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.User;
 
 import java.util.ArrayList;
 
@@ -28,24 +32,44 @@ public class ChatFragment extends android.support.v4.app.Fragment {
     RecyclerView.LayoutManager layoutManager;
     Toolbar toolbar;
     TextView mTitle;
+    EditText editText;
     String toolbarTitle;
-    int userId;
-    int action_type;
+    int senderID;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
 
-    public ChatFragment(String toolbarTitle, int userId, int action_type) {
+    public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
-        this.userId = userId;
-        this.action_type = action_type;
+        this.senderID = senderID;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrMessDetail.add(new MessageDetail("Tên event 1", "17/08/25 09:47", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", "Xem chi tiết", 1, "action_extra"));
-        arrMessDetail.add(new MessageDetail("Tên event 2", "18/08/25 10:47", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_47.jpg", "Mô tả", "Xem chi tiết", 1, "action_extra"));
-        arrMessDetail.add(new MessageDetail("Tên event 3", "19/08/25 11:47", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_69.jpg", "Mô tả", "Xem chi tiết", 1, "action_extra"));
-        arrMessDetail.add(new MessageDetail("Tên event 4", "20/08/25 12:47", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_88.jpg", "Mô tả", "Xem chi tiết", 1, "action_extra"));
+
+        arrMessDetail.add(new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
+                "Tên event 1", "17/08/25 09:47:02", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra"));
+        arrMessDetail.add(new MessageDetail(2, 2, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
+                "Nhắc nhở 1", "17/09/25 09:47:02", "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra"));
+        arrMessDetail.add(new MessageDetail(3, 3, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
+                "18/08/25 10:47:03", "Nội dung thông báo"));
+
+        arrMessDetail.add(new MessageDetail(3, 1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi" , true),
+                "18/08/25 10:47:03", "Xin chào"));
+        arrMessDetail.add(new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi" , true),
+                "18/08/25 11:47:04", "Tôi là Thúy Chi"));
+
+        arrMessDetail.add(new MessageDetail(3, 1, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady" , false),
+                "19/08/25 12:47:05", "Tôi là Trang Lady"));
+    }
+
+    ArrayList<MessageDetail> getMessageDetail(int senderID){
+        ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
+        for (MessageDetail messageDetail : arrMessDetail){
+            if (messageDetail.getUser().getId() == senderID){
+                arrMessageDetailOfSender.add(messageDetail);
+            }
+        }
+        return arrMessageDetailOfSender;
     }
 
     @Override
@@ -54,6 +78,16 @@ public class ChatFragment extends android.support.v4.app.Fragment {
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        editText = (EditText) view.findViewById(R.id.editText);
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
         mTitle.setText(toolbarTitle);
@@ -68,12 +102,17 @@ public class ChatFragment extends android.support.v4.app.Fragment {
         });
 
         messDetailRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessDetail);
-        adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail);
+        adapter = new MessageDetailRecyclerAdapter(getContext(), getMessageDetail(senderID));
 
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         messDetailRecyclerView.setAdapter(adapter);
 
         return view;
+    }
+
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

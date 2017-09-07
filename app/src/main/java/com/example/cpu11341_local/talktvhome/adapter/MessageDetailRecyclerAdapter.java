@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Created by CPU11341-local on 9/5/2017.
  */
 
-public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDetailRecyclerAdapter.RecyclerViewHolderEvent> {
+public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDetailRecyclerAdapter.EventHolder> {
 
     private Context context;
     private OnItemClickListener mItemClickListener;
@@ -30,25 +30,63 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         this.arrMessDetail = arrMessDetail;
     }
 
-
     @Override
-    public RecyclerViewHolderEvent onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new RecyclerViewHolderEvent(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
+    public int getItemViewType(int position) {
+        return arrMessDetail.get(position).getType();
     }
 
     @Override
-    public void onBindViewHolder(RecyclerViewHolderEvent holder, final int position) {
-        holder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
-        holder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
-        holder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
-        Glide.with(context)
-                .load(arrMessDetail.get(position).getImageURL())
-                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                .apply(RequestOptions.errorOf(R.drawable.grid_item
-                ))
-                .into(holder.imageViewEvent);
-        holder.textViewDes.setText(arrMessDetail.get(position).getDescription());
-        holder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
+    public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case 1:{
+                return new EventHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
+            }
+            case 2:{
+                return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
+            }
+            default:{
+                return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
+            }
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(EventHolder holder, final int position) {
+        switch (holder.getItemViewType()) {
+            case 1:
+                EventHolder eventHolder = (EventHolder) holder;
+                eventHolder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
+                eventHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
+                eventHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                Glide.with(context)
+                        .load(arrMessDetail.get(position).getImageURL())
+                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                        .apply(RequestOptions.errorOf(R.drawable.grid_item
+                        ))
+                        .into(eventHolder.imageViewEvent);
+                eventHolder.textViewDes.setText(arrMessDetail.get(position).getDescription());
+                eventHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
+                break;
+            case 2:
+                RemindHolder remindHolder = (RemindHolder) holder;
+                remindHolder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
+                remindHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
+                remindHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                remindHolder.textViewDes.setText(arrMessDetail.get(position).getDescription());
+                remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
+                break;
+            default:
+                MessageHolder messageHolder = (MessageHolder) holder;
+                Glide.with(context)
+                        .load(arrMessDetail.get(position).getUser().getAvatar())
+                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                        .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(messageHolder.imageViewAvatar);
+                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getMessage());
+                messageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                break;
+        }
     }
 
     public interface OnItemClickListener {
@@ -64,7 +102,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         return arrMessDetail.size();
     }
 
-    public class RecyclerViewHolderEvent extends RecyclerView.ViewHolder {
+    public class EventHolder extends RecyclerView.ViewHolder {
         TextView textViewDateTime;
         TextView textViewTitle;
         TextView textViewDate;
@@ -72,7 +110,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         TextView textViewDes;
         TextView textViewViewDetail;
 
-        public RecyclerViewHolderEvent(View view){
+        public EventHolder(View view){
             super(view);
             textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
             textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
@@ -83,18 +121,33 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         }
     }
 
-    public class RecyclerViewHolderRemind extends RecyclerView.ViewHolder {
+    public class RemindHolder extends EventHolder {
+        TextView textViewDateTime;
+        TextView textViewTitle;
+        TextView textViewDate;
+        TextView textViewDes;
+        TextView textViewViewDetail;
+
+        public RemindHolder(View view){
+            super(view);
+            textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
+            textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
+            textViewDate = (TextView) view.findViewById(R.id.textViewDate);
+            textViewDes = (TextView) view.findViewById(R.id.textViewDes);
+            textViewViewDetail = (TextView) view.findViewById(R.id.textViewViewDetail);
+        }
+    }
+
+    public class MessageHolder extends EventHolder {
         ImageView imageViewAvatar;
-        TextView textViewName;
-        TextView textViewLastMess;
+        TextView textViewMessDetail;
         TextView textViewDate;
 
-        public RecyclerViewHolderRemind(View view){
+        public MessageHolder(View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
-            textViewName = (TextView) view.findViewById(R.id.textViewName);
-            textViewLastMess = (TextView) view.findViewById(R.id.textViewLastMess);
-            textViewDate = (TextView) view.findViewById(R.id.textViewDate);
+            textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
+            textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
         }
     }
 }

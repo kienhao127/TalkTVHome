@@ -27,7 +27,7 @@
             android:textSize="20dp"/>
 
         <TextView
-            android:id="@+id/textViewDate"
+            android:id="@id/textViewDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hôm qua"
@@ -37,15 +37,6 @@
             android:layout_marginBottom="5dp"
             android:layout_below="@+id/textViewTitle"/>
 
-        <ImageView
-            android:id="@+id/imageViewEvent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:src="@drawable/nobanner"
-            android:layout_below="@+id/textViewDate"/>
-
         <TextView
             android:id="@+id/textViewDes"
             android:layout_width="match_parent"
@@ -53,7 +44,7 @@
             android:text="Mô tả"
             android:textSize="15dp"
             android:layout_margin="10dp"
-            android:layout_below="@+id/imageViewEvent"/>
+            android:layout_below="@+id/textViewDate"/>
 
         <View
             android:id="@+id/line"
