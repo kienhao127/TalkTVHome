@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.support.v4.app.Fragment;
 
 import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
 
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 public class OpenRoomActivity extends AppCompatActivity {
     ImageView imageView;
     boolean isLayoutGone = true;
+    boolean isMessShowed = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -34,6 +39,16 @@ public class OpenRoomActivity extends AppCompatActivity {
             int offlineVideoID = intent.getIntExtra("OfflineVideoID", -1);
             textView.setText("Offline Video ID = " + String.valueOf(offlineVideoID));
         }
+
+        findViewById(R.id.relativeLayout).setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
+                }
+            }
+        });
 
         imageView = (ImageView) findViewById(R.id.messageShow);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -53,18 +68,14 @@ public class OpenRoomActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Create a new Fragment to be placed in the activity layout
-                    MessageFragment messFragment = new MessageFragment("Tin nhắn", true);
-
-                    // In case this activity was started with special instructions from an
-                    // Intent, pass the Intent's extras to the fragment as arguments
-                    messFragment.setArguments(getIntent().getExtras());
-
                     // Add the fragment to the 'fragment_container' FrameLayout
+                    ChatFragment chatFragment = new ChatFragment("Tên user", 1);
                     getSupportFragmentManager().beginTransaction()
-                            .add(R.id.fragment_container, messFragment)
+                            .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
+                            .add(R.id.fragment_container, chatFragment)
                             .addToBackStack(null)
                             .commit();
+                    isMessShowed = false;
                 }
             }
         });
@@ -72,9 +83,18 @@ public class OpenRoomActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        FragmentManager fm = getFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStack();
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+            if (!isMessShowed){
+                MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
+                        .add(R.id.fragment_container, messFragment)
+                        .addToBackStack(null)
+                        .commit();
+                isMessShowed =true;
+            }
         } else {
             super.onBackPressed();
         }

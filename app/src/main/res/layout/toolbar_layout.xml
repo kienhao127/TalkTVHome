@@ -8,7 +8,7 @@
     android:background="?attr/colorPrimary"
     android:elevation="4dp"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-        <TextView
+        <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

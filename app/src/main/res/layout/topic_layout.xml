@@ -9,7 +9,7 @@
         android:layout_height="50dp"
         android:src="@drawable/horlist_item_logo"
         android:layout_marginRight="15dp"/>
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textViewName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,7 +19,7 @@
         android:text="Tên user"
         android:textColor="#000000"
         />
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textViewLastMess"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:layout_below="@+id/textViewName"
         android:textSize="15dp"
         android:text="Nội dung message"/>
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textViewDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

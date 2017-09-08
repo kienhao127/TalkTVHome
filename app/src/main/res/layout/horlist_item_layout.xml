@@ -9,7 +9,7 @@
         android:layout_gravity="center"
         android:src="@drawable/horlist_item_logo"/>
 
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

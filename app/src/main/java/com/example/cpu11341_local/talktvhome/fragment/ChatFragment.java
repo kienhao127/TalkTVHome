@@ -8,11 +8,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.support.v4.app.Fragment;
 
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
  * Created by CPU11341-local on 9/5/2017.
  */
 
-public class ChatFragment extends android.support.v4.app.Fragment {
+public class ChatFragment extends Fragment {
 
     RecyclerView messDetailRecyclerView;
     MessageDetailRecyclerAdapter adapter;
@@ -102,12 +104,20 @@ public class ChatFragment extends android.support.v4.app.Fragment {
         });
 
         messDetailRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessDetail);
+        messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                hideKeyboard(v);
+                return false;
+            }
+        });
+
         adapter = new MessageDetailRecyclerAdapter(getContext(), getMessageDetail(senderID));
 
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         messDetailRecyclerView.setAdapter(adapter);
-
+        messDetailRecyclerView.scrollToPosition(messDetailRecyclerView.getAdapter().getItemCount()-1);
         return view;
     }
 

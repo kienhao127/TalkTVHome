@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="#e5e5e5">
 
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textViewTitle"
         android:layout_width="match_parent"
         android:layout_height="30dp"

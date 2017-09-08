@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp">
-    <TextView
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:gravity="center_horizontal"
         android:id="@+id/textViewDateTime"
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
     <RelativeLayout android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_corner">
-        <TextView
+        <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@id/textViewTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +26,7 @@
             android:textColor="#000000"
             android:textSize="20dp"/>
 
-        <TextView
+        <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             android:src="@drawable/nobanner"
             android:layout_below="@+id/textViewDate"/>
 
-        <TextView
+        <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewDes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
             android:layout_marginBottom="5dp"
             android:layout_below="@+id/textViewDes"/>
 
-        <TextView
+        <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewViewDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

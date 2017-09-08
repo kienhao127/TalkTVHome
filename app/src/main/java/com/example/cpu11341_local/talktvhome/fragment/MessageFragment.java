@@ -2,6 +2,8 @@ package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,10 +33,12 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     String toolbarTitle;
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
+    String activityName;
 
-    public MessageFragment(String toolbarTitle, boolean isFollow) {
+    public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
         this.isFollow = isFollow;
+        this.activityName = activityName;
     }
 
 //    private String loadJSONFromAsset() {
@@ -161,21 +165,30 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                     case 1:
                     case 3:
                         ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
-                        getFragmentManager()
-                                .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                                .replace(R.id.fragment_container, chatFragment)
+
+                        FragmentTransaction Chatft = getFragmentManager().beginTransaction();
+                        if (activityName.equals(getActivity().getPackageName() + ".MessageActivity")){
+                            Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                        } else {
+                            Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                        }
+                        Chatft.add(R.id.fragment_container, chatFragment)
                                 .addToBackStack(null)
                                 .commit();
                         break;
                     case 2:
-                        MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false);
-                        getFragmentManager()
-                                .beginTransaction()
-                                .setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right)
-                                .replace(R.id.fragment_container, messageFragment)
-                                .addToBackStack(null)
-                                .commit();
+
+                        MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        if (activityName.equals(getActivity().getPackageName() + ".MessageActivity")){
+                            ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                        } else {
+                            ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                        }
+                        ft.add(R.id.fragment_container, messageFragment)
+                            .addToBackStack(null)
+                            .commit();
+
                         break;
                 }
             }
