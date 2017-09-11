@@ -8,13 +8,11 @@ public class User {
     String avatar;
     int id;
     String name;
-    boolean isFollow;
 
-    public User(int id, String avatar, String name, boolean isFollow) {
+    public User(int id, String avatar, String name) {
         this.avatar = avatar;
         this.id = id;
         this.name = name;
-        this.isFollow = isFollow;
     }
 
     public String getAvatar() {
@@ -27,9 +25,5 @@ public class User {
 
     public String getName() {
         return name;
-    }
-
-    public boolean isFollow() {
-        return isFollow;
     }
 }

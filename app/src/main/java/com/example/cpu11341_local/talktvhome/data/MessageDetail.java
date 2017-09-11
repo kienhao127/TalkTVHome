@@ -11,24 +11,24 @@ public class MessageDetail {
     String title;
     String datetime;
     String imageURL;
-    String description;
+    String text;
     int action_type; //1: go web, 2: go room
     String action_title;
     String action_extra;
-    String message;
+    boolean isWarning;
 
     public MessageDetail(){
 
     }
 
     //Event
-    public MessageDetail(int type, int id, User user, String title, String datetime, String imageURL, String description, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, int id, User user, String title, String datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
         this.id = id;
         this.user = user;
         this.title = title;
         this.datetime = datetime;
         this.imageURL = imageURL;
-        this.description = description;
+        this.text = text;
         this.action_type = action_type;
         this.action_title = action_title;
         this.action_extra = action_extra;
@@ -36,12 +36,12 @@ public class MessageDetail {
     }
 
     //Remind
-    public MessageDetail(int type, int id, User user, String title, String datetime, String description, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, int id, User user, String title, String datetime, String text, int action_type, String action_title, String action_extra) {
         this.id = id;
         this.user = user;
         this.title = title;
         this.datetime = datetime;
-        this.description = description;
+        this.text = text;
         this.action_type = action_type;
         this.action_title = action_title;
         this.action_extra = action_extra;
@@ -49,12 +49,13 @@ public class MessageDetail {
     }
 
     //Message
-    public MessageDetail(int type, int id, User user, String datetime, String message) {
+    public MessageDetail(int type, int id, User user, String datetime, String text, boolean isWarning) {
         this.id = id;
         this.user = user;
         this.datetime = datetime;
-        this.message = message;
+        this.text = text;
         this.type = type;
+        this.isWarning = isWarning;
     }
 
     public int getId() {
@@ -77,8 +78,8 @@ public class MessageDetail {
         return imageURL;
     }
 
-    public String getDescription() {
-        return description;
+    public String getText() {
+        return text;
     }
 
     public int getAction_type() {
@@ -93,12 +94,12 @@ public class MessageDetail {
         return action_extra;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public int getType() {
         return type;
+    }
+
+    public boolean isWarning() {
+        return isWarning;
     }
 
     public void setType(int type) {
@@ -125,8 +126,8 @@ public class MessageDetail {
         this.imageURL = imageURL;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public void setAction_type(int action_type) {
@@ -141,7 +142,7 @@ public class MessageDetail {
         this.action_extra = action_extra;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setWarning(boolean warning) {
+        isWarning = warning;
     }
 }

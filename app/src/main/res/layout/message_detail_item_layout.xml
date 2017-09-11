@@ -35,5 +35,13 @@
             android:layout_toEndOf="@+id/imageViewAvatar"
             android:layout_marginLeft="5dp"
             android:padding="7dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewWarningDot"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/textViewMessDetail"
+            android:layout_marginLeft="5dp"/>
     </RelativeLayout>
 </LinearLayout>

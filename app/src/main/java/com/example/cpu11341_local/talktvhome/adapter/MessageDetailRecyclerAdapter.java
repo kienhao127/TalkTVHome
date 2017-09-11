@@ -1,6 +1,7 @@
 package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +65,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.errorOf(R.drawable.grid_item
                         ))
                         .into(eventHolder.imageViewEvent);
-                eventHolder.textViewDes.setText(arrMessDetail.get(position).getDescription());
+                eventHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 eventHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
             case 2:
@@ -72,7 +73,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 remindHolder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
                 remindHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
                 remindHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
-                remindHolder.textViewDes.setText(arrMessDetail.get(position).getDescription());
+                remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
             default:
@@ -83,8 +84,11 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.errorOf(R.drawable.grid_item))
                         .apply(RequestOptions.circleCropTransform())
                         .into(messageHolder.imageViewAvatar);
-                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getMessage());
+                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                if (arrMessDetail.get(position).isWarning()){
+                    messageHolder.imageViewWarningDot.setImageResource(R.drawable.warning_dot);
+                }
                 break;
         }
     }
@@ -142,12 +146,13 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         ImageView imageViewAvatar;
         TextView textViewMessDetail;
         TextView textViewDate;
-
+        ImageView imageViewWarningDot;
         public MessageHolder(View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
+            imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
         }
     }
 }

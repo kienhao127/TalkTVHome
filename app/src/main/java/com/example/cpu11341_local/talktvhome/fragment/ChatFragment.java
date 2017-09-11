@@ -3,6 +3,7 @@ package com.example.cpu11341_local.talktvhome.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
@@ -47,31 +49,6 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        arrMessDetail.add(new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
-                "Tên event 1", "17/08/25 09:47:02", "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra"));
-        arrMessDetail.add(new MessageDetail(2, 2, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
-                "Nhắc nhở 1", "17/09/25 09:47:02", "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra"));
-        arrMessDetail.add(new MessageDetail(3, 3, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", true),
-                "18/08/25 10:47:03", "Nội dung thông báo"));
-
-        arrMessDetail.add(new MessageDetail(3, 1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi" , true),
-                "18/08/25 10:47:03", "Xin chào"));
-        arrMessDetail.add(new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi" , true),
-                "18/08/25 11:47:04", "Tôi là Thúy Chi"));
-
-        arrMessDetail.add(new MessageDetail(3, 1, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady" , false),
-                "19/08/25 12:47:05", "Tôi là Trang Lady"));
-    }
-
-    ArrayList<MessageDetail> getMessageDetail(int senderID){
-        ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
-        for (MessageDetail messageDetail : arrMessDetail){
-            if (messageDetail.getUser().getId() == senderID){
-                arrMessageDetailOfSender.add(messageDetail);
-            }
-        }
-        return arrMessageDetailOfSender;
     }
 
     @Override
@@ -112,7 +89,7 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        adapter = new MessageDetailRecyclerAdapter(getContext(), getMessageDetail(senderID));
+        adapter = new MessageDetailRecyclerAdapter(getContext(), MessageDataManager.getInstance().getListMessage(senderID));
 
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);

@@ -137,12 +137,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setTitle(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TITLE)));
                 messageDetail.setDatetime(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TIMEOFMESS)));
                 messageDetail.setImageURL(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_IMAGEURL)));
-                messageDetail.setDescription(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
+                messageDetail.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
                 messageDetail.setAction_type(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTYPE)));
                 messageDetail.setAction_title(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTITLE)));
                 messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
                 messageDetail.setType(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_TYPE)));
-                messageDetail.setMessage(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_MESSAGE)));
 
                 //getting user hobby where id = id from user_hobby table
 //                String selectHobbyQuery = "SELECT  * FROM " + TABLE_USER_HOBBY +" WHERE "+KEY_ID+" = "+ userModel.getId();

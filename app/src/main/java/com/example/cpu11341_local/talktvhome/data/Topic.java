@@ -11,14 +11,21 @@ public class Topic {
     String date;
     int action_type; //1: system, 2: not follow, 3: Chat
     int userId;
+    boolean hasNewMessage;
 
-    public Topic(String avatar, String name, String lastMess, String date, int action_type, int userId) {
+    public Topic(String avatar, String name, String lastMess, String date, int action_type, int userId, boolean hasNewMessage) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
         this.date = date;
         this.action_type = action_type;
         this.userId = userId;
+        this.hasNewMessage = hasNewMessage;
+    }
+
+
+    public boolean isHasNewMessage() {
+        return hasNewMessage;
     }
 
     public String getAvatar() {
@@ -43,5 +50,13 @@ public class Topic {
 
     public int getUserId() {
         return userId;
+    }
+
+    public void setHasNewMessage(boolean hasNewMessage) {
+        this.hasNewMessage = hasNewMessage;
+    }
+
+    public void setLastMess(String lastMess) {
+        this.lastMess = lastMess;
     }
 }

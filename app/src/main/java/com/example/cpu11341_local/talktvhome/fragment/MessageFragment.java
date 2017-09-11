@@ -1,20 +1,24 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
-import com.example.cpu11341_local.talktvhome.adapter.MessageRecyclerAdapter;
+import com.example.cpu11341_local.talktvhome.adapter.TopicRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 
 import java.util.ArrayList;
@@ -26,7 +30,7 @@ import java.util.ArrayList;
 public class MessageFragment extends android.support.v4.app.Fragment {
 
     RecyclerView messRecyclerView;
-    MessageRecyclerAdapter adapter;
+    TopicRecyclerAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     Toolbar toolbar;
     TextView mTitle;
@@ -34,6 +38,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
+    MessageDataManager messageDataManager = MessageDataManager.getInstance();
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -116,23 +121,11 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrTopic = getListTopic(isFollow);
-    }
-
-    ArrayList<Topic> getListTopic(boolean isFollow){
-        ArrayList<Topic> arrListTopic = new ArrayList<>();
-        if (isFollow){
-            arrListTopic.add( new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Tin nhắn cuối cùng", "Hôm qua", 1, 0));
-            arrListTopic.add( new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", "Tên người dùng: tin nhắn cuối cùng", "Hôm qua", 2, -1));
-            arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tin nhắn cuối cùng", "Hôm qua", 3, 1));
-        } else {
-            arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady", "Tin nhắn cuối cùng", "Hôm qua", 3, 2));
-        }
-        return arrListTopic;
+        arrTopic = messageDataManager.getListTopic(isFollow);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.message_fragment,container,false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -151,19 +144,20 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         });
 
         messRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
-        adapter = new MessageRecyclerAdapter(getContext(), arrTopic);
+        adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
 
         layoutManager = new LinearLayoutManager(getContext());
         messRecyclerView.setLayoutManager(layoutManager);
         messRecyclerView.setAdapter(adapter);
-
-        adapter.SetOnItemClickListener(new MessageRecyclerAdapter.OnItemClickListener(){
+        adapter.notifyItemChanged(2);
+        adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int position) {
 
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:
+                        arrTopic.get(position).setHasNewMessage(false);
                         ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
 
                         FragmentTransaction Chatft = getFragmentManager().beginTransaction();
@@ -194,5 +188,10 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
         });
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

@@ -19,28 +19,28 @@ import java.util.ArrayList;
  * Created by CPU11341-local on 9/1/2017.
  */
 
-public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecyclerAdapter.RecyclerViewHolder> {
+public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdapter.RecyclerViewHolder> {
 
     private Context context;
     private OnItemClickListener mItemClickListener;
     ArrayList<Topic> arrTopic = new ArrayList<>();
 
-    public MessageRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
+    public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
         this.context = context;
         this.arrTopic = arrTopic;
     }
 
 
     @Override
-    public MessageRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TopicRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic_layout,parent,false);
 
-        MessageRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new MessageRecyclerAdapter.RecyclerViewHolder(view);
+        TopicRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new TopicRecyclerAdapter.RecyclerViewHolder(view);
         return recyclerViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(MessageRecyclerAdapter.RecyclerViewHolder holder, final int position) {
+    public void onBindViewHolder(TopicRecyclerAdapter.RecyclerViewHolder holder, final int position) {
         Glide.with(context)
                 .load(arrTopic.get(position).getAvatar())
                 .apply(RequestOptions.circleCropTransform())
@@ -52,13 +52,16 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
         holder.textViewName.setText(arrTopic.get(position).getName());
         holder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
         holder.textViewDate.setText(arrTopic.get(position).getDate());
+        if (arrTopic.get(position).isHasNewMessage()){
+            holder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
+        }
     }
 
     public interface OnItemClickListener {
         public void onItemClick(View view, int position);
     }
 
-    public void SetOnItemClickListener(final MessageRecyclerAdapter.OnItemClickListener mItemClickListener) {
+    public void SetOnItemClickListener(final TopicRecyclerAdapter.OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
     }
 
@@ -72,6 +75,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
         TextView textViewName;
         TextView textViewLastMess;
         TextView textViewDate;
+        ImageView imageViewUnreadDot;
 
         public RecyclerViewHolder(View view){
             super(view);
@@ -79,6 +83,7 @@ public class MessageRecyclerAdapter extends RecyclerView.Adapter<MessageRecycler
             textViewName = (TextView) view.findViewById(R.id.textViewName);
             textViewLastMess = (TextView) view.findViewById(R.id.textViewLastMess);
             textViewDate = (TextView) view.findViewById(R.id.textViewDate);
+            imageViewUnreadDot = (ImageView) view.findViewById(R.id.imageViewUnreadDot);
             view.setOnClickListener(this);
         }
 

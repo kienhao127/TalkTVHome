@@ -3,6 +3,7 @@ package com.example.cpu11341_local.talktvhome;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,7 +16,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.TabData;
+import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.fragment.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +50,18 @@ public class MainActivity extends AppCompatActivity {
 
         mTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        final MessageDetail messageDetail = new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
+                "18/08/25 11:47:04", "Tin nhắn cuối cùng của Thúy Chi", false);
+        final Handler handler = new Handler();
+        final int delay = 10000; //milliseconds
+
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                MessageDataManager.getInstance().insertMessage(messageDetail);
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+
 
     }
 
