@@ -5,7 +5,7 @@ package com.example.cpu11341_local.talktvhome.data;
  */
 
 public class MessageDetail {
-    int type; //1: event, 2: remind, 3: message
+    int type; //1: event, 2: remind, 3: message, 4:my message
     int id;
     User user;
     String title;

@@ -44,11 +44,6 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        fragTransaction.detach(currentFragment);
-        fragTransaction.attach(currentFragment);
-        fragTransaction.commit();
         overridePendingTransition(0, R.anim.exit_to_right);
     }
 }

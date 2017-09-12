@@ -45,8 +45,11 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             case 2:{
                 return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
             }
-            default:{
+            case 3:{
                 return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
+            }
+            default:{
+                return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
             }
         }
     }
@@ -76,7 +79,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
-            default:
+            case 3:
                 MessageHolder messageHolder = (MessageHolder) holder;
                 Glide.with(context)
                         .load(arrMessDetail.get(position).getUser().getAvatar())
@@ -86,10 +89,27 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .into(messageHolder.imageViewAvatar);
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
-                if (arrMessDetail.get(position).isWarning()){
-                    messageHolder.imageViewWarningDot.setImageResource(R.drawable.warning_dot);
+                if (arrMessDetail.get(position).isWarning()) {
+                    messageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }
+                messageHolder.setIsRecyclable(false);
                 break;
+            default:
+                MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
+                Glide.with(context)
+                        .load(arrMessDetail.get(position).getUser().getAvatar())
+                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                        .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(myMessageHolder.imageViewAvatar);
+                myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                myMessageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                if (arrMessDetail.get(position).isWarning()) {
+                    myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
+                }
+                myMessageHolder.setIsRecyclable(false);
+                break;
+
         }
     }
 
@@ -148,6 +168,20 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         TextView textViewDate;
         ImageView imageViewWarningDot;
         public MessageHolder(View view){
+            super(view);
+            imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
+            textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
+            textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
+            imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
+        }
+    }
+
+    public class MyMessageHolder extends EventHolder {
+        ImageView imageViewAvatar;
+        TextView textViewMessDetail;
+        TextView textViewDate;
+        ImageView imageViewWarningDot;
+        public MyMessageHolder(View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);

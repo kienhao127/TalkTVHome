@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,7 +46,7 @@ public class OpenRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    getSupportFragmentManager().popBackStack();
+                    OpenRoomActivity.this.onBackPressed();
                 }
             }
         });
@@ -83,25 +84,19 @@ public class OpenRoomActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        if (!isMessShowed) {
             getSupportFragmentManager().popBackStack();
-            if (!isMessShowed){
-                MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
-                        .add(R.id.fragment_container, messFragment)
-                        .addToBackStack(null)
-                        .commit();
-                isMessShowed =true;
-            }
+
+            MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
+                    .add(R.id.fragment_container, messFragment)
+                    .addToBackStack(null)
+                    .commit();
+            isMessShowed = true;
         } else {
             super.onBackPressed();
         }
     }
-
-    public static float pxFromDp(final Context context, final float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
-    }
-
 }

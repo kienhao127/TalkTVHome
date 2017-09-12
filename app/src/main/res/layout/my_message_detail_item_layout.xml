@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="5dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1">
     <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:gravity="center_horizontal"
         android:id="@+id/textViewDateTime"
@@ -13,46 +14,50 @@
         android:layout_margin="10dp"/>
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp">
+        android:layout_marginLeft="5dp"
+        android:layout_weight="0.68">
 
         <ImageView
             android:id="@+id/imageViewAvatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/horlist_item_logo" />
+            android:src="@drawable/horlist_item_logo"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_corner"
-            android:text="Nội dung tin nhắn"
-            android:textColor="#000"
-            android:padding="7dp"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/imageViewMessageboxArrow" />
+            android:layout_toLeftOf="@+id/imageViewMessageboxArrow"
+            android:background="@drawable/my_message_box"
+            android:padding="7dp"
+            android:text="Nội dung tin nhắn"
+            android:textColor="#FFF" />
 
         <ImageView
             android:id="@+id/imageViewWarningDot"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/textViewMessDetail"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/textViewMessDetail"
             android:src="@drawable/warning_dot"
-            android:visibility="invisible"
-            android:layout_marginLeft="5dp"/>
+            android:visibility="invisible" />
 
         <ImageView
+            android:id="@+id/imageViewMessageboxArrow"
             android:layout_width="10dp"
             android:layout_height="10dp"
-            android:src="@drawable/messagebox_arrow"
-            android:id="@+id/imageViewMessageboxArrow"
+            android:src="@drawable/my_messagebox_arrow"
             android:layout_marginTop="20dp"
-            android:layout_toRightOf="@+id/imageViewAvatar"
-            android:layout_toEndOf="@+id/imageViewAvatar"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp" />
+            android:layout_toLeftOf="@+id/imageViewAvatar"
+            android:layout_toStartOf="@+id/imageViewAvatar"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp" />
     </RelativeLayout>
 </LinearLayout>

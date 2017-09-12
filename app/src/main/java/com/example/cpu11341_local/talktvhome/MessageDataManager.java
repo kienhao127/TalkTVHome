@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class MessageDataManager {
     ArrayList<Topic> arrListTopic = new ArrayList<>();
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
+    DataListener dataListener;
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() {
@@ -33,7 +34,7 @@ public class MessageDataManager {
         arrMessDetail.add(new MessageDetail(3, 1, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
                 "19/08/25 12:47:05", "Tôi là Trang Lady", false));
 
-        arrListTopic.add( new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Tin nhắn cuối cùng", "Hôm qua", 1, 0, true));
+        arrListTopic.add( new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Tin nhắn cuối cùng", "Hôm qua", 1, 0, false));
         arrListTopic.add( new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", "Tên người dùng: tin nhắn cuối cùng", "Hôm qua", 2, -1, false));
         arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tin nhắn cuối cùng", "Hôm qua", 3, 1, false));
         arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady", "Tin nhắn cuối cùng", "Hôm qua", 3, 2, true));
@@ -41,6 +42,7 @@ public class MessageDataManager {
 
     public static MessageDataManager getInstance() {
         if(instance == null) {
+            Log.i("ASDSA", "ASD");
             instance = new MessageDataManager();
         }
         return instance;
@@ -77,17 +79,29 @@ public class MessageDataManager {
 
     public boolean insertMessage(MessageDetail messageDetail){
         arrMessDetail.add(messageDetail);
-        updateTopic(messageDetail.getUser().getId(), messageDetail.getText());
+        updateTopic(messageDetail.getUser().getId(), messageDetail);
+        if (dataListener!=null){
+            dataListener.onDataChanged();
+        }
         return true;
     }
 
-    public boolean updateTopic(int senderID, String lastMess){
+    public boolean updateTopic(int senderID, MessageDetail messageDetail){
         for(Topic topic:arrListTopic){
             if (topic.getUserId() == senderID){
-                topic.setLastMess(lastMess);
+                topic.setLastMess(messageDetail.getText());
+                topic.setDate(messageDetail.getDatetime());
                 topic.setHasNewMessage(true);
             }
         }
         return true;
+    }
+
+    public interface DataListener{
+        void onDataChanged();
+    }
+
+    public void setDataListener(DataListener dataListener) {
+        this.dataListener = dataListener;
     }
 }

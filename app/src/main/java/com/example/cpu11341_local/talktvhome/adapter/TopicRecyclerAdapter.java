@@ -1,7 +1,9 @@
 package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +56,11 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
         holder.textViewDate.setText(arrTopic.get(position).getDate());
         if (arrTopic.get(position).isHasNewMessage()){
             holder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
+            holder.textViewDate.setTypeface(null, Typeface.BOLD);
+            holder.textViewLastMess.setTypeface(null, Typeface.BOLD);
+            holder.textViewName.setTypeface(null, Typeface.BOLD);
         }
+        holder.setIsRecyclable(false);
     }
 
     public interface OnItemClickListener {

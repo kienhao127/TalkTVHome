@@ -3,6 +3,7 @@ package com.example.cpu11341_local.talktvhome.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 
 public class MessageFragment extends android.support.v4.app.Fragment {
 
-    RecyclerView messRecyclerView;
+    RecyclerView topicRecyclerView;
     TopicRecyclerAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     Toolbar toolbar;
@@ -38,7 +39,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
-    MessageDataManager messageDataManager = MessageDataManager.getInstance();
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -121,7 +121,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrTopic = messageDataManager.getListTopic(isFollow);
+        arrTopic = MessageDataManager.getInstance().getListTopic(isFollow);
     }
 
     @Override
@@ -143,21 +143,32 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        messRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
+        topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
         adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
 
         layoutManager = new LinearLayoutManager(getContext());
-        messRecyclerView.setLayoutManager(layoutManager);
-        messRecyclerView.setAdapter(adapter);
-        adapter.notifyItemChanged(2);
+        topicRecyclerView.setLayoutManager(layoutManager);
+        topicRecyclerView.setAdapter(adapter);
+        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged() {
+                arrTopic.clear();
+                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+                if (adapter!=null){
+                    adapter.notifyDataSetChanged();
+                    topicRecyclerView.scrollToPosition(arrTopic.size()-1);
+                }
+            }
+        });
+        topicRecyclerView.scrollToPosition(adapter.getItemCount()-1);
+
         adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int position) {
-
+                arrTopic.get(position).setHasNewMessage(false);
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:
-                        arrTopic.get(position).setHasNewMessage(false);
                         ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
 
                         FragmentTransaction Chatft = getFragmentManager().beginTransaction();
@@ -171,7 +182,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                                 .commit();
                         break;
                     case 2:
-
                         MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
                         if (activityName.equals(getActivity().getPackageName() + ".MessageActivity")){

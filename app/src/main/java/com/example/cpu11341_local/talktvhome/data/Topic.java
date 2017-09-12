@@ -59,4 +59,8 @@ public class Topic {
     public void setLastMess(String lastMess) {
         this.lastMess = lastMess;
     }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
 }
