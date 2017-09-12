@@ -1,8 +1,12 @@
 package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.net.ParseException;
 import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,7 @@ import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by CPU11341-local on 9/5/2017.
@@ -56,6 +61,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
 
     @Override
     public void onBindViewHolder(EventHolder holder, final int position) {
+        DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
@@ -88,7 +94,13 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.circleCropTransform())
                         .into(messageHolder.imageViewAvatar);
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
-                messageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                try {
+                    Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
+                    String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
+                    messageHolder.textViewDate.setText(strDatetime);
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                }
                 if (arrMessDetail.get(position).isWarning()) {
                     messageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }
@@ -103,7 +115,13 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.circleCropTransform())
                         .into(myMessageHolder.imageViewAvatar);
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
-                myMessageHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                try {
+                    Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
+                    String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
+                    myMessageHolder.textViewDate.setText(strDatetime);
+                } catch (java.text.ParseException e) {
+                    e.printStackTrace();
+                }
                 if (arrMessDetail.get(position).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }

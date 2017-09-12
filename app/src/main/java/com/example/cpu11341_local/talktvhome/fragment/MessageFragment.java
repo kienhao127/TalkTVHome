@@ -39,6 +39,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
+    MessageDataManager.TopicDataListener topicDataListener;
+    MessageDataManager.UnfollowTopicDataListener unFollowTopicDataListener;
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -122,6 +124,31 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         arrTopic = MessageDataManager.getInstance().getListTopic(isFollow);
+        if (isFollow){
+            topicDataListener = new MessageDataManager.TopicDataListener() {
+                @Override
+                public void onDataChanged() {
+                    arrTopic.clear();
+                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+                    if (adapter!=null){
+                        adapter.notifyDataSetChanged();
+                        topicRecyclerView.scrollToPosition(arrTopic.size()-1);
+                    }
+                }
+            };
+        } else {
+            unFollowTopicDataListener = new MessageDataManager.UnfollowTopicDataListener() {
+                @Override
+                public void onDataChanged() {
+                    arrTopic.clear();
+                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+                    if (adapter!=null){
+                        adapter.notifyDataSetChanged();
+                        topicRecyclerView.scrollToPosition(arrTopic.size()-1);
+                    }
+                }
+            };
+        }
     }
 
     @Override
@@ -149,23 +176,19 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         topicRecyclerView.setLayoutManager(layoutManager);
         topicRecyclerView.setAdapter(adapter);
-        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-            @Override
-            public void onDataChanged() {
-                arrTopic.clear();
-                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-                if (adapter!=null){
-                    adapter.notifyDataSetChanged();
-                    topicRecyclerView.scrollToPosition(arrTopic.size()-1);
-                }
-            }
-        });
+
+        if (isFollow){
+            MessageDataManager.getInstance().setTopicDataListener(topicDataListener);
+        } else {
+            MessageDataManager.getInstance().setUnfollowTopicDataListener(unFollowTopicDataListener);
+        }
         topicRecyclerView.scrollToPosition(adapter.getItemCount()-1);
 
         adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int position) {
                 arrTopic.get(position).setHasNewMessage(false);
+                adapter.notifyDataSetChanged();
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:

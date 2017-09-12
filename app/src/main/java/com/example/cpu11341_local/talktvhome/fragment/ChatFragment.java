@@ -104,7 +104,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 MessageDetail messageDetail = new MessageDetail(4, 1, new User(1, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
                         date , editText.getText().toString(), false);
-                MessageDataManager.getInstance().insertMessage(messageDetail);
+                MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
                 editText.setText("");
             }
         });
@@ -154,5 +154,10 @@ public class ChatFragment extends Fragment {
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 }

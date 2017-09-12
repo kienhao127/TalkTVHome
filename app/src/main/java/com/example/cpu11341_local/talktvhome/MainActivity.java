@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
                 MessageDetail messageDetail = new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
                         date, String.valueOf(r.nextInt(100)), false);
-                MessageDataManager.getInstance().insertMessage(messageDetail);
+                MessageDataManager.getInstance().insertMessage(messageDetail, getBaseContext());
                 handler.postDelayed(this, delay);
             }
         }, delay);

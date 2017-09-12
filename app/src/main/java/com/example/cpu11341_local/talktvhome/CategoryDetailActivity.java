@@ -1,5 +1,9 @@
 package com.example.cpu11341_local.talktvhome;
 
+/**
+ * Created by CPU11341-local on 9/1/2017.
+ */
+
 import android.app.Fragment;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +32,4 @@ public class CategoryDetailActivity extends AppCompatActivity {
         textView.setText(pageUrl);
     }
 
-    /**
-     * Created by CPU11341-local on 9/1/2017.
-     */
 }
