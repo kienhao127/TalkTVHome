@@ -1,5 +1,7 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.TopicRecyclerAdapter;
@@ -39,8 +42,9 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
-    MessageDataManager.TopicDataListener topicDataListener;
-    MessageDataManager.UnfollowTopicDataListener unFollowTopicDataListener;
+    MessageDataManager.DataListener dataListener;
+    FragmentManager.OnBackStackChangedListener onBackStackChangedListener;
+    Activity mActivity;
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -124,31 +128,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         arrTopic = MessageDataManager.getInstance().getListTopic(isFollow);
-        if (isFollow){
-            topicDataListener = new MessageDataManager.TopicDataListener() {
-                @Override
-                public void onDataChanged() {
-                    arrTopic.clear();
-                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-                    if (adapter!=null){
-                        adapter.notifyDataSetChanged();
-                        topicRecyclerView.scrollToPosition(arrTopic.size()-1);
-                    }
-                }
-            };
-        } else {
-            unFollowTopicDataListener = new MessageDataManager.UnfollowTopicDataListener() {
-                @Override
-                public void onDataChanged() {
-                    arrTopic.clear();
-                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-                    if (adapter!=null){
-                        adapter.notifyDataSetChanged();
-                        topicRecyclerView.scrollToPosition(arrTopic.size()-1);
-                    }
-                }
-            };
-        }
+
     }
 
     @Override
@@ -177,37 +157,53 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         topicRecyclerView.setLayoutManager(layoutManager);
         topicRecyclerView.setAdapter(adapter);
 
-        if (isFollow){
-            MessageDataManager.getInstance().setTopicDataListener(topicDataListener);
-        } else {
-            MessageDataManager.getInstance().setUnfollowTopicDataListener(unFollowTopicDataListener);
-        }
         topicRecyclerView.scrollToPosition(adapter.getItemCount()-1);
+
+        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged() {
+                arrTopic.clear();
+                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+                if (adapter!=null){
+                    adapter.notifyDataSetChanged();
+                    topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
+                }
+            }
+        });
+
 
         adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view, int position) {
                 arrTopic.get(position).setHasNewMessage(false);
                 adapter.notifyDataSetChanged();
+                getActivity().getSupportFragmentManager().addOnBackStackChangedListener( new FragmentManager.OnBackStackChangedListener() {
+                    @Override
+                    public void onBackStackChanged() {
+                        Log.i("Count", String.valueOf(getActivity()));
+                        if (getActivity().getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                            onResume();
+                        }
+                    }
+                });
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:
                         ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
-
-                        FragmentTransaction Chatft = getFragmentManager().beginTransaction();
-                        if (activityName.equals(getActivity().getPackageName() + ".MessageActivity")){
+                        FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
+                        if (getActivity() instanceof MessageActivity){
                             Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
                         } else {
                             Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
                         }
-                        Chatft.add(R.id.fragment_container, chatFragment)
+                        Chatft.add(R.id.fragment_container, chatFragment, "ChatFragment")
                                 .addToBackStack(null)
                                 .commit();
                         break;
                     case 2:
                         MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        if (activityName.equals(getActivity().getPackageName() + ".MessageActivity")){
+                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        if (getActivity() instanceof MessageActivity){
                             ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
                         } else {
                             ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
@@ -226,5 +222,32 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        arrTopic.clear();
+        arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+        if (adapter!=null){
+            adapter.notifyDataSetChanged();
+            topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
+        }
+        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged() {
+                arrTopic.clear();
+                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
+                if (adapter!=null){
+                    adapter.notifyDataSetChanged();
+                    topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (context instanceof Activity){
+            mActivity =(Activity) context;
+        }
+
     }
 }

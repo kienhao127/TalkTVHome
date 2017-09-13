@@ -1,10 +1,12 @@
 package com.example.cpu11341_local.talktvhome;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
@@ -32,10 +34,6 @@ public class MessageActivity extends AppCompatActivity {
             // Create a new Fragment to be placed in the activity layout
             MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
 
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
-            messFragment.setArguments(getIntent().getExtras());
-
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_container, messFragment)
@@ -45,7 +43,12 @@ public class MessageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+            getSupportFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
         overridePendingTransition(0, R.anim.exit_to_right);
     }
 }

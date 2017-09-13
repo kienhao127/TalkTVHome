@@ -60,11 +60,23 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Handler handler = new Handler();
-        final int delay = 10000; //milliseconds
+        final int delay = 3000; //milliseconds
+
+//        handler.postDelayed(new Runnable(){
+//            public void run(){
+//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+//                String date = df.format(Calendar.getInstance().getTime());
+//
+//                MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
+//                        date, String.valueOf(r.nextInt(100)), false);
+//                MessageDataManager.getInstance().insertMessage(messageDetail, getBaseContext());
+//                handler.postDelayed(this, delay);
+//            }
+//        }, delay);
 
         handler.postDelayed(new Runnable(){
             public void run(){
-                DateFormat df = new SimpleDateFormat("d/MM/yy HH:mm:ss");
+                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
                 String date = df.format(Calendar.getInstance().getTime());
 
                 MessageDetail messageDetail = new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),

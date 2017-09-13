@@ -22,8 +22,6 @@ public class MessageDataManager {
     ArrayList<Topic> arrListTopic = new ArrayList<>();
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     DataListener dataListener;
-    TopicDataListener topicDataListener;
-    UnfollowTopicDataListener unfollowTopicDataListener;
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
 
     private static MessageDataManager instance = null;
@@ -110,8 +108,6 @@ public class MessageDataManager {
     }
 
     public boolean updateTopic(int senderID, MessageDetail messageDetail, Context context){
-
-
         for(Topic topic:arrListTopic){
             if (topic.getUserId() == senderID){
                 topic.setLastMess(messageDetail.getText());
@@ -125,12 +121,6 @@ public class MessageDataManager {
                 topic.setHasNewMessage(true);
             }
         }
-        if (unfollowTopicDataListener!=null){
-            unfollowTopicDataListener.onDataChanged();
-        }
-        if (topicDataListener != null){
-            topicDataListener.onDataChanged();
-        }
         return true;
     }
 
@@ -138,23 +128,8 @@ public class MessageDataManager {
         void onDataChanged();
     }
 
-    public interface TopicDataListener{
-        void onDataChanged();
-    }
-
-    public interface UnfollowTopicDataListener{
-        void onDataChanged();
-    }
-
     public void setDataListener(DataListener dataListener) {
         this.dataListener = dataListener;
     }
 
-    public void setTopicDataListener(TopicDataListener topicDataListener) {
-        this.topicDataListener = topicDataListener;
-    }
-
-    public void setUnfollowTopicDataListener(UnfollowTopicDataListener unfollowTopicDataListener) {
-        this.unfollowTopicDataListener = unfollowTopicDataListener;
-    }
 }

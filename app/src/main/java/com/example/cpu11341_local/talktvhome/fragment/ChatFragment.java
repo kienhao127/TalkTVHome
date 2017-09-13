@@ -48,6 +48,7 @@ public class ChatFragment extends Fragment {
     String toolbarTitle;
     int senderID;
     TalkTextView talkTextViewSend;
+    MessageDataManager.DataListener dataListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
 
     public ChatFragment(String toolbarTitle, int senderID) {
@@ -58,6 +59,19 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("Create view", "Chat Fragment");
+        dataListener = new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged() {
+                arrMessDetail.clear();
+                arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+                if (adapter!=null){
+                    adapter.notifyDataSetChanged();
+                    messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size()-1);
+                }
+            }
+        };
+        MessageDataManager.getInstance().setDataListener(dataListener);
     }
 
     @Override
@@ -133,17 +147,7 @@ public class ChatFragment extends Fragment {
 
         arrMessDetail = MessageDataManager.getInstance().getListMessage(senderID);
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail);
-        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-            @Override
-            public void onDataChanged() {
-                arrMessDetail.clear();
-                arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
-                if (adapter!=null){
-                    adapter.notifyDataSetChanged();
-                    messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size()-1);
-                }
-            }
-        });
+
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         messDetailRecyclerView.setAdapter(adapter);
@@ -154,10 +158,5 @@ public class ChatFragment extends Fragment {
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 }

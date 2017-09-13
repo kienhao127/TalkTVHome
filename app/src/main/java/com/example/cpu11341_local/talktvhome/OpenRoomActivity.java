@@ -46,7 +46,8 @@ public class OpenRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-                    OpenRoomActivity.this.onBackPressed();
+                    getSupportFragmentManager().popBackStack();
+                    isMessShowed = true;
                 }
             }
         });
@@ -96,7 +97,11 @@ public class OpenRoomActivity extends AppCompatActivity {
                     .commit();
             isMessShowed = true;
         } else {
-            super.onBackPressed();
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+                getSupportFragmentManager().popBackStack();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 }
