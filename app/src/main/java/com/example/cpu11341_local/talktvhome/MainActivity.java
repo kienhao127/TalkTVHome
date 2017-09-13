@@ -60,19 +60,19 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Handler handler = new Handler();
-        final int delay = 3000; //milliseconds
+        final int delay = 10000; //milliseconds
 
-//        handler.postDelayed(new Runnable(){
-//            public void run(){
-//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-//                String date = df.format(Calendar.getInstance().getTime());
-//
-//                MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
-//                        date, String.valueOf(r.nextInt(100)), false);
-//                MessageDataManager.getInstance().insertMessage(messageDetail, getBaseContext());
-//                handler.postDelayed(this, delay);
-//            }
-//        }, delay);
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+                String date = df.format(Calendar.getInstance().getTime());
+
+                MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
+                        date, String.valueOf(r.nextInt(100)), false);
+                MessageDataManager.getInstance().insertMessage(messageDetail, getBaseContext());
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
 
         handler.postDelayed(new Runnable(){
             public void run(){
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 MessageDataManager.getInstance().insertMessage(messageDetail, getBaseContext());
                 handler.postDelayed(this, delay);
             }
-        }, delay);
+        }, 15000);
 
 
     }
@@ -129,5 +129,11 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return tab[position].getTitle();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MessageDataManager.getInstance().setDataListener(null);
     }
 }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 
@@ -96,8 +97,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 try {
                     Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
-                    String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
-                    messageHolder.textViewDate.setText(strDatetime);
+                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(date));
                 } catch (java.text.ParseException e) {
                     e.printStackTrace();
                 }

@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
@@ -133,6 +134,13 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getActivity().onBackPressed();
+
+                if (getActivity() instanceof MessageActivity){
+                    if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0){
+                        MessageFragment messageFragment =  (MessageFragment) getFragmentManager().findFragmentByTag("MessFrag");
+                        messageFragment.onResume();
+                    }
+                }
             }
         });
 

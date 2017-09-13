@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class MessageActivity extends AppCompatActivity {
-
+    MessageFragment messFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +32,7 @@ public class MessageActivity extends AppCompatActivity {
             }
 
             // Create a new Fragment to be placed in the activity layout
-            MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+            messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
@@ -43,12 +43,25 @@ public class MessageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
         if (getSupportFragmentManager().getBackStackEntryCount() > 0){
             getSupportFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
         }
         overridePendingTransition(0, R.anim.exit_to_right);
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1){
+            MessageFragment messageFragment =  (MessageFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
+            if (messageFragment != null){
+                messageFragment.onResume();
+            }
+        } else {
+            this.onResume();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        messFragment.onResume();
     }
 }

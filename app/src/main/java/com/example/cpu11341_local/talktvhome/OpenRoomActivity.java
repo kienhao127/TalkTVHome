@@ -25,7 +25,7 @@ public class OpenRoomActivity extends AppCompatActivity {
     ImageView imageView;
     boolean isLayoutGone = true;
     boolean isMessShowed = false;
-
+    MessageFragment messFragment;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +88,11 @@ public class OpenRoomActivity extends AppCompatActivity {
         if (!isMessShowed) {
             getSupportFragmentManager().popBackStack();
 
-            MessageFragment messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+            messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
                     .add(R.id.fragment_container, messFragment)
-                    .addToBackStack(null)
                     .commit();
             isMessShowed = true;
         } else {
@@ -102,6 +101,22 @@ public class OpenRoomActivity extends AppCompatActivity {
             } else {
                 super.onBackPressed();
             }
+            if (getSupportFragmentManager().getBackStackEntryCount() > 1){
+                MessageFragment messageFragment =  (MessageFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
+                if (messageFragment != null){
+                    messageFragment.onResume();
+                }
+            } else {
+                this.onResume();
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (messFragment != null){
+            messFragment.onResume();
         }
     }
 }

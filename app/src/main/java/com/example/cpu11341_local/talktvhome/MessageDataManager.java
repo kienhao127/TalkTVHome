@@ -42,7 +42,7 @@ public class MessageDataManager {
                 "11/09/17 12:47:05", "Tôi là Trang Lady", false));
 
         arrListTopic.add( new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", "18/08/17 10:47:03", 1, 0, false));
-        arrListTopic.add( new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", "Tên người dùng: tin nhắn cuối cùng", "Hôm qua", 2, -1, false));
+        arrListTopic.add( new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", "Tên người dùng: tin nhắn cuối cùng", "11/09/17 12:47:05", 2, -1, false));
         arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", "1/09/17 11:47:04", 3, 1, false));
         arrListTopic.add( new Topic("http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady", "Tôi là Trang Lady", "11/09/17 12:47:05", 3, 2, true));
     }
@@ -72,8 +72,7 @@ public class MessageDataManager {
                 if (topic.getUserId() != 2){
                     try {
                         Date date = dateFormat.parse(topic.getDate());
-                        String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
-                        topic.setDate(strDatetime);
+                        topic.setDate(ElapsedTime.getRelativeTimeSpanString(date));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -86,8 +85,7 @@ public class MessageDataManager {
                 if (topic.getUserId() == 2){
                     try {
                         Date date = dateFormat.parse(topic.getDate());
-                        String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
-                        topic.setDate(strDatetime);
+                        topic.setDate(ElapsedTime.getRelativeTimeSpanString(date));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
@@ -113,8 +111,7 @@ public class MessageDataManager {
                 topic.setLastMess(messageDetail.getText());
                 try {
                     Date date = dateFormat.parse(messageDetail.getDatetime());
-                    String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
-                    topic.setDate(strDatetime);
+                    topic.setDate(ElapsedTime.getRelativeTimeSpanString(date));
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }

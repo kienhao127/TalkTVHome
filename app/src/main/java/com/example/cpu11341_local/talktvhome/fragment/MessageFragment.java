@@ -177,15 +177,15 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             public void onItemClick(View view, int position) {
                 arrTopic.get(position).setHasNewMessage(false);
                 adapter.notifyDataSetChanged();
-                getActivity().getSupportFragmentManager().addOnBackStackChangedListener( new FragmentManager.OnBackStackChangedListener() {
-                    @Override
-                    public void onBackStackChanged() {
-                        Log.i("Count", String.valueOf(getActivity()));
-                        if (getActivity().getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                            onResume();
-                        }
-                    }
-                });
+//                getActivity().getSupportFragmentManager().addOnBackStackChangedListener( new FragmentManager.OnBackStackChangedListener() {
+//                    @Override
+//                    public void onBackStackChanged() {
+//                        Log.i("Count", String.valueOf(getActivity()));
+//                        if (getActivity().getSupportFragmentManager().getBackStackEntryCount() == 0) {
+//                            onResume();
+//                        }
+//                    }
+//                });
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:
@@ -208,7 +208,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                         } else {
                             ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
                         }
-                        ft.add(R.id.fragment_container, messageFragment)
+                        ft.add(R.id.fragment_container, messageFragment, "MessFrag")
                             .addToBackStack(null)
                             .commit();
 
@@ -222,6 +222,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("On resume", "MessFrag");
         arrTopic.clear();
         arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
         if (adapter!=null){
@@ -239,15 +240,5 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                 }
             }
         });
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        if (context instanceof Activity){
-            mActivity =(Activity) context;
-        }
-
     }
 }
