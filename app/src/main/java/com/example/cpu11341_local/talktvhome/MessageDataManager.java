@@ -1,14 +1,17 @@
 package com.example.cpu11341_local.talktvhome;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
+import android.support.v4.app.FragmentManager;
 import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
+import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -96,33 +99,47 @@ public class MessageDataManager {
         return arrTopic;
     }
 
-    public boolean insertMessage(MessageDetail messageDetail, Context context){
+    public boolean insertMessage(MessageDetail messageDetail, boolean isSameChatFragment){
         arrMessDetail.add(messageDetail);
-        updateTopic(messageDetail.getUser().getId(), messageDetail, context);
+        updateTopic(messageDetail.getUser().getId(), messageDetail, isSameChatFragment);
         if (dataListener!=null){
-            dataListener.onDataChanged();
+            dataListener.onDataChanged(messageDetail.getUser().getId());
         }
         return true;
     }
 
-    public boolean updateTopic(int senderID, MessageDetail messageDetail, Context context){
-        for(Topic topic:arrListTopic){
+    public boolean updateTopic(int senderID, MessageDetail messageDetail, boolean isSameChatFragment){
+        String strDate = "";
+        String strText = "";
+        try {
+            Date date = dateFormat.parse(messageDetail.getDatetime());
+            strDate = ElapsedTime.getRelativeTimeSpanString(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (messageDetail.getType() == 4){
+            strText = "Bạn: " + messageDetail.getText();
+        } else {
+            strText = messageDetail.getText();
+        }
+        for (int i=0; i<arrListTopic.size(); i++){
+            Topic topic = arrListTopic.get(i);
+            Log.i("senderID", String.valueOf(senderID));
             if (topic.getUserId() == senderID){
-                topic.setLastMess(messageDetail.getText());
-                try {
-                    Date date = dateFormat.parse(messageDetail.getDatetime());
-                    topic.setDate(ElapsedTime.getRelativeTimeSpanString(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                topic.setHasNewMessage(true);
+                topic.setLastMess(strText);
+                topic.setDate(strDate);
+                topic.setHasNewMessage(!isSameChatFragment);
+                arrListTopic.remove(i);
+                arrListTopic.add(2, topic);
+                return true;
             }
         }
+        arrListTopic.add(2, new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, strDate, 3, senderID, true));
         return true;
     }
 
     public interface DataListener{
-        void onDataChanged();
+        void onDataChanged(int senderID);
     }
 
     public void setDataListener(DataListener dataListener) {

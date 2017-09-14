@@ -117,8 +117,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 try {
                     Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
-                    String strDatetime = (String) DateUtils.getRelativeTimeSpanString(date.getTime());
-                    myMessageHolder.textViewDate.setText(strDatetime);
+                    myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(date));
                 } catch (java.text.ParseException e) {
                     e.printStackTrace();
                 }

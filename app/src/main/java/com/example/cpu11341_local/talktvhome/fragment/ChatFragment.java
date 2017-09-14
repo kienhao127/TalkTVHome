@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
+import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -24,6 +25,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
@@ -57,18 +59,23 @@ public class ChatFragment extends Fragment {
         this.senderID = senderID;
     }
 
+    public int getSenderID() {
+        return senderID;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("Create view", "Chat Fragment");
         dataListener = new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged() {
-                arrMessDetail.clear();
-                arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
-                if (adapter!=null){
-                    adapter.notifyDataSetChanged();
-                    messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size()-1);
+            public void onDataChanged(int senderID) {
+                ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                if (chatFragment.getSenderID() == senderID) {
+                    arrMessDetail.clear();
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
                 }
             }
         };
@@ -111,16 +118,18 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        DateFormat df = new SimpleDateFormat("EEE, d/MMM/yyyy, HH:mm:ss");
-        final String date = df.format(Calendar.getInstance().getTime());
-
         talkTextViewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageDetail messageDetail = new MessageDetail(4, 1, new User(1, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
-                        date , editText.getText().toString(), false);
-                MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
+                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+                df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
+                String date = df.format(Calendar.getInstance().getTime());
+
+                MessageDetail messageDetail = new MessageDetail(4, 1, new User(senderID, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
+                        date, editText.getText().toString(), false);
+                MessageDataManager.getInstance().insertMessage(messageDetail, true);
                 editText.setText("");
+                messDetailRecyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
             }
         });
 
@@ -166,5 +175,28 @@ public class ChatFragment extends Fragment {
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        arrMessDetail.clear();
+        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
+        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged(int senderID) {
+                ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                if (chatFragment.getSenderID() == senderID) {
+                    arrMessDetail.clear();
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        });
     }
 }

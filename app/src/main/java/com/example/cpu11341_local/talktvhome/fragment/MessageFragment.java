@@ -161,7 +161,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged() {
+            public void onDataChanged(int senderID) {
                 arrTopic.clear();
                 arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
                 if (adapter!=null){
@@ -177,15 +177,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             public void onItemClick(View view, int position) {
                 arrTopic.get(position).setHasNewMessage(false);
                 adapter.notifyDataSetChanged();
-//                getActivity().getSupportFragmentManager().addOnBackStackChangedListener( new FragmentManager.OnBackStackChangedListener() {
-//                    @Override
-//                    public void onBackStackChanged() {
-//                        Log.i("Count", String.valueOf(getActivity()));
-//                        if (getActivity().getSupportFragmentManager().getBackStackEntryCount() == 0) {
-//                            onResume();
-//                        }
-//                    }
-//                });
                 switch (arrTopic.get(position).getAction_type()){
                     case 1:
                     case 3:
@@ -222,21 +213,18 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("On resume", "MessFrag");
         arrTopic.clear();
         arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
         if (adapter!=null){
             adapter.notifyDataSetChanged();
-            topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
         }
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged() {
+            public void onDataChanged(int senderID) {
                 arrTopic.clear();
                 arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
                 if (adapter!=null){
                     adapter.notifyDataSetChanged();
-                    topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
                 }
             }
         });
