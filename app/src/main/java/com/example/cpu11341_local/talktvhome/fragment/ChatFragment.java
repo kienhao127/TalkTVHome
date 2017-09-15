@@ -34,6 +34,7 @@ import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -125,8 +126,13 @@ public class ChatFragment extends Fragment {
                 df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
                 String date = df.format(Calendar.getInstance().getTime());
 
-                MessageDetail messageDetail = new MessageDetail(4, 1, new User(senderID, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
-                        date, editText.getText().toString(), false);
+                MessageDetail messageDetail = null;
+                try {
+                    messageDetail = new MessageDetail(4, 1, new User(senderID, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
+                            df.parse(date), editText.getText().toString(), false);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 MessageDataManager.getInstance().insertMessage(messageDetail, true);
                 editText.setText("");
                 messDetailRecyclerView.smoothScrollToPosition(adapter.getItemCount()-1);

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 
@@ -53,7 +54,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
 
         holder.textViewName.setText(arrTopic.get(position).getName());
         holder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
-        holder.textViewDate.setText(arrTopic.get(position).getDate());
+        holder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
         if (arrTopic.get(position).isHasNewMessage()){
             holder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
             holder.textViewDate.setTypeface(null, Typeface.BOLD);

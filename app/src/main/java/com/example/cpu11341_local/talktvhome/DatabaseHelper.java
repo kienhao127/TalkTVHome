@@ -135,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
 
                 messageDetail.setTitle(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TITLE)));
-                messageDetail.setDatetime(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TIMEOFMESS)));
+//                messageDetail.setDatetime(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TIMEOFMESS)));
                 messageDetail.setImageURL(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_IMAGEURL)));
                 messageDetail.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
                 messageDetail.setAction_type(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTYPE)));

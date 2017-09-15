@@ -66,9 +66,9 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
-                eventHolder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
+                eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 eventHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
-                eventHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                eventHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 Glide.with(context)
                         .load(arrMessDetail.get(position).getImageURL())
                         .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
@@ -80,9 +80,9 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 break;
             case 2:
                 RemindHolder remindHolder = (RemindHolder) holder;
-                remindHolder.textViewDateTime.setText(arrMessDetail.get(position).getDatetime());
+                remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
-                remindHolder.textViewDate.setText(arrMessDetail.get(position).getDatetime());
+                remindHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
@@ -95,12 +95,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.circleCropTransform())
                         .into(messageHolder.imageViewAvatar);
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
-                try {
-                    Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
-                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(date));
-                } catch (java.text.ParseException e) {
-                    e.printStackTrace();
-                }
+                messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+
                 if (arrMessDetail.get(position).isWarning()) {
                     messageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }
@@ -115,12 +111,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .apply(RequestOptions.circleCropTransform())
                         .into(myMessageHolder.imageViewAvatar);
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
-                try {
-                    Date date = dateFormat.parse(arrMessDetail.get(position).getDatetime());
-                    myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(date));
-                } catch (java.text.ParseException e) {
-                    e.printStackTrace();
-                }
+                myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 if (arrMessDetail.get(position).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }

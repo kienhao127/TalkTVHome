@@ -1,5 +1,7 @@
 package com.example.cpu11341_local.talktvhome.data;
 
+import java.util.Date;
+
 /**
  * Created by CPU11341-local on 9/5/2017.
  */
@@ -8,12 +10,12 @@ public class Topic {
     String avatar;
     String name;
     String lastMess;
-    String date;
+    Date date;
     int action_type; //1: system, 2: not follow, 3: Chat
     int userId;
     boolean hasNewMessage;
 
-    public Topic(String avatar, String name, String lastMess, String date, int action_type, int userId, boolean hasNewMessage) {
+    public Topic(String avatar, String name, String lastMess, Date date, int action_type, int userId, boolean hasNewMessage) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
@@ -40,7 +42,7 @@ public class Topic {
         return lastMess;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -60,7 +62,7 @@ public class Topic {
         this.lastMess = lastMess;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 }

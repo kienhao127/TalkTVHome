@@ -28,6 +28,7 @@ import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.HomeFragment;
 
+import java.text.ParseException;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,8 +99,13 @@ public class MainActivity extends AppCompatActivity {
                 df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
                 String date = df.format(Calendar.getInstance().getTime());
 
-                MessageDetail messageDetail = new MessageDetail(3, 2, new User(4, "http://avatar1.cctalk.vn/csmtalk_user3/453014912?t=1502427610", "LiLaa ❤"),
-                        date, String.valueOf(r.nextInt(100)), false);
+                MessageDetail messageDetail = null;
+                try {
+                    messageDetail = new MessageDetail(3, 2, new User(4, "http://avatar1.cctalk.vn/csmtalk_user3/453014912?t=1502427610", "LiLaa ❤"),
+                            df.parse(date), String.valueOf(r.nextInt(100)), false);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 MessageDataManager.getInstance().insertMessage(messageDetail, isSameChatFragment(1));
                 handler2.postDelayed(this, delay);
             }
@@ -161,6 +167,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        MessageDataManager.getInstance().setDataListener(null);
+//        MessageDataManager.getInstance().setDataListener(null);
     }
 }
