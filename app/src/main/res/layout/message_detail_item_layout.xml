@@ -27,32 +27,22 @@
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/imageViewMessageboxArrow"
             android:background="@drawable/rounded_corner"
-            android:text="Nội dung tin nhắn"
-            android:textColor="#000"
             android:padding="7dp"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/imageViewMessageboxArrow" />
+            android:text="Nội dung tin nhắn"
+            android:textColor="#000" />
 
         <ImageView
-            android:id="@+id/imageViewWarningDot"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/textViewMessDetail"
-            android:src="@drawable/warning_dot"
-            android:visibility="invisible"
-            android:layout_marginLeft="5dp"/>
-
-        <ImageView
+            android:id="@+id/imageViewMessageboxArrow"
             android:layout_width="10dp"
             android:layout_height="10dp"
-            android:src="@drawable/messagebox_arrow"
-            android:id="@+id/imageViewMessageboxArrow"
-            android:layout_marginTop="20dp"
-            android:layout_toRightOf="@+id/imageViewAvatar"
-            android:layout_toEndOf="@+id/imageViewAvatar"
             android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp" />
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="20dp"
+            android:layout_toEndOf="@+id/imageViewAvatar"
+            android:layout_toRightOf="@+id/imageViewAvatar"
+            android:src="@drawable/messagebox_arrow" />
     </RelativeLayout>
 </LinearLayout>

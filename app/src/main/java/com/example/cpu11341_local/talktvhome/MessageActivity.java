@@ -1,5 +1,8 @@
 package com.example.cpu11341_local.talktvhome;
 
+import android.icu.text.DateFormat;
+import android.icu.text.SimpleDateFormat;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -8,14 +11,19 @@ import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class MessageActivity extends AppCompatActivity {
     MessageFragment messFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

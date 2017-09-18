@@ -16,8 +16,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
+import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,16 +98,12 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                         .into(messageHolder.imageViewAvatar);
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-
-                if (arrMessDetail.get(position).isWarning()) {
-                    messageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
-                }
-                messageHolder.setIsRecyclable(false);
                 break;
             default:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
+                User curUser = MessageDataManager.getInstance().getCurrentUser();
                 Glide.with(context)
-                        .load(arrMessDetail.get(position).getUser().getAvatar())
+                        .load(curUser.getAvatar())
                         .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                         .apply(RequestOptions.errorOf(R.drawable.grid_item))
                         .apply(RequestOptions.circleCropTransform())
@@ -115,7 +113,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 if (arrMessDetail.get(position).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 }
-                myMessageHolder.setIsRecyclable(false);
                 break;
 
         }

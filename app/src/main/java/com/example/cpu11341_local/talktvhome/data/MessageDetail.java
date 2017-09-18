@@ -11,7 +11,7 @@ public class MessageDetail {
     int id;
     User user;
     String title;
-    Date datetime;
+    long datetime;
     String imageURL;
     String text;
     int action_type; //1: go web, 2: go room
@@ -24,7 +24,7 @@ public class MessageDetail {
     }
 
     //Event
-    public MessageDetail(int type, int id, User user, String title, Date datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, int id, User user, String title, long datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -38,7 +38,7 @@ public class MessageDetail {
     }
 
     //Remind
-    public MessageDetail(int type, int id, User user, String title, Date datetime, String text, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, int id, User user, String title, long datetime, String text, int action_type, String action_title, String action_extra) {
         this.id = id;
         this.user = user;
         this.title = title;
@@ -51,7 +51,7 @@ public class MessageDetail {
     }
 
     //Message
-    public MessageDetail(int type, int id, User user, Date datetime, String text, boolean isWarning) {
+    public MessageDetail(int type, int id, User user, long datetime, String text, boolean isWarning) {
         this.id = id;
         this.user = user;
         this.datetime = datetime;
@@ -72,7 +72,7 @@ public class MessageDetail {
         return title;
     }
 
-    public Date getDatetime() {
+    public long getDatetime() {
         return datetime;
     }
 
@@ -120,7 +120,7 @@ public class MessageDetail {
         this.title = title;
     }
 
-    public void setDatetime(Date datetime) {
+    public void setDatetime(long datetime) {
         this.datetime = datetime;
     }
 

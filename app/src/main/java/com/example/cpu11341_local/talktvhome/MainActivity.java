@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
@@ -29,7 +27,9 @@ import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.HomeFragment;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
@@ -62,57 +62,53 @@ public class MainActivity extends AppCompatActivity {
         mTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
+        MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
+                        Calendar.getInstance().getTimeInMillis(), "Tôi là Trang Lady", false);
+                MessageDataManager.getInstance().insertMessage(messageDetail);
+
         final Random r = new Random();
-
-
-        final Handler handler1 = new Handler();
-        final Handler handler2 = new Handler();
+        final Handler handler = new Handler();
         final int delay = 5000; //milliseconds
-
+//
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
 //                MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
-//                        date, String.valueOf(r.nextInt(100)), false);
+//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
 //                MessageDataManager.getInstance().insertMessage(messageDetail, isSameChatFragment(2));
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
 //
-//        handler1.postDelayed(new Runnable(){
-//            public void run(){
-//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-//                String date = df.format(Calendar.getInstance().getTime());
-//
-//                MessageDetail messageDetail = new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
-//                        date, String.valueOf(r.nextInt(100)), false);
-//                MessageDataManager.getInstance().insertMessage(messageDetail, isSameChatFragment(1));
-//                handler1.postDelayed(this, delay);
-//            }
-//        }, 15000);
-
-        handler2.postDelayed(new Runnable(){
+        handler.postDelayed(new Runnable(){
             public void run(){
                 DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
                 String date = df.format(Calendar.getInstance().getTime());
 
-                MessageDetail messageDetail = null;
-                try {
-                    messageDetail = new MessageDetail(3, 2, new User(4, "http://avatar1.cctalk.vn/csmtalk_user3/453014912?t=1502427610", "LiLaa ❤"),
-                            df.parse(date), String.valueOf(r.nextInt(100)), false);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                MessageDataManager.getInstance().insertMessage(messageDetail, isSameChatFragment(1));
-                handler2.postDelayed(this, delay);
+                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1),
+                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
+
+                MessageDataManager.getInstance().insertMessage(messageDetail);
+                handler.postDelayed(this, delay);
             }
-        }, 5000);
+        }, delay);
+//
+//        handler.postDelayed(new Runnable(){
+//            public void run(){
+//                MessageDetail messageDetail = null;
+//                messageDetail = new MessageDetail(3, 2, new User(4, "http://avatar1.cctalk.vn/csmtalk_user3/453014912?t=1502427610", "LiLaa ❤"),
+//                       Calendar.getInstance().getTimeInMillis() , String.valueOf(r.nextInt(100)), false);
+//                MessageDataManager.getInstance().insertMessage(messageDetail, isSameChatFragment(1));
+//                handler.postDelayed(this, delay);
+//            }
+////        }, 5000);
     }
 
     boolean isSameChatFragment(int senderID){
+        int i = getSupportFragmentManager().getBackStackEntryCount();
+        Log.i("Index", String.valueOf(i));
         ChatFragment chatFragment =  (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (chatFragment != null){
             if (chatFragment.getSenderID() == senderID){
@@ -167,6 +163,5 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        MessageDataManager.getInstance().setDataListener(null);
     }
 }

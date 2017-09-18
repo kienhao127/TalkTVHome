@@ -15,8 +15,13 @@ import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,34 +35,35 @@ public class MessageDataManager {
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     DataListener dataListener;
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
+    Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() throws ParseException {
+        linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
+        linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
+        linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
+
         arrMessDetail.add(new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-                "Tên event 1", dateFormat.parse("25/08/17 09:47:02"), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra"));
+                "Tên event 1", dateFormat.parse("25/08/17 09:47:02").getTime(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra"));
         arrMessDetail.add(new MessageDetail(2, 2, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-                "Nhắc nhở 1", dateFormat.parse("25/09/17 09:47:02"), "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra"));
+                "Nhắc nhở 1", dateFormat.parse("25/09/17 09:47:02").getTime(), "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra"));
         arrMessDetail.add(new MessageDetail(3, 3, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-                dateFormat.parse("18/08/17 10:47:03"), "Nội dung thông báo", false));
+                dateFormat.parse("18/08/17 10:47:03").getTime(), "Nội dung thông báo", false));
         linkedHashMapMsgDetail.put(0, new ArrayList<>(arrMessDetail));
         arrMessDetail.clear();
 
         arrMessDetail.add(new MessageDetail(3, 1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
-                dateFormat.parse("18/08/17 10:47:03"), "Xin chào", false));
+                dateFormat.parse("18/08/17 10:47:03").getTime(), "Xin chào", false));
         arrMessDetail.add(new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
-                dateFormat.parse("1/09/17 11:47:04"), "Tôi là Thúy Chi", true));
+                dateFormat.parse("1/09/17 11:47:04").getTime(), "Tôi là Thúy Chi", false));
+
+
         linkedHashMapMsgDetail.put(1, new ArrayList<>(arrMessDetail));
         arrMessDetail.clear();
 
-        arrMessDetail.add(new MessageDetail(3, 1, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
-                dateFormat.parse("11/09/17 12:47:05"), "Tôi là Trang Lady", false));
-        linkedHashMapMsgDetail.put(2, new ArrayList<>(arrMessDetail));
-        arrMessDetail.clear();
-
-        linkedHashMapTopic.put(0, new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", dateFormat.parse("18/08/17 10:47:03"), 1, 0, false));
-        linkedHashMapTopic.put(1, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", dateFormat.parse("1/09/17 11:47:04"), 3, 1, false));
-        linkedHashMapTopic.put(2, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady", "Tôi là Trang Lady", dateFormat.parse("11/09/17 12:47:05"), 3, 2, true));
-        linkedHashMapTopic.put(-1, new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", "Tên người dùng: tin nhắn cuối cùng", dateFormat.parse("11/09/17 12:47:05"), 2, -1, false));
+        linkedHashMapTopic.put(0, new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", dateFormat.parse("18/08/17 10:47:03").getTime(), 1, 0, false));
+        linkedHashMapTopic.put(1, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", dateFormat.parse("1/09/17 11:47:04").getTime(), 3, 1, false));
     }
 
     public static MessageDataManager getInstance() {
@@ -91,21 +97,26 @@ public class MessageDataManager {
         return arrTopic;
     }
 
-    public boolean insertMessage(MessageDetail messageDetail, boolean isSameChatFragment){
+    public User getUser(int userID){
+        return linkedHashMapUser.get(userID);
+    }
+
+    public User getCurrentUser(){
+        return linkedHashMapUser.get(5);
+    }
+
+    public boolean insertMessage(MessageDetail messageDetail){
         if (linkedHashMapMsgDetail.get(messageDetail.getUser().getId()) != null){
             linkedHashMapMsgDetail.get(messageDetail.getUser().getId()).add(messageDetail);
         } else {
             arrMessDetail.add(messageDetail);
             linkedHashMapMsgDetail.put(messageDetail.getUser().getId(), arrMessDetail);
         }
-        updateTopic(messageDetail.getUser().getId(), messageDetail, isSameChatFragment);
-        if (dataListener!=null){
-            dataListener.onDataChanged(messageDetail.getUser().getId());
-        }
+        updateTopic(messageDetail.getUser().getId(), messageDetail);
         return true;
     }
 
-    public boolean updateTopic(int senderID, MessageDetail messageDetail, boolean isSameChatFragment){
+    public boolean updateTopic(int senderID, MessageDetail messageDetail){
         String strText = "";
 
         if (messageDetail.getType() == 4){
@@ -114,19 +125,39 @@ public class MessageDataManager {
             strText = messageDetail.getText();
         }
 
-        Topic topic = linkedHashMapTopic.get(senderID);
+        Topic topic = linkedHashMapTopic.get(-1);
+        if (!isFollow(senderID)) {
+            if (topic != null) {
+                topic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
+                topic.setDate(messageDetail.getDatetime());
+            }
+        }
+
+        topic = linkedHashMapTopic.get(senderID);
         if (topic != null){
+            if (dataListener!=null){
+                dataListener.onDataChanged(topic);
+            }
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
-            topic.setHasNewMessage(!isSameChatFragment);
             return true;
         }
-        linkedHashMapTopic.put(senderID, new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true));
+
+        Topic newTopic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true);
+        if (dataListener!=null){
+            dataListener.onDataChanged(newTopic);
+        }
+        linkedHashMapTopic.put(senderID, newTopic);
+        if (!isFollow(senderID)) {
+            if (linkedHashMapTopic.get(-1) == null)
+                linkedHashMapTopic.put(-1, new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true));
+        }
+        linkedHashMapTopic = sortByValue(linkedHashMapTopic);
         return true;
     }
 
     public interface DataListener{
-        void onDataChanged(int senderID);
+        void onDataChanged(Topic topic);
     }
 
     public void setDataListener(DataListener dataListener) {
@@ -138,5 +169,34 @@ public class MessageDataManager {
             return false;
         }
         return true;
+    }
+
+    private static Map<Integer, Topic> sortByValue(Map<Integer, Topic> unsortMap) {
+
+        // 1. Convert Map to List of Map
+        Topic topicSystem = unsortMap.get(0);
+        Topic topicUnfollowMsg = unsortMap.get(-1);
+        unsortMap.remove(0);
+        unsortMap.remove(-1);
+        List<Map.Entry<Integer, Topic>> list = new LinkedList<>(unsortMap.entrySet());
+
+        // 2. Sort list with Collections.sort(), provide a custom Comparator
+        //    Try switch the o1 o2 position for a different order
+        Collections.sort(list, new Comparator<Map.Entry<Integer, Topic>>() {
+            public int compare(Map.Entry<Integer, Topic> o1,
+                               Map.Entry<Integer, Topic> o2) {
+                return (Long.valueOf(o2.getValue().getDate())).compareTo(o1.getValue().getDate());
+            }
+        });
+
+        // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
+        Map<Integer, Topic> sortedMap = new LinkedHashMap<Integer, Topic>();
+        sortedMap.put(topicSystem.getUserId(), topicSystem);
+        sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
+        for (Map.Entry<Integer, Topic> entry : list) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return sortedMap;
     }
 }

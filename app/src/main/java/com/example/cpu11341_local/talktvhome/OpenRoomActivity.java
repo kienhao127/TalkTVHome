@@ -48,7 +48,7 @@ public class OpenRoomActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     getSupportFragmentManager().popBackStack();
-                    isMessShowed = true;
+                    MessageDataManager.getInstance().setDataListener(null);
                 }
             }
         });
@@ -78,7 +78,7 @@ public class OpenRoomActivity extends AppCompatActivity {
                             .add(R.id.fragment_container, chatFragment)
                             .addToBackStack(null)
                             .commit();
-                    isMessShowed = false;
+                    isMessShowed = true;
                 }
             }
         });
@@ -86,7 +86,7 @@ public class OpenRoomActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (!isMessShowed) {
+        if (isMessShowed) {
             getSupportFragmentManager().popBackStack();
 
             messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
@@ -94,8 +94,9 @@ public class OpenRoomActivity extends AppCompatActivity {
                     .beginTransaction()
                     .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
                     .add(R.id.fragment_container, messFragment)
+                    .addToBackStack(null)
                     .commit();
-            isMessShowed = true;
+            isMessShowed = false;
         } else {
             Log.i("asd", String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
             if (getSupportFragmentManager().getBackStackEntryCount() > 0){

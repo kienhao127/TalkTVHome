@@ -161,7 +161,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged(int senderID) {
+            public void onDataChanged(Topic topic) {
+                topic.setHasNewMessage(true);
                 arrTopic.clear();
                 arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
                 if (adapter!=null){
@@ -220,7 +221,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         }
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged(int senderID) {
+            public void onDataChanged(Topic topic) {
+                topic.setHasNewMessage(true);
                 arrTopic.clear();
                 arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
                 if (adapter!=null){

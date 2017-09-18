@@ -10,12 +10,12 @@ public class Topic {
     String avatar;
     String name;
     String lastMess;
-    Date date;
+    long date;
     int action_type; //1: system, 2: not follow, 3: Chat
     int userId;
     boolean hasNewMessage;
 
-    public Topic(String avatar, String name, String lastMess, Date date, int action_type, int userId, boolean hasNewMessage) {
+    public Topic(String avatar, String name, String lastMess, long date, int action_type, int userId, boolean hasNewMessage) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
@@ -42,7 +42,7 @@ public class Topic {
         return lastMess;
     }
 
-    public Date getDate() {
+    public long getDate() {
         return date;
     }
 
@@ -62,7 +62,7 @@ public class Topic {
         this.lastMess = lastMess;
     }
 
-    public void setDate(Date date) {
+    public void setDate(long date) {
         this.date = date;
     }
 }

@@ -31,6 +31,7 @@ import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
@@ -69,11 +70,12 @@ public class ChatFragment extends Fragment {
         super.onCreate(savedInstanceState);
         dataListener = new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged(int senderID) {
+            public void onDataChanged(Topic topic) {
                 ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (chatFragment.getSenderID() == senderID) {
+                if (chatFragment.getSenderID() == topic.getUserId()) {
+                    topic.setHasNewMessage(false);
                     arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -122,18 +124,11 @@ public class ChatFragment extends Fragment {
         talkTextViewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
-                String date = df.format(Calendar.getInstance().getTime());
 
                 MessageDetail messageDetail = null;
-                try {
-                    messageDetail = new MessageDetail(4, 1, new User(senderID, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"),
-                            df.parse(date), editText.getText().toString(), false);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                MessageDataManager.getInstance().insertMessage(messageDetail, true);
+                messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID),
+                        Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
+                MessageDataManager.getInstance().insertMessage(messageDetail);
                 editText.setText("");
                 messDetailRecyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
             }
@@ -193,11 +188,12 @@ public class ChatFragment extends Fragment {
         }
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged(int senderID) {
+            public void onDataChanged(Topic topic) {
                 ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (chatFragment.getSenderID() == senderID) {
+                if (chatFragment.getSenderID() == topic.getUserId()) {
+                    topic.setHasNewMessage(false);
                     arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
