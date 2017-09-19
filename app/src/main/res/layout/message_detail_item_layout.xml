@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="5dp"
+    android:padding="2dp"
     android:orientation="vertical">
     <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:gravity="center_horizontal"
@@ -26,12 +26,12 @@
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
+            android:layout_height="50dp"
             android:layout_toRightOf="@+id/imageViewMessageboxArrow"
             android:background="@drawable/rounded_corner"
             android:padding="7dp"
             android:text="Nội dung tin nhắn"
+            android:gravity="center"
             android:textColor="#000" />
 
         <ImageView

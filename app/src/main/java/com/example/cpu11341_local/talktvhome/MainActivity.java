@@ -62,13 +62,14 @@ public class MainActivity extends AppCompatActivity {
         mTitle.setText(toolbar.getTitle());
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        MessageDetail messageDetail = new MessageDetail(3, 2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
-                        Calendar.getInstance().getTimeInMillis(), "Tôi là Trang Lady", false);
-                MessageDataManager.getInstance().insertMessage(messageDetail);
+        MessageDataManager.getInstance().insertUser( new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"), getApplicationContext());
+        MessageDataManager.getInstance().insertUser( new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"), getApplicationContext());
+        MessageDataManager.getInstance().insertUser( new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"), getApplicationContext());
+        MessageDataManager.getInstance().insertUser( new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"), getApplicationContext());
 
         final Random r = new Random();
         final Handler handler = new Handler();
-        final int delay = 5000; //milliseconds
+        final int delay = 10000; //milliseconds
 //
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
@@ -82,18 +83,18 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }, delay);
 //
-        handler.postDelayed(new Runnable(){
-            public void run(){
-                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                String date = df.format(Calendar.getInstance().getTime());
-
-                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1),
-                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
-
-                MessageDataManager.getInstance().insertMessage(messageDetail);
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
+//        handler.postDelayed(new Runnable(){
+//            public void run(){
+//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+//                String date = df.format(Calendar.getInstance().getTime());
+//
+//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1),
+//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
+//
+//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
+//                handler.postDelayed(this, delay);
+//            }
+//        }, delay);
 //
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
@@ -104,18 +105,6 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 ////        }, 5000);
-    }
-
-    boolean isSameChatFragment(int senderID){
-        int i = getSupportFragmentManager().getBackStackEntryCount();
-        Log.i("Index", String.valueOf(i));
-        ChatFragment chatFragment =  (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (chatFragment != null){
-            if (chatFragment.getSenderID() == senderID){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

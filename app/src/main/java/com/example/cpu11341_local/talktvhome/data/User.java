@@ -15,6 +15,10 @@ public class User {
         this.name = name;
     }
 
+    public User(){
+
+    }
+
     public String getAvatar() {
         return avatar;
     }
@@ -25,5 +29,17 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

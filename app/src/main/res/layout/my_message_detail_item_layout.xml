@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="5dp"
+    android:padding="2dp"
     android:orientation="vertical"
     android:weightSum="1">
     <com.example.cpu11341_local.talktvhome.myview.TalkTextView
@@ -26,17 +26,18 @@
             android:src="@drawable/horlist_item_logo"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:layout_alignParentEnd="true"/>
 
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/imageViewMessageboxArrow"
             android:background="@drawable/my_message_box"
             android:padding="7dp"
             android:text="Nội dung tin nhắn"
+            android:gravity="center"
             android:textColor="#FFF" />
 
         <ImageView
@@ -46,8 +47,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@+id/textViewMessDetail"
-            android:src="@drawable/warning_dot"
-            android:visibility="invisible" />
+            android:src="@drawable/warning_dot" />
 
         <ImageView
             android:id="@+id/imageViewMessageboxArrow"

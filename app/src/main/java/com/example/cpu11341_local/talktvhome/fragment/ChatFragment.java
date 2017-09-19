@@ -75,7 +75,7 @@ public class ChatFragment extends Fragment {
                 if (chatFragment.getSenderID() == topic.getUserId()) {
                     topic.setHasNewMessage(false);
                     arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId()));
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -126,9 +126,9 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
 
                 MessageDetail messageDetail = null;
-                messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID),
+                messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID, getContext()),
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
-                MessageDataManager.getInstance().insertMessage(messageDetail);
+                MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
                 editText.setText("");
                 messDetailRecyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
             }
@@ -163,7 +163,7 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        arrMessDetail = MessageDataManager.getInstance().getListMessage(senderID);
+        arrMessDetail = MessageDataManager.getInstance().getListMessage(senderID, getContext());
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail);
 
         layoutManager = new LinearLayoutManager(getContext());
@@ -182,7 +182,7 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         arrMessDetail.clear();
-        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID));
+        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -193,7 +193,7 @@ public class ChatFragment extends Fragment {
                 if (chatFragment.getSenderID() == topic.getUserId()) {
                     topic.setHasNewMessage(false);
                     arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId()));
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }

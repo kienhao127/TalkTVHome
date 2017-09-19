@@ -127,7 +127,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrTopic = MessageDataManager.getInstance().getListTopic(isFollow);
+        arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
 
     }
 
@@ -150,85 +150,92 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
-        adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
+        if (arrTopic == null){
 
-        layoutManager = new LinearLayoutManager(getContext());
-        topicRecyclerView.setLayoutManager(layoutManager);
-        topicRecyclerView.setAdapter(adapter);
+        } else {
 
-        topicRecyclerView.scrollToPosition(adapter.getItemCount()-1);
+            topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
+            adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
 
-        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-            @Override
-            public void onDataChanged(Topic topic) {
-                topic.setHasNewMessage(true);
-                arrTopic.clear();
-                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-                if (adapter!=null){
+            layoutManager = new LinearLayoutManager(getContext());
+            topicRecyclerView.setLayoutManager(layoutManager);
+            topicRecyclerView.setAdapter(adapter);
+
+            topicRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
+
+            MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+                @Override
+                public void onDataChanged(Topic topic) {
+                    topic.setHasNewMessage(true);
+                    arrTopic.clear();
+                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                        topicRecyclerView.smoothScrollToPosition(arrTopic.size() - 1);
+                    }
+                }
+            });
+
+
+            adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    arrTopic.get(position).setHasNewMessage(false);
                     adapter.notifyDataSetChanged();
-                    topicRecyclerView.smoothScrollToPosition(arrTopic.size()-1);
+                    switch (arrTopic.get(position).getAction_type()) {
+                        case 1:
+                        case 3:
+                            ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
+                            FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
+                            if (getActivity() instanceof MessageActivity) {
+                                Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                            } else {
+                                Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                            }
+                            Chatft.add(R.id.fragment_container, chatFragment, "ChatFragment")
+                                    .addToBackStack(null)
+                                    .commit();
+                            break;
+                        case 2:
+                            MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            if (getActivity() instanceof MessageActivity) {
+                                ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                            } else {
+                                ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                            }
+                            ft.add(R.id.fragment_container, messageFragment, "MessFrag")
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            break;
+                    }
                 }
-            }
-        });
-
-
-        adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener(){
-            @Override
-            public void onItemClick(View view, int position) {
-                arrTopic.get(position).setHasNewMessage(false);
-                adapter.notifyDataSetChanged();
-                switch (arrTopic.get(position).getAction_type()){
-                    case 1:
-                    case 3:
-                        ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
-                        FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
-                        if (getActivity() instanceof MessageActivity){
-                            Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
-                        } else {
-                            Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
-                        }
-                        Chatft.add(R.id.fragment_container, chatFragment, "ChatFragment")
-                                .addToBackStack(null)
-                                .commit();
-                        break;
-                    case 2:
-                        MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
-                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                        if (getActivity() instanceof MessageActivity){
-                            ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
-                        } else {
-                            ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
-                        }
-                        ft.add(R.id.fragment_container, messageFragment, "MessFrag")
-                            .addToBackStack(null)
-                            .commit();
-
-                        break;
-                }
-            }
-        });
+            });
+        }
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        arrTopic.clear();
-        arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-        if (adapter!=null){
-            adapter.notifyDataSetChanged();
-        }
-        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-            @Override
-            public void onDataChanged(Topic topic) {
-                topic.setHasNewMessage(true);
-                arrTopic.clear();
-                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow));
-                if (adapter!=null){
-                    adapter.notifyDataSetChanged();
-                }
+        if (arrTopic != null) {
+            arrTopic.clear();
+            arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
             }
-        });
+            MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+                @Override
+                public void onDataChanged(Topic topic) {
+                    topic.setHasNewMessage(true);
+                    arrTopic.clear();
+                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
     }
 }

@@ -53,17 +53,15 @@ public class MessageDataManager {
         linkedHashMapMsgDetail.put(0, new ArrayList<>(arrMessDetail));
         arrMessDetail.clear();
 
-        arrMessDetail.add(new MessageDetail(3, 1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
-                dateFormat.parse("18/08/17 10:47:03").getTime(), "Xin chào", false));
-        arrMessDetail.add(new MessageDetail(3, 2, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
-                dateFormat.parse("1/09/17 11:47:04").getTime(), "Tôi là Thúy Chi", false));
-
+        arrMessDetail.add(new MessageDetail(3, 1, linkedHashMapUser.get(1), dateFormat.parse("18/08/17 10:47:03").getTime(), "Xin chào", false));
+        arrMessDetail.add(new MessageDetail(3, 2, linkedHashMapUser.get(1), dateFormat.parse("1/09/17 11:47:04").getTime(), "Tôi là Thúy Chi", false));
 
         linkedHashMapMsgDetail.put(1, new ArrayList<>(arrMessDetail));
         arrMessDetail.clear();
 
         linkedHashMapTopic.put(0, new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", dateFormat.parse("18/08/17 10:47:03").getTime(), 1, 0, false));
         linkedHashMapTopic.put(1, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", dateFormat.parse("1/09/17 11:47:04").getTime(), 3, 1, false));
+
     }
 
     public static MessageDataManager getInstance() {
@@ -77,41 +75,49 @@ public class MessageDataManager {
         return instance;
     }
 
-    public ArrayList<MessageDetail> getListMessage(int senderID){
+    public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
+
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
-        for (MessageDetail messageDetail : linkedHashMapMsgDetail.get(senderID)){
-            arrMessageDetailOfSender.add(messageDetail);
-        }
+        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(senderID);
         return arrMessageDetailOfSender;
     }
 
-    public ArrayList<Topic> getListTopic(boolean isFollow) {
+    public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
-
-        for (Topic topic : linkedHashMapTopic.values()){
+        if (DatabaseHelper.getInstance(context).getListTopic() == null){
+            return null;
+        }
+        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()){
             if (isFollow(topic.getUserId()) == isFollow){
                 topic.setDate(topic.getDate());
                 arrTopic.add(topic);
             }
         }
+
         return arrTopic;
     }
 
-    public User getUser(int userID){
-        return linkedHashMapUser.get(userID);
+    public boolean insertUser(User user, Context context){
+        DatabaseHelper.getInstance(context).insertUser(user);
+        return true;
+    }
+
+    public User getUser(int userID, Context context){
+        return DatabaseHelper.getInstance(context).getUser(userID);
     }
 
     public User getCurrentUser(){
         return linkedHashMapUser.get(5);
     }
 
-    public boolean insertMessage(MessageDetail messageDetail){
-        if (linkedHashMapMsgDetail.get(messageDetail.getUser().getId()) != null){
-            linkedHashMapMsgDetail.get(messageDetail.getUser().getId()).add(messageDetail);
-        } else {
-            arrMessDetail.add(messageDetail);
-            linkedHashMapMsgDetail.put(messageDetail.getUser().getId(), arrMessDetail);
-        }
+    public boolean insertMessage(MessageDetail messageDetail, Context context){
+        DatabaseHelper.getInstance(context).insertMessage(messageDetail);
+//        if (linkedHashMapMsgDetail.get(messageDetail.getUser().getId()) != null){
+//            linkedHashMapMsgDetail.get(messageDetail.getUser().getId()).add(messageDetail);
+//        } else {
+//            arrMessDetail.add(messageDetail);
+//            linkedHashMapMsgDetail.put(messageDetail.getUser().getId(), arrMessDetail);
+//        }
         updateTopic(messageDetail.getUser().getId(), messageDetail);
         return true;
     }
@@ -140,6 +146,10 @@ public class MessageDataManager {
             }
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
+            long t = System.currentTimeMillis();
+            linkedHashMapTopic = sortByValue(linkedHashMapTopic);
+            long d = System.currentTimeMillis() - t;
+            Log.i("Time: ", String.valueOf(d));
             return true;
         }
 
@@ -152,7 +162,10 @@ public class MessageDataManager {
             if (linkedHashMapTopic.get(-1) == null)
                 linkedHashMapTopic.put(-1, new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true));
         }
+        long t = System.currentTimeMillis();
         linkedHashMapTopic = sortByValue(linkedHashMapTopic);
+        long d = System.currentTimeMillis() - t;
+        Log.i("Time: ", String.valueOf(d));
         return true;
     }
 
@@ -177,7 +190,9 @@ public class MessageDataManager {
         Topic topicSystem = unsortMap.get(0);
         Topic topicUnfollowMsg = unsortMap.get(-1);
         unsortMap.remove(0);
-        unsortMap.remove(-1);
+        if (topicUnfollowMsg != null){
+            unsortMap.remove(-1);
+        }
         List<Map.Entry<Integer, Topic>> list = new LinkedList<>(unsortMap.entrySet());
 
         // 2. Sort list with Collections.sort(), provide a custom Comparator
@@ -192,7 +207,9 @@ public class MessageDataManager {
         // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
         Map<Integer, Topic> sortedMap = new LinkedHashMap<Integer, Topic>();
         sortedMap.put(topicSystem.getUserId(), topicSystem);
-        sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
+        if (topicUnfollowMsg != null){
+            sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
+        }
         for (Map.Entry<Integer, Topic> entry : list) {
             sortedMap.put(entry.getKey(), entry.getValue());
         }
