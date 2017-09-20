@@ -73,11 +73,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TOPIC_TABLE_CREATE =
             "CREATE TABLE " + TOPIC_TABLE_NAME + " (" +
                     TOPIC_COLUMN_NAME_USERID + " INTEGER PRIMARY KEY, " +
-                    TOPIC_COLUMN_NAME_NAME + "TEXT, " +
-                    TOPIC_COLUMN_NAME_LASTMSG + "TEXT, " +
-                    TOPIC_COLUMN_NAME_AVATAR + "TEXT, " +
-                    TOPIC_COLUMN_NAME_ACTIONTYPE + "INTEGER, " +
-                    TOPIC_COLUMN_NAME_HASNEWMSG + "INTEGER" +
+                    TOPIC_COLUMN_NAME_NAME + " TEXT, " +
+                    TOPIC_COLUMN_NAME_LASTMSG + " TEXT, " +
+                    TOPIC_COLUMN_NAME_AVATAR + " TEXT, " +
+                    TOPIC_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
+                    TOPIC_COLUMN_NAME_DATETIME + " TEXT, " +
+                    TOPIC_COLUMN_NAME_HASNEWMSG + " INTEGER" +
                     ");";
 
     private static DatabaseHelper instance = null;
@@ -108,19 +109,77 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean addUser(String name, String avatar, int isFollow) {
+    public boolean insertUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
-        //adding user name in users table
         ContentValues values = new ContentValues();
-        values.put(USER_COLUMN_NAME_NAME, name);
-        values.put(USER_COLUMN_NAME_AVATAR, avatar);
-        // db.insert(TABLE_USER, null, values);
+        values.put(USER_COLUMN_NAME_ID, user.getId());
+        values.put(USER_COLUMN_NAME_NAME, user.getName());
+        values.put(USER_COLUMN_NAME_AVATAR, user.getAvatar());
+
         long result = db.insert(USER_TABLE_NAME, null, values);
         if (result == -1){
             return false;
         } else {
             return true;
         }
+    }
+
+    public User getUser(int userID){
+        User user = new User();
+        String selectQuery = "SELECT  *" +
+                " FROM " + USER_TABLE_NAME +
+                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cUser = db.rawQuery(selectQuery, null);
+        if (cUser.moveToFirst()) {
+            do {
+                user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
+                user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
+                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
+            } while (cUser.moveToNext());
+        }
+        return user;
+    }
+
+    public boolean insertTopic(Topic topic){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TOPIC_COLUMN_NAME_ACTIONTYPE, topic.getAction_type());
+        values.put(TOPIC_COLUMN_NAME_AVATAR, topic.getAvatar());
+        values.put(TOPIC_COLUMN_NAME_DATETIME, topic.getDate());
+        values.put(TOPIC_COLUMN_NAME_HASNEWMSG, topic.isHasNewMessage());
+        values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
+        values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
+        values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
+
+        long result = db.insert(TOPIC_TABLE_NAME, null, values);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public ArrayList<Topic> getListTopic(){
+        ArrayList<Topic> arrTopic = new ArrayList<>();
+        String selectQuery = "SELECT *" +
+                " FROM " + TOPIC_TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        if (cTopic.moveToFirst()) {
+            do {
+                Topic topic = new Topic();
+                topic.setUserId(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID)));
+                topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
+                topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+                topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
+                topic.setHasNewMessage(Boolean.parseBoolean(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG))));
+                topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
+                topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+                arrTopic.add(topic);
+            } while (cTopic.moveToNext());
+        }
+        return arrTopic;
     }
 
     public boolean insertMessage(MessageDetail messageDetail) {
@@ -142,59 +201,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             return true;
         }
-    }
-
-    public boolean insertUser(User user){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(USER_COLUMN_NAME_ID, user.getId());
-        values.put(USER_COLUMN_NAME_NAME, user.getName());
-        values.put(USER_COLUMN_NAME_AVATAR, user.getAvatar());
-
-        long result = db.insert(USER_TABLE_NAME, null, values);
-        if (result == -1){
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public User getUser(int userID){
-        User user = new User();
-        String selectQuery = "SELECT  *" +
-                " FROM " + MESSAGE_TABLE_NAME +
-                " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + userID;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cUser = db.rawQuery(selectQuery, null);
-        if (cUser.moveToFirst()) {
-            do {
-                user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
-                user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
-                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
-            } while (cUser.moveToNext());
-        }
-        return user;
-    }
-
-    public ArrayList<Topic> getListTopic(){
-        ArrayList<Topic> arrTopic = new ArrayList<>();
-        String selectQuery = "SELECT  *" +
-                " FROM " + TOPIC_TABLE_NAME;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cTopic = db.rawQuery(selectQuery, null);
-        if (cTopic.moveToFirst()) {
-            do {
-                Topic topic = new Topic();
-                topic.setUserId(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID)));
-                topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
-                topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
-                topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
-                topic.setHasNewMessage(Boolean.parseBoolean(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG))));
-                topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
-                topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
-            } while (cTopic.moveToNext());
-        }
-        return null;
     }
 
     public ArrayList<MessageDetail> getListMessage(int senderID){

@@ -128,7 +128,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
-
     }
 
     @Override
@@ -162,20 +161,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             topicRecyclerView.setAdapter(adapter);
 
             topicRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
-
-            MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-                @Override
-                public void onDataChanged(Topic topic) {
-                    topic.setHasNewMessage(true);
-                    arrTopic.clear();
-                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                        topicRecyclerView.smoothScrollToPosition(arrTopic.size() - 1);
-                    }
-                }
-            });
-
 
             adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener() {
                 @Override

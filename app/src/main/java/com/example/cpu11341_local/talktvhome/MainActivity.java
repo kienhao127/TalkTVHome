@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Random r = new Random();
         final Handler handler = new Handler();
-        final int delay = 10000; //milliseconds
+        final int delay = 5000; //milliseconds
 //
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
@@ -83,18 +83,18 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }, delay);
 //
-//        handler.postDelayed(new Runnable(){
-//            public void run(){
-//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-//                String date = df.format(Calendar.getInstance().getTime());
-//
-//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1),
-//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
-//
-//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
-//                handler.postDelayed(this, delay);
-//            }
-//        }, delay);
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+                String date = df.format(Calendar.getInstance().getTime());
+
+                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(5, getBaseContext()),
+                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
+
+                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
 //
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
