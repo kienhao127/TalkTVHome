@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.cpu11341_local.talktvhome.DatabaseHelper;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
@@ -166,6 +167,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                 @Override
                 public void onItemClick(View view, int position) {
                     arrTopic.get(position).setHasNewMessage(false);
+                    DatabaseHelper.getInstance(getContext()).updateTopic(arrTopic.get(position));
                     adapter.notifyDataSetChanged();
                     switch (arrTopic.get(position).getAction_type()) {
                         case 1:
@@ -214,6 +216,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                 @Override
                 public void onDataChanged(Topic topic) {
                     topic.setHasNewMessage(true);
+                    DatabaseHelper.getInstance(getContext()).updateTopic(topic);
                     arrTopic.clear();
                     arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
                     if (adapter != null) {

@@ -77,13 +77,16 @@ public class MessageDataManager {
 
     public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
+        long t = System.currentTimeMillis();
         arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(senderID);
+        long d = System.currentTimeMillis() - t;
+        Log.i("Load msg time ", String.valueOf(d));
         return arrMessageDetailOfSender;
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
-        if (DatabaseHelper.getInstance(context).getListTopic() == null){
+        if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
         }
         for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()){
@@ -112,12 +115,6 @@ public class MessageDataManager {
 
     public boolean insertMessage(MessageDetail messageDetail, Context context){
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
-//        if (linkedHashMapMsgDetail.get(messageDetail.getUser().getId()) != null){
-//            linkedHashMapMsgDetail.get(messageDetail.getUser().getId()).add(messageDetail);
-//        } else {
-//            arrMessDetail.add(messageDetail);
-//            linkedHashMapMsgDetail.put(messageDetail.getUser().getId(), arrMessDetail);
-//        }
         updateTopic(messageDetail.getUser().getId(), messageDetail, context);
         return true;
     }
@@ -141,16 +138,17 @@ public class MessageDataManager {
 
         topic = linkedHashMapTopic.get(senderID);
         if (topic != null){
-            if (dataListener!=null){
-                dataListener.onDataChanged(topic);
-            }
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
+            DatabaseHelper.getInstance(context).updateTopic(topic);
             linkedHashMapTopic.put(senderID, topic);
             long t = System.currentTimeMillis();
             linkedHashMapTopic = sortByValue(linkedHashMapTopic);
             long d = System.currentTimeMillis() - t;
             Log.i("Time: ", String.valueOf(d));
+            if (dataListener!=null){
+                dataListener.onDataChanged(topic);
+            }
             return true;
         }
 

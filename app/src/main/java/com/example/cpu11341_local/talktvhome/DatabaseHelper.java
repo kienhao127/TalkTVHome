@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MESSAGE_COLUMN_NAME_ID = "id";
     public static final String MESSAGE_COLUMN_NAME_SENDERID = "senderid";
     public static final String MESSAGE_COLUMN_NAME_TITLE = "title";
-    public static final String MESSAGE_COLUMN_NAME_TIMEOFMESS = "timeofmsg";
+    public static final String MESSAGE_COLUMN_NAME_DATETIME = "timeofmsg";
     public static final String MESSAGE_COLUMN_NAME_IMAGEURL = "imageurl";
     public static final String MESSAGE_COLUMN_NAME_DESCRIPTION = "text";
     public static final String MESSAGE_COLUMN_NAME_ACTIONTYPE = "actiontype";
@@ -54,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     MESSAGE_COLUMN_NAME_TYPE + " INTEGER," +
                     MESSAGE_COLUMN_NAME_SENDERID + " INTEGER, " +
                     MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_TIMEOFMESS + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
                     MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
                     MESSAGE_COLUMN_NAME_DESCRIPTION + " TEXT, " +
                     MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
@@ -118,8 +118,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(USER_TABLE_NAME, null, values);
         if (result == -1){
+            db.close();
             return false;
         } else {
+            db.close();
             return true;
         }
     }
@@ -138,6 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
             } while (cUser.moveToNext());
         }
+        db.close();
         return user;
     }
 
@@ -147,15 +150,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TOPIC_COLUMN_NAME_ACTIONTYPE, topic.getAction_type());
         values.put(TOPIC_COLUMN_NAME_AVATAR, topic.getAvatar());
         values.put(TOPIC_COLUMN_NAME_DATETIME, topic.getDate());
-        values.put(TOPIC_COLUMN_NAME_HASNEWMSG, topic.isHasNewMessage());
+        values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
         values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
         values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
 
         long result = db.insert(TOPIC_TABLE_NAME, null, values);
         if (result == -1){
+            db.close();
             return false;
         } else {
+            db.close();
+            return true;
+        }
+    }
+
+    public boolean updateTopic(Topic topic){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TOPIC_COLUMN_NAME_ACTIONTYPE, topic.getAction_type());
+        values.put(TOPIC_COLUMN_NAME_AVATAR, topic.getAvatar());
+        values.put(TOPIC_COLUMN_NAME_DATETIME, topic.getDate());
+        values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
+        values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
+        values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
+        values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
+
+        long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_USERID + " = ?", new String[] {String.valueOf(topic.getUserId())});
+        if (result == -1){
+            db.close();
+            return false;
+        } else {
+            db.close();
             return true;
         }
     }
@@ -173,12 +199,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
                 topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
                 topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
-                topic.setHasNewMessage(Boolean.parseBoolean(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG))));
+                topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
                 topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
                 topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
                 arrTopic.add(topic);
             } while (cTopic.moveToNext());
         }
+        db.close();
         return arrTopic;
     }
 
@@ -187,7 +214,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(MESSAGE_COLUMN_NAME_SENDERID, messageDetail.getUser().getId());
         values.put(MESSAGE_COLUMN_NAME_TITLE, messageDetail.getTitle());
-        values.put(MESSAGE_COLUMN_NAME_TIMEOFMESS, messageDetail.getDatetime());
+        values.put(MESSAGE_COLUMN_NAME_DATETIME, messageDetail.getDatetime());
         values.put(MESSAGE_COLUMN_NAME_IMAGEURL, messageDetail.getImageURL());
         values.put(MESSAGE_COLUMN_NAME_DESCRIPTION, messageDetail.getText());
         values.put(MESSAGE_COLUMN_NAME_ACTIONTYPE, messageDetail.getAction_type());
@@ -197,8 +224,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(MESSAGE_TABLE_NAME, null, values);
         if (result == -1){
+            db.close();
             return false;
         } else {
+            db.close();
             return true;
         }
     }
@@ -206,8 +235,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<MessageDetail> getListMessage(int senderID){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
-                            " FROM " + MESSAGE_TABLE_NAME +
-                            " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID;
+                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 50)" +
+                            " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID +
+                            " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
@@ -216,28 +246,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setType(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_TYPE)));
                 messageDetail.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
                 messageDetail.setTitle(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TITLE)));
-                messageDetail.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_TIMEOFMESS)));
+                messageDetail.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
                 messageDetail.setImageURL(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_IMAGEURL)));
                 messageDetail.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
                 messageDetail.setAction_type(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTYPE)));
                 messageDetail.setAction_title(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTITLE)));
                 messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
                 messageDetail.setWarning(Boolean.parseBoolean(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ISWARNING))));
+                messageDetail.setUser(getUser(senderID));
 
-                User user = new User();
-                String selectUser = "SELECT  * FROM " + USER_TABLE_NAME +" WHERE "+ USER_COLUMN_NAME_ID +" = "+ senderID;
-                Cursor cUser = db.rawQuery(selectUser, null);
-                if (cUser.moveToFirst()) {
-                    do {
-                        user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
-                        user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
-                        user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
-                    } while (cUser.moveToNext());
-                }
-                messageDetail.setUser(user);
                 arrMessDetail.add(messageDetail);
             } while (c.moveToNext());
         }
+        db.close();
         return arrMessDetail;
     }
 }

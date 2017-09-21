@@ -5,6 +5,7 @@ import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.icu.util.TimeZone;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -25,6 +26,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 
+import com.example.cpu11341_local.talktvhome.DatabaseHelper;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
@@ -68,21 +70,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        dataListener = new MessageDataManager.DataListener() {
-            @Override
-            public void onDataChanged(Topic topic) {
-                ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (chatFragment.getSenderID() == topic.getUserId()) {
-                    topic.setHasNewMessage(false);
-                    arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-            }
-        };
-        MessageDataManager.getInstance().setDataListener(dataListener);
+//        new MyTask().execute();
     }
 
     @Override
@@ -192,6 +180,7 @@ public class ChatFragment extends Fragment {
                 ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
                 if (chatFragment.getSenderID() == topic.getUserId()) {
                     topic.setHasNewMessage(false);
+                    DatabaseHelper.getInstance(getContext()).updateTopic(topic);
                     arrMessDetail.clear();
                     arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
                     if (adapter != null) {
@@ -200,5 +189,17 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
+    }
+
+    class MyTask extends AsyncTask<String, Integer, String>{
+        @Override
+        protected String doInBackground(String... params) {
+            arrMessDetail.clear();
+            arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+            return null;
+        }
     }
 }
