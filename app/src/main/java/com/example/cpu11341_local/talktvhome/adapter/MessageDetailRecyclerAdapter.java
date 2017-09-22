@@ -5,6 +5,7 @@ import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.net.ParseException;
 import android.provider.ContactsContract;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -34,15 +36,36 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     private Context context;
     private OnItemClickListener mItemClickListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
+    boolean isLoading;
+    private int visibleThreshold = 8;
+    private int lastVisibleItem, totalItemCount;
 
-    public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail){
+    public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail, RecyclerView recyclerView){
         this.context = context;
         this.arrMessDetail = arrMessDetail;
+
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (linearLayoutManager != null){
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && lastVisibleItem <= visibleThreshold) {
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
+                        }
+                        isLoading = true;
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public int getItemViewType(int position) {
-        return arrMessDetail.get(position).getType();
+        return arrMessDetail.get(position) == null ? -1 : arrMessDetail.get(position).getType();
     }
 
     @Override
@@ -57,15 +80,17 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             case 3:{
                 return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
             }
-            default:{
+            case 4:{
                 return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
+            }
+            default:{
+                return new LoadingHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_layout,parent,false));
             }
         }
     }
 
     @Override
     public void onBindViewHolder(EventHolder holder, final int position) {
-        DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
@@ -91,25 +116,27 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 break;
             case 3:
                 MessageHolder messageHolder = (MessageHolder) holder;
-                if (position == 0 || arrMessDetail.get(position - 1).getType() != arrMessDetail.get(position).getType()){
-                    messageHolder.textViewDate.setVisibility(View.VISIBLE);
-                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                    messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    Glide.with(context)
-                            .load(arrMessDetail.get(position).getUser().getAvatar())
-                            .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                            .apply(RequestOptions.errorOf(R.drawable.grid_item))
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(messageHolder.imageViewAvatar);
-                    messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
-                }else {
-                    messageHolder.textViewDate.setVisibility(View.GONE);
-                    messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                    messageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
+                if (position == 0 || position > 0 && arrMessDetail.get(position-1)!=null) {
+                    if (position == 0 || arrMessDetail.get(position - 1).getType() != arrMessDetail.get(position).getType()){
+                        messageHolder.textViewDate.setVisibility(View.VISIBLE);
+                        messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                        messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                        Glide.with(context)
+                                .load(arrMessDetail.get(position).getUser().getAvatar())
+                                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                                .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(messageHolder.imageViewAvatar);
+                        messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
+                    } else {
+                        messageHolder.textViewDate.setVisibility(View.GONE);
+                        messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
+                        messageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
+                    }
+                    messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 }
-                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 break;
-            default:
+            case 4:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
                 if (position == 0 || arrMessDetail.get(position - 1).getType() != arrMessDetail.get(position).getType()){
                     myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
@@ -135,7 +162,11 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                     myMessageHolder.imageViewWarningDot.setVisibility(View.INVISIBLE);
                 }
                 break;
-
+            default:{
+                LoadingHolder loadingHolder = (LoadingHolder) holder;
+                loadingHolder.progressBar.setIndeterminate(true);
+                break;
+            }
         }
     }
 
@@ -149,7 +180,11 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
 
     @Override
     public int getItemCount() {
-        return arrMessDetail.size();
+        return arrMessDetail == null ? 0 : arrMessDetail.size();
+    }
+
+    public void setLoaded() {
+        isLoading = false;
     }
 
     public class EventHolder extends RecyclerView.ViewHolder {
@@ -218,5 +253,22 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
             imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
         }
+    }
+
+    public class LoadingHolder extends EventHolder{
+        public ProgressBar progressBar;
+        public LoadingHolder(View view){
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBarLoadMoreMsg);
+        }
+    }
+
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+
+    private OnLoadMoreListener onLoadMoreListener;
+    public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
+        this.onLoadMoreListener = mOnLoadMoreListener;
     }
 }

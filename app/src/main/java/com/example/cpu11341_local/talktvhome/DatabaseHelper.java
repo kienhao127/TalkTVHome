@@ -127,20 +127,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public User getUser(int userID){
-        User user = new User();
-        String selectQuery = "SELECT  *" +
-                " FROM " + USER_TABLE_NAME +
-                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cUser = db.rawQuery(selectQuery, null);
-        if (cUser.moveToFirst()) {
-            do {
-                user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
-                user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
-                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
-            } while (cUser.moveToNext());
-        }
-        db.close();
+        User user = new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi");
+//        String selectQuery = "SELECT  *" +
+//                " FROM " + USER_TABLE_NAME +
+//                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor cUser = db.rawQuery(selectQuery, null);
+//        if (cUser.moveToFirst()) {
+//            do {
+//                user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
+//                user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
+//                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
+//            } while (cUser.moveToNext());
+//        }
+//        db.close();
         return user;
     }
 
@@ -232,10 +232,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<MessageDetail> getListMessage(int senderID){
+    public ArrayList<MessageDetail> getListMessage(int senderID, int scrollTimes){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
-                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 50)" +
+                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
                             " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();

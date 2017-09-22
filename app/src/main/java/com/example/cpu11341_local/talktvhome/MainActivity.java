@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Random r = new Random();
         final Handler handler = new Handler();
-        final int delay = 5000; //milliseconds
+        final int delay = 3000; //milliseconds
 //
 //        handler.postDelayed(new Runnable(){
 //            public void run(){
@@ -83,14 +83,16 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }, delay);
 //
+
 //        handler.postDelayed(new Runnable(){
+//            int i=0;
 //            public void run(){
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
 //                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1, getBaseContext()),
-//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(r.nextInt(100)), false);
-//
+//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//                i++;
 //                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
 //                handler.postDelayed(this, delay);
 //            }

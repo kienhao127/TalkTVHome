@@ -25,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
+import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.DatabaseHelper;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
@@ -57,6 +58,8 @@ public class ChatFragment extends Fragment {
     TalkTextView talkTextViewSend;
     MessageDataManager.DataListener dataListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
+    int scrollTimes = 0;
+    boolean isAllMsg = false;
 
     public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
@@ -151,13 +154,42 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        arrMessDetail = MessageDataManager.getInstance().getListMessage(senderID, getContext());
-        adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail);
-
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
-        messDetailRecyclerView.setAdapter(adapter);
+        adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail, messDetailRecyclerView);
         messDetailRecyclerView.scrollToPosition(adapter.getItemCount()-1);
+        //set load more listener for the RecyclerView adapter
+        adapter.setOnLoadMoreListener(new MessageDetailRecyclerAdapter.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                if (!isAllMsg){
+                    arrMessDetail.add(0, null);
+                    adapter.notifyItemInserted(0);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.i("RunHandler", "Load data");
+                            arrMessDetail.remove(0);
+                            adapter.notifyItemRemoved(0);
+
+                            //Generating more data
+                            scrollTimes++;
+                            ArrayList<MessageDetail> arrMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
+                            if (arrMsgDetail.size() < 30){
+                                isAllMsg = true;
+                            }
+                            arrMessDetail.addAll(0, arrMsgDetail);
+                            adapter.notifyDataSetChanged();
+                            adapter.setLoaded();
+                        }
+                    }, 3000);
+                } else {
+                    Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+        messDetailRecyclerView.setAdapter(adapter);
         return view;
     }
 
@@ -170,7 +202,7 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         arrMessDetail.clear();
-        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
+        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -189,17 +221,5 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
-    }
-
-    class MyTask extends AsyncTask<String, Integer, String>{
-        @Override
-        protected String doInBackground(String... params) {
-            arrMessDetail.clear();
-            arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-            return null;
-        }
     }
 }

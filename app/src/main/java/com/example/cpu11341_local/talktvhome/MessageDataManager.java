@@ -39,10 +39,10 @@ public class MessageDataManager {
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() throws ParseException {
-//        linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
-//        linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
-//        linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
-//        linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
+        linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
+        linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
+        linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
 
 //        arrMessDetail.add(new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
 //                "Tên event 1", dateFormat.parse("25/08/17 09:47:02").getTime(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra"));
@@ -75,12 +75,19 @@ public class MessageDataManager {
         return instance;
     }
 
-    public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
+    public ArrayList<MessageDetail> getListMessageFromDB(int senderID, Context context, int scrollTimes){
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
         long t = System.currentTimeMillis();
-        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(senderID);
+        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(senderID, scrollTimes);
+        linkedHashMapMsgDetail.put(senderID, arrMessageDetailOfSender);
         long d = System.currentTimeMillis() - t;
         Log.i("Load msg time ", String.valueOf(d));
+        return arrMessageDetailOfSender;
+    }
+
+    public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
+        ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
+        arrMessageDetailOfSender = linkedHashMapMsgDetail.get(senderID);
         return arrMessageDetailOfSender;
     }
 
@@ -96,7 +103,6 @@ public class MessageDataManager {
                 linkedHashMapTopic.put(topic.getUserId(), topic);
             }
         }
-
         return arrTopic;
     }
 
@@ -106,7 +112,7 @@ public class MessageDataManager {
     }
 
     public User getUser(int userID, Context context){
-        return DatabaseHelper.getInstance(context).getUser(userID);
+        return linkedHashMapUser.get(userID);
     }
 
     public User getCurrentUser(){
@@ -115,6 +121,11 @@ public class MessageDataManager {
 
     public boolean insertMessage(MessageDetail messageDetail, Context context){
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
+        ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
+        arrMsgDetail = linkedHashMapMsgDetail.get(messageDetail.getUser().getId());
+        if (arrMsgDetail != null){
+            arrMsgDetail.add(messageDetail);
+        }
         updateTopic(messageDetail.getUser().getId(), messageDetail, context);
         return true;
     }
