@@ -47,4 +47,9 @@ public class ElapsedTime {
         }
         return df.format(date);
     }
+
+    public static int getDayOfDate(long date){
+        DateFormat df = new SimpleDateFormat("d");
+        return Integer.valueOf(df.format(date));
+    }
 }

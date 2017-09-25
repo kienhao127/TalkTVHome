@@ -1,15 +1,10 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.app.Activity;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
-import android.icu.util.TimeZone;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,17 +25,14 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.DatabaseHelper;
-import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
-import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -73,6 +67,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        arrMessDetail.clear();
+        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
 //        new MyTask().execute();
     }
 
@@ -121,7 +117,6 @@ public class ChatFragment extends Fragment {
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
                 MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
                 editText.setText("");
-                messDetailRecyclerView.smoothScrollToPosition(adapter.getItemCount()-1);
             }
         });
 
@@ -171,18 +166,17 @@ public class ChatFragment extends Fragment {
                             Log.i("RunHandler", "Load data");
                             arrMessDetail.remove(0);
                             adapter.notifyItemRemoved(0);
-
                             //Generating more data
                             scrollTimes++;
-                            ArrayList<MessageDetail> arrMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
-                            if (arrMsgDetail.size() < 30){
+                            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
+                            if (arrNewMsgDetail.size() < 30){
                                 isAllMsg = true;
                             }
-                            arrMessDetail.addAll(0, arrMsgDetail);
-                            adapter.notifyDataSetChanged();
+                            arrMessDetail.addAll(0, arrNewMsgDetail);
+                            adapter.notifyItemRangeInserted(0, arrNewMsgDetail.size());
                             adapter.setLoaded();
                         }
-                    }, 3000);
+                    }, 1000);
                 } else {
                     Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_LONG).show();
                 }
@@ -190,6 +184,25 @@ public class ChatFragment extends Fragment {
             }
         });
         messDetailRecyclerView.setAdapter(adapter);
+
+        adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view) {
+                TextView textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
+                TextView textViewText = (TextView) view.findViewById(R.id.textViewMessDetail);
+                if (textViewDateTime.getVisibility() == View.VISIBLE){
+                    Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
+                    textViewDateTime.setVisibility(View.GONE);
+                    textViewDateTime.startAnimation(showOff);
+                } else {
+                    Animation showUp = AnimationUtils.loadAnimation(getContext(), R.anim.show_up);
+                    Animation slide_down = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
+                    textViewDateTime.setVisibility(View.VISIBLE);
+                    textViewDateTime.startAnimation(showUp);
+                    textViewText.startAnimation(slide_down);
+                }
+            }
+        });
         return view;
     }
 
@@ -202,7 +215,8 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         arrMessDetail.clear();
-        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
+        Log.i("ArrMsgDetailSize", String.valueOf(MessageDataManager.getInstance().getListMessage(senderID, getContext()).size()));
+        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -217,6 +231,7 @@ public class ChatFragment extends Fragment {
                     arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
+                        messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
                     }
                 }
             }

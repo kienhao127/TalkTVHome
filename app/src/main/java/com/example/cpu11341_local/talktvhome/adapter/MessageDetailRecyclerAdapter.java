@@ -38,7 +38,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     boolean isLoading;
     private int visibleThreshold = 8;
-    private int lastVisibleItem, totalItemCount;
+    private int firstVisibleItem, totalItemCount;
 
     public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail, RecyclerView recyclerView){
         this.context = context;
@@ -51,8 +51,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 super.onScrolled(recyclerView, dx, dy);
                 if (linearLayoutManager != null){
                     totalItemCount = linearLayoutManager.getItemCount();
-                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (!isLoading && lastVisibleItem <= visibleThreshold) {
+                    firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+                    if (!isLoading && firstVisibleItem == 0) {
                         if (onLoadMoreListener != null) {
                             onLoadMoreListener.onLoadMore();
                         }
@@ -116,10 +116,26 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 break;
             case 3:
                 MessageHolder messageHolder = (MessageHolder) holder;
-                if (position == 0 || position > 0 && arrMessDetail.get(position-1)!=null) {
-                    if (position == 0 || arrMessDetail.get(position - 1).getType() != arrMessDetail.get(position).getType()){
-                        messageHolder.textViewDate.setVisibility(View.VISIBLE);
-                        messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                if (position == 0){
+                    messageHolder.textViewDate.setVisibility(View.VISIBLE);
+                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                } else {
+                    if (arrMessDetail.get(position - 1) != null){
+                        if (ElapsedTime.getDayOfDate(arrMessDetail.get(position).getDatetime()) != ElapsedTime.getDayOfDate(arrMessDetail.get(position - 1).getDatetime())) {
+                            messageHolder.textViewDate.setVisibility(View.VISIBLE);
+                            messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                        } else {
+                            messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                            messageHolder.textViewDate.setVisibility(View.GONE);
+                        }
+                    }
+                }
+
+                if (position < arrMessDetail.size() - 1){
+                    if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
+                        messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
+                        messageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
+                    } else {
                         messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                         Glide.with(context)
                                 .load(arrMessDetail.get(position).getUser().getAvatar())
@@ -127,33 +143,64 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                                 .apply(RequestOptions.errorOf(R.drawable.grid_item))
                                 .apply(RequestOptions.circleCropTransform())
                                 .into(messageHolder.imageViewAvatar);
+                        messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                         messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
-                    } else {
-                        messageHolder.textViewDate.setVisibility(View.GONE);
-                        messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                        messageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
                     }
-                    messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                } else {
+                    messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                    Glide.with(context)
+                            .load(arrMessDetail.get(position).getUser().getAvatar())
+                            .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                            .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(messageHolder.imageViewAvatar);
+                    messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                    messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                 }
+                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 break;
             case 4:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
-                if (position == 0 || arrMessDetail.get(position - 1).getType() != arrMessDetail.get(position).getType()){
+                if (position == 0){
                     myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
                     myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                } else {
+                    if (arrMessDetail.get(position - 1) != null){
+                        if (ElapsedTime.getDayOfDate(arrMessDetail.get(position).getDatetime()) != ElapsedTime.getDayOfDate(arrMessDetail.get(position - 1).getDatetime())) {
+                            myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
+                            myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                        } else {
+                            myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                            myMessageHolder.textViewDate.setVisibility(View.GONE);
+                        }
+                    }
+                }
+
+                if (position < arrMessDetail.size() - 1){
+                    if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
+                        myMessageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
+                        myMessageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
+                    } else {
+                        myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                        Glide.with(context)
+                                .load(MessageDataManager.getInstance().getCurrentUser().getAvatar())
+                                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                                .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(myMessageHolder.imageViewAvatar);
+                        myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                        myMessageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
+                    }
+                } else {
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    User curUser = MessageDataManager.getInstance().getCurrentUser();
                     Glide.with(context)
-                            .load(curUser.getAvatar())
+                            .load(MessageDataManager.getInstance().getCurrentUser().getAvatar())
                             .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                             .apply(RequestOptions.errorOf(R.drawable.grid_item))
                             .apply(RequestOptions.circleCropTransform())
                             .into(myMessageHolder.imageViewAvatar);
+                    myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                     myMessageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
-                }else {
-                    myMessageHolder.textViewDate.setVisibility(View.GONE);
-                    myMessageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                    myMessageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
                 }
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 if (arrMessDetail.get(position).isWarning()) {
@@ -171,7 +218,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
+        public void onItemClick(View view);
     }
 
     public void SetOnItemClickListener(final MessageDetailRecyclerAdapter.OnItemClickListener mItemClickListener) {
@@ -236,6 +283,14 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
             imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mItemClickListener!=null){
+                        mItemClickListener.onItemClick(v);
+                    }
+                }
+            });
         }
     }
 
@@ -252,6 +307,14 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
             imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mItemClickListener!=null){
+                        mItemClickListener.onItemClick(v);
+                    }
+                }
+            });
         }
     }
 
