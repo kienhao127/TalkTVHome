@@ -37,8 +37,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     private OnItemClickListener mItemClickListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     boolean isLoading;
-    private int visibleThreshold = 8;
-    private int firstVisibleItem, totalItemCount;
+    private int firstVisibleItem;
 
     public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail, RecyclerView recyclerView){
         this.context = context;
@@ -50,7 +49,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (linearLayoutManager != null){
-                    totalItemCount = linearLayoutManager.getItemCount();
                     firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
                     if (!isLoading && firstVisibleItem == 0) {
                         if (onLoadMoreListener != null) {
@@ -329,7 +327,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     public interface OnLoadMoreListener {
         void onLoadMore();
     }
-
     private OnLoadMoreListener onLoadMoreListener;
     public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
         this.onLoadMoreListener = mOnLoadMoreListener;

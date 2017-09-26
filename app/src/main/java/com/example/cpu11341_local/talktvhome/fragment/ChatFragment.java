@@ -2,6 +2,7 @@ package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.app.Activity;
 import android.icu.util.Calendar;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -20,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
@@ -52,8 +54,10 @@ public class ChatFragment extends Fragment {
     TalkTextView talkTextViewSend;
     MessageDataManager.DataListener dataListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
+    TextView textViewLoading;
     int scrollTimes = 0;
     boolean isAllMsg = false;
+    boolean isResume = false;
 
     public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
@@ -67,15 +71,12 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrMessDetail.clear();
-        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
-//        new MyTask().execute();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.chat_fragment,container,false);
-
+        View view = inflater.inflate(R.layout.chat_fragment, container, false);
+        textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
         talkTextViewSend = (TalkTextView) view.findViewById(R.id.talkTextViewSend);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -96,7 +97,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0){
+                if (s.length() > 0) {
                     talkTextViewSend.setVisibility(View.VISIBLE);
                 } else {
                     talkTextViewSend.setVisibility(View.INVISIBLE);
@@ -120,10 +121,10 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         mTitle.setText(toolbarTitle);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -131,9 +132,9 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 getActivity().onBackPressed();
 
-                if (getActivity() instanceof MessageActivity){
-                    if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0){
-                        MessageFragment messageFragment =  (MessageFragment) getFragmentManager().findFragmentByTag("MessFrag");
+                if (getActivity() instanceof MessageActivity) {
+                    if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0) {
+                        MessageFragment messageFragment = (MessageFragment) getFragmentManager().findFragmentByTag("MessFrag");
                         messageFragment.onResume();
                     }
                 }
@@ -152,31 +153,13 @@ public class ChatFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail, messDetailRecyclerView);
-        messDetailRecyclerView.scrollToPosition(adapter.getItemCount()-1);
+        messDetailRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
         //set load more listener for the RecyclerView adapter
         adapter.setOnLoadMoreListener(new MessageDetailRecyclerAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                if (!isAllMsg){
-                    arrMessDetail.add(0, null);
-                    adapter.notifyItemInserted(0);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i("RunHandler", "Load data");
-                            arrMessDetail.remove(0);
-                            adapter.notifyItemRemoved(0);
-                            //Generating more data
-                            scrollTimes++;
-                            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
-                            if (arrNewMsgDetail.size() < 30){
-                                isAllMsg = true;
-                            }
-                            arrMessDetail.addAll(0, arrNewMsgDetail);
-                            adapter.notifyItemRangeInserted(0, arrNewMsgDetail.size());
-                            adapter.setLoaded();
-                        }
-                    }, 1000);
+                if (!isAllMsg) {
+                    new LoadMoreDataTask().execute();
                 } else {
                     Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_LONG).show();
                 }
@@ -190,7 +173,7 @@ public class ChatFragment extends Fragment {
             public void onItemClick(View view) {
                 TextView textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
                 TextView textViewText = (TextView) view.findViewById(R.id.textViewMessDetail);
-                if (textViewDateTime.getVisibility() == View.VISIBLE){
+                if (textViewDateTime.getVisibility() == View.VISIBLE) {
                     Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
                     textViewDateTime.setVisibility(View.GONE);
                     textViewDateTime.startAnimation(showOff);
@@ -207,19 +190,17 @@ public class ChatFragment extends Fragment {
     }
 
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        arrMessDetail.clear();
-        Log.i("ArrMsgDetailSize", String.valueOf(MessageDataManager.getInstance().getListMessage(senderID, getContext()).size()));
-        arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+
+        LoadDataTask dataTask = new LoadDataTask();
+        dataTask.execute();
+
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic) {
@@ -236,5 +217,71 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private class LoadDataTask extends AsyncTask<String, Void, ArrayList<MessageDetail>> {
+        @Override
+        protected ArrayList<MessageDetail> doInBackground(String... urls) {
+
+            ArrayList<MessageDetail> arrayListMessageDetail = new ArrayList<>();
+            if (!isResume) {
+                arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
+            } else {
+                arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
+            }
+            return arrayListMessageDetail;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<MessageDetail> result) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    arrMessDetail.clear();
+                    arrMessDetail.addAll(result);
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                    if (!isResume){
+                        messDetailRecyclerView.scrollToPosition(arrMessDetail.size() - 1);
+                    }
+                    textViewLoading.setVisibility(View.GONE);
+                    isResume = true;
+                }
+            }, 150);
+        }
+    }
+
+    private class LoadMoreDataTask extends AsyncTask<String, Void, ArrayList<MessageDetail>> {
+        @Override
+        protected void onPreExecute() {
+            arrMessDetail.add(0, null);
+            adapter.notifyItemInserted(0);
+        }
+
+        @Override
+        protected ArrayList<MessageDetail> doInBackground(String... urls) {
+            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
+            return arrNewMsgDetail;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<MessageDetail> result) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scrollTimes++;
+                    if (result.size() < 30) {
+                        isAllMsg = true;
+                    }
+                    arrMessDetail.remove(0);
+                    adapter.notifyItemRemoved(0);
+
+                    arrMessDetail.addAll(0, result);
+                    adapter.notifyItemRangeInserted(0, result.size());
+                    adapter.setLoaded();
+                }
+            }, 150);
+        }
     }
 }
