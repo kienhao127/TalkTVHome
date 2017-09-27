@@ -21,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
@@ -51,7 +52,7 @@ public class ChatFragment extends Fragment {
     EditText editText;
     String toolbarTitle;
     int senderID;
-    TalkTextView talkTextViewSend;
+    ImageView imageViewSend;
     MessageDataManager.DataListener dataListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     TextView textViewLoading;
@@ -75,20 +76,13 @@ public class ChatFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.i("ASDAS", "ASDASD");
         View view = inflater.inflate(R.layout.chat_fragment, container, false);
         textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
-        talkTextViewSend = (TalkTextView) view.findViewById(R.id.talkTextViewSend);
+        imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         editText = (EditText) view.findViewById(R.id.editText);
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -97,22 +91,20 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 0) {
-                    talkTextViewSend.setVisibility(View.VISIBLE);
+                if (s.length() > 0 && !("".equals(s.toString().trim()))) {
+                    imageViewSend.setVisibility(View.VISIBLE);
                 } else {
-                    talkTextViewSend.setVisibility(View.INVISIBLE);
+                    imageViewSend.setVisibility(View.INVISIBLE);
                 }
             }
-
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
 
-        talkTextViewSend.setOnClickListener(new View.OnClickListener() {
+        imageViewSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 MessageDetail messageDetail = null;
                 messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID, getContext()),
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
@@ -130,8 +122,8 @@ public class ChatFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyboard(v);
                 getActivity().onBackPressed();
-
                 if (getActivity() instanceof MessageActivity) {
                     if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0) {
                         MessageFragment messageFragment = (MessageFragment) getFragmentManager().findFragmentByTag("MessFrag");
@@ -142,18 +134,12 @@ public class ChatFragment extends Fragment {
         });
 
         messDetailRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessDetail);
-        messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                hideKeyboard(v);
-                return false;
-            }
-        });
 
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail, messDetailRecyclerView);
         messDetailRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
+
         //set load more listener for the RecyclerView adapter
         adapter.setOnLoadMoreListener(new MessageDetailRecyclerAdapter.OnLoadMoreListener() {
             @Override
@@ -186,18 +172,52 @@ public class ChatFragment extends Fragment {
                 }
             }
         });
+
+        messDetailRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v,
+                                       int left, int top, int right, int bottom,
+                                       int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (bottom < oldBottom) {
+                    messDetailRecyclerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            messDetailRecyclerView.scrollToPosition(
+                                    messDetailRecyclerView.getAdapter().getItemCount() - 1);
+                        }
+                    }, 100);
+                }
+            }
+        });
+
+        messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
+            float x1, x2;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    x1 = event.getX();
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP){
+                    x2 = event.getX();
+                    if (x1 == x2){
+                        hideKeyboard(v);
+                    }
+                }
+                return false;
+            }
+        });
         return view;
     }
 
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
+        editText.clearFocus();
         LoadDataTask dataTask = new LoadDataTask();
         dataTask.execute();
 
@@ -257,6 +277,7 @@ public class ChatFragment extends Fragment {
         protected void onPreExecute() {
             arrMessDetail.add(0, null);
             adapter.notifyItemInserted(0);
+            scrollTimes++;
         }
 
         @Override
@@ -267,21 +288,14 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(final ArrayList<MessageDetail> result) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    scrollTimes++;
-                    if (result.size() < 30) {
-                        isAllMsg = true;
-                    }
-                    arrMessDetail.remove(0);
-                    adapter.notifyItemRemoved(0);
-
-                    arrMessDetail.addAll(0, result);
-                    adapter.notifyItemRangeInserted(0, result.size());
-                    adapter.setLoaded();
-                }
-            }, 150);
+            if (result.size() < 30) {
+                isAllMsg = true;
+            }
+            arrMessDetail.remove(0);
+            adapter.notifyItemRemoved(0);
+            arrMessDetail.addAll(0, result);
+            adapter.notifyItemRangeInserted(0, result.size());
+            adapter.setLoaded();
         }
     }
 }

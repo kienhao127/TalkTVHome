@@ -274,18 +274,18 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         TextView textViewDate;
         ImageView imageViewWarningDot;
         ImageView imageViewMsgArrow;
-        public MessageHolder(View view){
+        public MessageHolder(final View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
             imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
-            view.setOnClickListener(new View.OnClickListener() {
+            textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mItemClickListener!=null){
-                        mItemClickListener.onItemClick(v);
+                        mItemClickListener.onItemClick(view);
                     }
                 }
             });
@@ -298,18 +298,18 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         TextView textViewDate;
         ImageView imageViewWarningDot;
         ImageView imageViewMsgArrow;
-        public MyMessageHolder(View view){
+        public MyMessageHolder(final View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
             imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
-            view.setOnClickListener(new View.OnClickListener() {
+            textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mItemClickListener!=null){
-                        mItemClickListener.onItemClick(v);
+                        mItemClickListener.onItemClick(view);
                     }
                 }
             });
