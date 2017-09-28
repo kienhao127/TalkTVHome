@@ -31,18 +31,20 @@ import java.util.Date;
  * Created by CPU11341-local on 9/5/2017.
  */
 
-public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDetailRecyclerAdapter.EventHolder> {
+public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private OnItemClickListener mItemClickListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     boolean isLoading;
     private int firstVisibleItem;
+    int itemType1Count = 0,itemType2Count = 0, itemType3Count = 0, itemType4Count = 0;
+    RecyclerView recyclerView;
 
     public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail, RecyclerView recyclerView){
         this.context = context;
         this.arrMessDetail = arrMessDetail;
-
+        this.recyclerView = recyclerView;
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -67,18 +69,22 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     }
 
     @Override
-    public EventHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
             case 1:{
+                itemType1Count++;
                 return new EventHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
             }
             case 2:{
+                itemType2Count++;
                 return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
             }
             case 3:{
+                itemType3Count++;
                 return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
             }
             case 4:{
+                itemType4Count++;
                 return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
             }
             default:{
@@ -88,7 +94,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
     }
 
     @Override
-    public void onBindViewHolder(EventHolder holder, final int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
@@ -213,6 +219,10 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
                 break;
             }
         }
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(1, itemType1Count);
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(2, itemType2Count);
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(3, itemType3Count);
+        recyclerView.getRecycledViewPool().setMaxRecycledViews(4, itemType4Count);
     }
 
     public interface OnItemClickListener {
@@ -225,7 +235,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
 
     @Override
     public int getItemCount() {
-        return arrMessDetail == null ? 0 : arrMessDetail.size();
+        return arrMessDetail.size();
     }
 
     public void setLoaded() {
@@ -251,7 +261,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         }
     }
 
-    public class RemindHolder extends EventHolder {
+    public class RemindHolder extends RecyclerView.ViewHolder {
         TextView textViewDateTime;
         TextView textViewTitle;
         TextView textViewDate;
@@ -268,7 +278,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         }
     }
 
-    public class MessageHolder extends EventHolder {
+    public class MessageHolder extends RecyclerView.ViewHolder {
         ImageView imageViewAvatar;
         TextView textViewMessDetail;
         TextView textViewDate;
@@ -292,7 +302,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         }
     }
 
-    public class MyMessageHolder extends EventHolder {
+    public class MyMessageHolder extends RecyclerView.ViewHolder {
         ImageView imageViewAvatar;
         TextView textViewMessDetail;
         TextView textViewDate;
@@ -316,7 +326,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<MessageDe
         }
     }
 
-    public class LoadingHolder extends EventHolder{
+    public class LoadingHolder extends RecyclerView.ViewHolder{
         public ProgressBar progressBar;
         public LoadingHolder(View view){
             super(view);

@@ -76,7 +76,7 @@ public class ChatFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.i("ASDAS", "ASDASD");
+        Log.i("OnCreateView", "ASDASD");
         View view = inflater.inflate(R.layout.chat_fragment, container, false);
         textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
@@ -134,12 +134,10 @@ public class ChatFragment extends Fragment {
         });
 
         messDetailRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessDetail);
-
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail, messDetailRecyclerView);
         messDetailRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
-
         //set load more listener for the RecyclerView adapter
         adapter.setOnLoadMoreListener(new MessageDetailRecyclerAdapter.OnLoadMoreListener() {
             @Override
@@ -153,7 +151,6 @@ public class ChatFragment extends Fragment {
             }
         });
         messDetailRecyclerView.setAdapter(adapter);
-
         adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view) {
@@ -217,6 +214,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.i("OnResume", "ASDASD");
         editText.clearFocus();
         LoadDataTask dataTask = new LoadDataTask();
         dataTask.execute();
@@ -257,6 +255,7 @@ public class ChatFragment extends Fragment {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i("LoadData", "ASDASD");
                     arrMessDetail.clear();
                     arrMessDetail.addAll(result);
                     if (adapter != null) {
@@ -282,6 +281,7 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
+            Log.i("LoadMoreData", "ASDASD");
             ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
             return arrNewMsgDetail;
         }
