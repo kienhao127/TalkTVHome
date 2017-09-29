@@ -51,7 +51,6 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
                 .apply(RequestOptions.errorOf(R.drawable.grid_item
                 ))
                 .into(holder.imageViewAvatar);
-
         holder.textViewName.setText(arrTopic.get(position).getName());
         holder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
         holder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));

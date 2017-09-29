@@ -13,6 +13,8 @@ import com.example.cpu11341_local.talktvhome.data.User;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by CPU11341-local on 9/7/2017.
@@ -72,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TOPIC_TABLE_CREATE =
             "CREATE TABLE " + TOPIC_TABLE_NAME + " (" +
-                    TOPIC_COLUMN_NAME_USERID + " INTEGER PRIMARY KEY, " +
+                    TOPIC_COLUMN_NAME_USERID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     TOPIC_COLUMN_NAME_NAME + " TEXT, " +
                     TOPIC_COLUMN_NAME_LASTMSG + " TEXT, " +
                     TOPIC_COLUMN_NAME_AVATAR + " TEXT, " +
@@ -127,7 +129,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public User getUser(int userID){
-        User user = new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi");
+        Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
+        linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
+        linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
+        linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
 //        String selectQuery = "SELECT  *" +
 //                " FROM " + USER_TABLE_NAME +
 //                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
@@ -141,7 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //            } while (cUser.moveToNext());
 //        }
 //        db.close();
-        return user;
+        return linkedHashMapUser.get(userID);
     }
 
     public boolean insertTopic(Topic topic){

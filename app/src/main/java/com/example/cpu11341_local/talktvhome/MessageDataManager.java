@@ -106,6 +106,10 @@ public class MessageDataManager {
         return arrTopic;
     }
 
+    public Topic getTopic(int senderID){
+        return linkedHashMapTopic.get(senderID);
+    }
+
     public boolean insertUser(User user, Context context){
         DatabaseHelper.getInstance(context).insertUser(user);
         return true;
@@ -167,8 +171,11 @@ public class MessageDataManager {
         }
         linkedHashMapTopic.put(senderID, newTopic);
         if (!isFollow(senderID)) {
-            if (linkedHashMapTopic.get(-1) == null)
-                linkedHashMapTopic.put(-1, new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true));
+            if (linkedHashMapTopic.get(-1) == null){
+                Topic unFollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true);
+                linkedHashMapTopic.put(-1, unFollowTopic);
+                DatabaseHelper.getInstance(context).insertTopic(unFollowTopic);
+            }
         }
         long t = System.currentTimeMillis();
         linkedHashMapTopic = sortByValue(linkedHashMapTopic);
@@ -185,7 +192,7 @@ public class MessageDataManager {
         this.dataListener = dataListener;
     }
 
-    private boolean isFollow(int senderID){
+    public boolean isFollow(int senderID){
         if (senderID == 2){
             return false;
         }

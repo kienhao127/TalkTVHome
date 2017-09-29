@@ -109,6 +109,7 @@ public class ChatFragment extends Fragment {
                 messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID, getContext()),
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
                 MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
+                messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
                 editText.setText("");
             }
         });
@@ -214,7 +215,6 @@ public class ChatFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("OnResume", "ASDASD");
         editText.clearFocus();
         LoadDataTask dataTask = new LoadDataTask();
         dataTask.execute();
@@ -230,7 +230,6 @@ public class ChatFragment extends Fragment {
                     arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
-                        messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
                     }
                 }
             }
@@ -240,7 +239,6 @@ public class ChatFragment extends Fragment {
     private class LoadDataTask extends AsyncTask<String, Void, ArrayList<MessageDetail>> {
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
-
             ArrayList<MessageDetail> arrayListMessageDetail = new ArrayList<>();
             if (!isResume) {
                 arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
@@ -294,7 +292,7 @@ public class ChatFragment extends Fragment {
             arrMessDetail.remove(0);
             adapter.notifyItemRemoved(0);
             arrMessDetail.addAll(0, result);
-            adapter.notifyItemRangeInserted(0, result.size());
+            adapter.notifyItemRangeInserted(0, result.size()-1);
             adapter.setLoaded();
         }
     }

@@ -215,6 +215,16 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
                 @Override
                 public void onDataChanged(Topic topic) {
+                    if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
+                        Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                        unFollowTopic.setHasNewMessage(true);
+                        DatabaseHelper.getInstance(getContext()).updateTopic(unFollowTopic);
+                        arrTopic.clear();
+                        arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                        if (adapter != null) {
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
                     topic.setHasNewMessage(true);
                     DatabaseHelper.getInstance(getContext()).updateTopic(topic);
                     arrTopic.clear();
