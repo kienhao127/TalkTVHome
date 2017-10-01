@@ -241,8 +241,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<MessageDetail> getListMessage(int senderID, int scrollTimes){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
-                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
-                            " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID +
+                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
