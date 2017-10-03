@@ -65,10 +65,6 @@ public class ChatFragment extends Fragment {
         this.senderID = senderID;
     }
 
-    public int getSenderID() {
-        return senderID;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -222,12 +218,13 @@ public class ChatFragment extends Fragment {
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic) {
-                ChatFragment chatFragment = (ChatFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-                if (chatFragment.getSenderID() == topic.getUserId()) {
+                Log.i("Arr msg detail", String.valueOf(MessageDataManager.getInstance().getListMessage(senderID, getContext()).size()));
+                if (senderID == topic.getUserId()) {
+                    Log.i("SnederID", String.valueOf(senderID));
                     topic.setHasNewMessage(false);
                     DatabaseHelper.getInstance(getContext()).updateTopic(topic);
                     arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(topic.getUserId(), getContext()));
+                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -253,7 +250,7 @@ public class ChatFragment extends Fragment {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("LoadData", "ASDASD");
+                    Log.i("LoadData", String.valueOf(result.size()));
                     arrMessDetail.clear();
                     arrMessDetail.addAll(result);
                     if (adapter != null) {

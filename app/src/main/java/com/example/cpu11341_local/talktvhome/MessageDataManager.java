@@ -33,7 +33,7 @@ public class MessageDataManager {
     DataListener dataListener;
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
     Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
-    ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
+    Map<Integer, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() throws ParseException {
@@ -77,19 +77,26 @@ public class MessageDataManager {
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
         long t = System.currentTimeMillis();
         arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(senderID, scrollTimes);
-        arrMsgDetail.addAll(0, arrMessageDetailOfSender);
+        ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
+        if (linkedHashMapMsgDetail.get(senderID) != null){
+            arrMsgDetail = linkedHashMapMsgDetail.get(senderID);
+            arrMsgDetail.addAll(0, arrMessageDetailOfSender);
+        } else {
+            arrMsgDetail.addAll(arrMessageDetailOfSender);
+        }
+        linkedHashMapMsgDetail.put(senderID, arrMsgDetail);
         long d = System.currentTimeMillis() - t;
         Log.i("Load msg time ", String.valueOf(d));
         return arrMessageDetailOfSender;
     }
 
     public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
-        return arrMsgDetail;
+        return linkedHashMapMsgDetail.get(senderID);
     }
 
-    public void clearMsgDetail(){
-        arrMsgDetail.clear();
-    }
+//    public void clearMsgDetail(){
+//        arrMsgDetail.clear();
+//    }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
@@ -125,8 +132,16 @@ public class MessageDataManager {
 
     public boolean insertMessage(MessageDetail messageDetail, Context context){
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
-        arrMsgDetail.add(messageDetail);
-        updateTopic(messageDetail.getUser().getId(), messageDetail, context);
+        int senderID = messageDetail.getUser().getId();
+        ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
+        if (linkedHashMapMsgDetail.get(senderID) != null){
+            arrMsgDetail = linkedHashMapMsgDetail.get(senderID);
+            arrMsgDetail.add(messageDetail);
+        }else {
+            arrMsgDetail.add(messageDetail);
+        }
+        linkedHashMapMsgDetail.put(senderID, arrMsgDetail);
+        updateTopic(senderID, messageDetail, context);
         return true;
     }
 

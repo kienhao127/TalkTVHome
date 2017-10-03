@@ -51,7 +51,7 @@ public class MessageActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        MessageDataManager.getInstance().clearMsgDetail();
+//        MessageDataManager.getInstance().clearMsgDetail();
         if (getSupportFragmentManager().getBackStackEntryCount() > 0){
             getSupportFragmentManager().popBackStack();
         } else {
