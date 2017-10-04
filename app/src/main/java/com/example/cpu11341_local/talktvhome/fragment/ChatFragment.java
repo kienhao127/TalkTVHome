@@ -212,19 +212,19 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         editText.clearFocus();
-        LoadDataTask dataTask = new LoadDataTask();
-        dataTask.execute();
+        if (!isResume){
+            LoadDataTask dataTask = new LoadDataTask();
+            dataTask.execute();
+        }
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
-            public void onDataChanged(Topic topic) {
-                Log.i("Arr msg detail", String.valueOf(MessageDataManager.getInstance().getListMessage(senderID, getContext()).size()));
+            public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 if (senderID == topic.getUserId()) {
                     Log.i("SnederID", String.valueOf(senderID));
                     topic.setHasNewMessage(false);
                     DatabaseHelper.getInstance(getContext()).updateTopic(topic);
-                    arrMessDetail.clear();
-                    arrMessDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
+                    arrMessDetail.add(messageDetail);
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -237,11 +237,7 @@ public class ChatFragment extends Fragment {
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
             ArrayList<MessageDetail> arrayListMessageDetail = new ArrayList<>();
-            if (!isResume) {
-                arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
-            } else {
-                arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessage(senderID, getContext()));
-            }
+            arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
             return arrayListMessageDetail;
         }
 
@@ -256,9 +252,7 @@ public class ChatFragment extends Fragment {
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
-                    if (!isResume){
-                        messDetailRecyclerView.scrollToPosition(arrMessDetail.size() - 1);
-                    }
+                    messDetailRecyclerView.scrollToPosition(arrMessDetail.size() - 1);
                     textViewLoading.setVisibility(View.GONE);
                     isResume = true;
                 }

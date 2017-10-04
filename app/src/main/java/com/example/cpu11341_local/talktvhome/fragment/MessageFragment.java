@@ -24,6 +24,7 @@ import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.TopicRecyclerAdapter;
+import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 
 import java.util.ArrayList;
@@ -214,7 +215,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
             MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
                 @Override
-                public void onDataChanged(Topic topic) {
+                public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                     if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
                         Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
                         unFollowTopic.setHasNewMessage(true);

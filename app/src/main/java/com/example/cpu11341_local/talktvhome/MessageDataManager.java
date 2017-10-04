@@ -173,7 +173,7 @@ public class MessageDataManager {
             long d = System.currentTimeMillis() - t;
             Log.i("Time: ", String.valueOf(d));
             if (dataListener!=null){
-                dataListener.onDataChanged(topic);
+                dataListener.onDataChanged(topic, messageDetail);
             }
             return true;
         }
@@ -182,7 +182,7 @@ public class MessageDataManager {
         DatabaseHelper.getInstance(context).insertTopic(newTopic);
 
         if (dataListener!=null){
-            dataListener.onDataChanged(newTopic);
+            dataListener.onDataChanged(newTopic, messageDetail);
         }
         linkedHashMapTopic.put(senderID, newTopic);
         if (!isFollow(senderID)) {
@@ -200,7 +200,7 @@ public class MessageDataManager {
     }
 
     public interface DataListener{
-        void onDataChanged(Topic topic);
+        void onDataChanged(Topic topic, MessageDetail messageDetail);
     }
 
     public void setDataListener(DataListener dataListener) {
