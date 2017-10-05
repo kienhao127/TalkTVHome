@@ -35,6 +35,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     private Context context;
     private OnItemClickListener mItemClickListener;
+    private OnItemLongClickListener mItemLongClickListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     boolean isLoading;
     private int firstVisibleItem;
@@ -229,8 +230,16 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         public void onItemClick(View view);
     }
 
-    public void SetOnItemClickListener(final MessageDetailRecyclerAdapter.OnItemClickListener mItemClickListener) {
+    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
+    }
+
+    public interface OnItemLongClickListener {
+        public void onItemLongClick(View view, int position);
+    }
+
+    public void SetOnItemLongClickListener(final OnItemLongClickListener mItemLongClickListener) {
+        this.mItemLongClickListener = mItemLongClickListener;
     }
 
     @Override
@@ -299,6 +308,15 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     }
                 }
             });
+            textViewMessDetail.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mItemLongClickListener!=null){
+                        mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -321,6 +339,15 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     if (mItemClickListener!=null){
                         mItemClickListener.onItemClick(view);
                     }
+                }
+            });
+            textViewMessDetail.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mItemLongClickListener!=null){
+                        mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
+                    }
+                    return true;
                 }
             });
         }

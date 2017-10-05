@@ -219,7 +219,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                     if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
                         Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
                         unFollowTopic.setHasNewMessage(true);
-                        DatabaseHelper.getInstance(getContext()).updateTopic(unFollowTopic);
+                        MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
                         arrTopic.clear();
                         arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
                         if (adapter != null) {
@@ -227,7 +227,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                         }
                     }
                     topic.setHasNewMessage(true);
-                    DatabaseHelper.getInstance(getContext()).updateTopic(topic);
+                    MessageDataManager.getInstance().updateTopic(topic, getContext());
                     arrTopic.clear();
                     arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
                     if (adapter != null) {

@@ -215,6 +215,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrTopic;
     }
 
+    public Topic getTopic(int senderID){
+        Topic topic = new Topic();
+        String selectQuery = "SELECT *" +
+                " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_USERID + " = " + senderID;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        if (cTopic.moveToFirst()) {
+            topic.setUserId(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID)));
+            topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
+            topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+            topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
+            topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
+            topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
+            topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+        }
+        db.close();
+        if (topic != null) {
+            return topic;
+        }
+        return null;
+    }
+
     public boolean insertMessage(MessageDetail messageDetail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

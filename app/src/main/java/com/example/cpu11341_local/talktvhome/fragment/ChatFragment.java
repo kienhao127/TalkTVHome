@@ -53,7 +53,6 @@ public class ChatFragment extends Fragment {
     String toolbarTitle;
     int senderID;
     ImageView imageViewSend;
-    MessageDataManager.DataListener dataListener;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     TextView textViewLoading;
     int scrollTimes = 0;
@@ -167,6 +166,13 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, int position) {
+                Toast.makeText(getContext(), "On Item Long Click" + String.valueOf(position), Toast.LENGTH_LONG).show();
+            }
+        });
+
         messDetailRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v,
@@ -223,11 +229,20 @@ public class ChatFragment extends Fragment {
                 if (senderID == topic.getUserId()) {
                     Log.i("SnederID", String.valueOf(senderID));
                     topic.setHasNewMessage(false);
-                    DatabaseHelper.getInstance(getContext()).updateTopic(topic);
+                    MessageDataManager.getInstance().updateTopic(topic, getContext());
                     arrMessDetail.add(messageDetail);
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
+                }
+                if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
+                    Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                    if (senderID == topic.getUserId()){
+                        unFollowTopic.setHasNewMessage(false);
+                    } else {
+                        unFollowTopic.setHasNewMessage(true);
+                    }
+                    MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
                 }
             }
         });

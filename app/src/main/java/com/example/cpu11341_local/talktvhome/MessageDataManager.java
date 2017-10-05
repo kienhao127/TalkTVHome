@@ -40,6 +40,7 @@ public class MessageDataManager {
         linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
         linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
         linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put(3, new User(3, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi 2"));
         linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
 
 //        arrMessDetail.add(new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
@@ -94,17 +95,13 @@ public class MessageDataManager {
         return linkedHashMapMsgDetail.get(senderID);
     }
 
-//    public void clearMsgDetail(){
-//        arrMsgDetail.clear();
-//    }
-
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
         }
         for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()){
-            if (isFollow(topic.getUserId()) == isFollow){
+            if (isFollow(topic.getUserId()) == isFollow) {
                 topic.setDate(topic.getDate());
                 arrTopic.add(topic);
                 linkedHashMapTopic.put(topic.getUserId(), topic);
@@ -117,10 +114,10 @@ public class MessageDataManager {
         return linkedHashMapTopic.get(senderID);
     }
 
-    public boolean insertUser(User user, Context context){
-        DatabaseHelper.getInstance(context).insertUser(user);
-        return true;
-    }
+//    public boolean insertUser(User user, Context context){
+//        DatabaseHelper.getInstance(context).insertUser(user);
+//        return true;
+//    }
 
     public User getUser(int userID, Context context){
         return linkedHashMapUser.get(userID);
@@ -141,11 +138,11 @@ public class MessageDataManager {
             arrMsgDetail.add(messageDetail);
         }
         linkedHashMapMsgDetail.put(senderID, arrMsgDetail);
-        updateTopic(senderID, messageDetail, context);
+        insert_updateTopic(senderID, messageDetail, context);
         return true;
     }
 
-    public boolean updateTopic(int senderID, MessageDetail messageDetail, Context context){
+    public boolean insert_updateTopic(int senderID, MessageDetail messageDetail, Context context){
         String strText = "";
 
         if (messageDetail.getType() == 4){
@@ -154,50 +151,48 @@ public class MessageDataManager {
             strText = messageDetail.getText();
         }
 
-        Topic topic = linkedHashMapTopic.get(-1);
         if (!isFollow(senderID)) {
+            Topic topic = linkedHashMapTopic.get(-1);
             if (topic != null) {
                 topic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
                 topic.setDate(messageDetail.getDatetime());
+            } else {
+                Topic unFollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true);
+                DatabaseHelper.getInstance(context).insertTopic(unFollowTopic);
+                linkedHashMapTopic.put(-1, unFollowTopic);
             }
         }
 
-        topic = linkedHashMapTopic.get(senderID);
-        if (topic != null){
+        Topic topic = DatabaseHelper.getInstance(context).getTopic(senderID);
+        if (topic.getName() != null){
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
             DatabaseHelper.getInstance(context).updateTopic(topic);
             linkedHashMapTopic.put(senderID, topic);
-            long t = System.currentTimeMillis();
-            linkedHashMapTopic = sortByValue(linkedHashMapTopic);
-            long d = System.currentTimeMillis() - t;
-            Log.i("Time: ", String.valueOf(d));
             if (dataListener!=null){
                 dataListener.onDataChanged(topic, messageDetail);
             }
-            return true;
-        }
-
-        Topic newTopic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true);
-        DatabaseHelper.getInstance(context).insertTopic(newTopic);
-
-        if (dataListener!=null){
-            dataListener.onDataChanged(newTopic, messageDetail);
-        }
-        linkedHashMapTopic.put(senderID, newTopic);
-        if (!isFollow(senderID)) {
-            if (linkedHashMapTopic.get(-1) == null){
-                Topic unFollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true);
-                linkedHashMapTopic.put(-1, unFollowTopic);
-                DatabaseHelper.getInstance(context).insertTopic(unFollowTopic);
+        } else {
+            Topic newTopic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true);
+            DatabaseHelper.getInstance(context).insertTopic(newTopic);
+            linkedHashMapTopic.put(senderID, newTopic);
+            if (dataListener!=null){
+                dataListener.onDataChanged(newTopic, messageDetail);
             }
         }
+
         long t = System.currentTimeMillis();
         linkedHashMapTopic = sortByValue(linkedHashMapTopic);
         long d = System.currentTimeMillis() - t;
         Log.i("Time: ", String.valueOf(d));
         return true;
     }
+
+    public boolean updateTopic(Topic topic, Context context){
+        DatabaseHelper.getInstance(context).updateTopic(topic);
+        return true;
+    }
+
 
     public interface DataListener{
         void onDataChanged(Topic topic, MessageDetail messageDetail);
@@ -208,7 +203,7 @@ public class MessageDataManager {
     }
 
     public boolean isFollow(int senderID){
-        if (senderID == 2){
+        if (senderID == 2 || senderID == 3){
             return false;
         }
         return true;
