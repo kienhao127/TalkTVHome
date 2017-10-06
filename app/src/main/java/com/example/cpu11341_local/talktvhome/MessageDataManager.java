@@ -91,8 +91,8 @@ public class MessageDataManager {
         return arrMessageDetailOfSender;
     }
 
-    public ArrayList<MessageDetail> getListMessage(int senderID, Context context){
-        return linkedHashMapMsgDetail.get(senderID);
+    public boolean deleteMessage(int id, Context context){
+        return DatabaseHelper.getInstance(context).deleteMessage(id);
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {

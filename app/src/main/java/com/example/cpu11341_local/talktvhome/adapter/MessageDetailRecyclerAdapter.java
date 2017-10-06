@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.User;
+import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -227,7 +230,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     }
 
     public interface OnItemClickListener {
-        public void onItemClick(View view);
+        public void onItemClick(View view, int position);
     }
 
     public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
@@ -303,8 +306,20 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mItemClickListener!=null){
-                        mItemClickListener.onItemClick(view);
+                    textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
+                    textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
+                    if (textViewDate.getVisibility() == View.VISIBLE) {
+                        Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
+                        textViewDate.setVisibility(View.GONE);
+                        textViewDate.startAnimation(showOff);
+                        textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
+                    } else {
+                        Animation showUp = AnimationUtils.loadAnimation(context, R.anim.show_up);
+                        Animation slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+                        textViewDate.setVisibility(View.VISIBLE);
+                        textViewDate.startAnimation(showUp);
+                        textViewMessDetail.startAnimation(slide_down);
+                        textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
                     }
                 }
             });
@@ -336,8 +351,20 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mItemClickListener!=null){
-                        mItemClickListener.onItemClick(view);
+                    textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
+                    textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
+                    if (textViewDate.getVisibility() == View.VISIBLE) {
+                        Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
+                        textViewDate.setVisibility(View.GONE);
+                        textViewDate.startAnimation(showOff);
+                        textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
+                    } else {
+                        Animation showUp = AnimationUtils.loadAnimation(context, R.anim.show_up);
+                        Animation slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
+                        textViewDate.setVisibility(View.VISIBLE);
+                        textViewDate.startAnimation(showUp);
+                        textViewMessDetail.startAnimation(slide_down);
+                        textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
                     }
                 }
             });

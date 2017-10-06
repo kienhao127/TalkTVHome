@@ -14,6 +14,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
+
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerViewMessDetail"
         android:layout_width="match_parent"
@@ -62,7 +64,6 @@
             android:layout_toStartOf="@+id/imageViewSend"
             android:layout_toRightOf="@+id/imageViewEmoji"
             android:layout_toEndOf="@+id/imageViewEmoji" />
-
         <ImageView
             android:id="@+id/imageViewSend"
             android:padding="8dp"
@@ -73,4 +74,5 @@
             android:layout_alignParentEnd="true"
             android:visibility="invisible"/>
     </RelativeLayout>
+    <include layout="@layout/context_menu_layout"/>
 </RelativeLayout>

@@ -289,4 +289,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return arrMessDetail;
     }
+
+    public boolean deleteMessage(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
+    }
 }

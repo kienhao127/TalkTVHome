@@ -1,6 +1,9 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,9 +23,12 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
@@ -35,6 +41,8 @@ import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapte
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -58,6 +66,13 @@ public class ChatFragment extends Fragment {
     int scrollTimes = 0;
     boolean isAllMsg = false;
     boolean isResume = false;
+    boolean isDeleted = false;
+    RelativeLayout relativeLayoutContextMenu;
+    int selectedPosition;
+    TalkTextView selectedMsgDetailItem;
+    Button btnCopy;
+    Button btnShare;
+    Button btnDelete;
 
     public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
@@ -70,7 +85,7 @@ public class ChatFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         Log.i("OnCreateView", "ASDASD");
         View view = inflater.inflate(R.layout.chat_fragment, container, false);
         textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
@@ -78,6 +93,10 @@ public class ChatFragment extends Fragment {
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         editText = (EditText) view.findViewById(R.id.editText);
+        relativeLayoutContextMenu = (RelativeLayout) view.findViewById(R.id.contextMenu);
+        btnCopy = (Button) view.findViewById(R.id.btnCopy);
+        btnShare = (Button) view.findViewById(R.id.btnShare);
+        btnDelete = (Button) view.findViewById(R.id.btnDelete);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -147,29 +166,20 @@ public class ChatFragment extends Fragment {
             }
         });
         messDetailRecyclerView.setAdapter(adapter);
-        adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view) {
-                TextView textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
-                TextView textViewText = (TextView) view.findViewById(R.id.textViewMessDetail);
-                if (textViewDateTime.getVisibility() == View.VISIBLE) {
-                    Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
-                    textViewDateTime.setVisibility(View.GONE);
-                    textViewDateTime.startAnimation(showOff);
-                } else {
-                    Animation showUp = AnimationUtils.loadAnimation(getContext(), R.anim.show_up);
-                    Animation slide_down = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
-                    textViewDateTime.setVisibility(View.VISIBLE);
-                    textViewDateTime.startAnimation(showUp);
-                    textViewText.startAnimation(slide_down);
-                }
-            }
-        });
 
         adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
-                Toast.makeText(getContext(), "On Item Long Click" + String.valueOf(position), Toast.LENGTH_LONG).show();
+                selectedPosition = position;
+                selectedMsgDetailItem = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
+                if (arrMessDetail.get(position).getType() == 4){
+                    selectedMsgDetailItem.setBackgroundResource(R.drawable.selected_my_msg_box);
+                } else {
+                    selectedMsgDetailItem.setBackgroundResource(R.drawable.selected_msg_box);
+                }
+                Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
+                relativeLayoutContextMenu.setVisibility(View.VISIBLE);
+                relativeLayoutContextMenu.startAnimation(enter_from_bottom);
             }
         });
 
@@ -206,6 +216,56 @@ public class ChatFragment extends Fragment {
                 return false;
             }
         });
+
+        relativeLayoutContextMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (relativeLayoutContextMenu.getVisibility() == View.VISIBLE) {
+                    Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
+                    relativeLayoutContextMenu.setVisibility(View.GONE);
+                    relativeLayoutContextMenu.startAnimation(context_menu_exit);
+                    if (!isDeleted) {
+                        if (arrMessDetail.get(selectedPosition).getType() == 4) {
+                            selectedMsgDetailItem.setBackgroundResource(R.drawable.my_message_box);
+                        } else {
+                            selectedMsgDetailItem.setBackgroundResource(R.drawable.rounded_corner);
+                        }
+                    }
+                    isDeleted = false;
+                }
+            }
+        });
+
+        btnCopy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData cData = ClipData.newPlainText("text", arrMessDetail.get(selectedPosition).getText());
+                clipboardManager.setPrimaryClip(cData);
+                Toast.makeText(getContext(), "Đã sao chép", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Share " + arrMessDetail.get(selectedPosition).getText(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
+                Toast.makeText(getContext(), "Delete " + arrMessDetail.get(selectedPosition).getText(), Toast.LENGTH_LONG).show();
+                arrMessDetail.remove(selectedPosition);
+                adapter.notifyDataSetChanged();
+                Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
+                relativeLayoutContextMenu.setVisibility(View.GONE);
+                relativeLayoutContextMenu.startAnimation(context_menu_exit);
+            }
+        });
+
         return view;
     }
 
