@@ -64,15 +64,11 @@ public class ChatFragment extends Fragment {
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     TextView textViewLoading;
     int scrollTimes = 0;
-    boolean isAllMsg = false;
-    boolean isResume = false;
-    boolean isDeleted = false;
+    boolean isAllMsg = false, isResume = false;
     RelativeLayout relativeLayoutContextMenu;
     int selectedPosition;
-    TalkTextView selectedMsgDetailItem;
-    Button btnCopy;
-    Button btnShare;
-    Button btnDelete;
+    TalkTextView selectedMsgDetail;
+    Button btnCopy, btnShare, btnDelete;
 
     public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
@@ -97,6 +93,7 @@ public class ChatFragment extends Fragment {
         btnCopy = (Button) view.findViewById(R.id.btnCopy);
         btnShare = (Button) view.findViewById(R.id.btnShare);
         btnDelete = (Button) view.findViewById(R.id.btnDelete);
+        selectedMsgDetail = (TalkTextView) view.findViewById(R.id.seletedMsgDetail);
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -149,6 +146,7 @@ public class ChatFragment extends Fragment {
         });
 
         messDetailRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessDetail);
+        messDetailRecyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         messDetailRecyclerView.setLayoutManager(layoutManager);
         adapter = new MessageDetailRecyclerAdapter(getContext(), arrMessDetail, messDetailRecyclerView);
@@ -165,18 +163,14 @@ public class ChatFragment extends Fragment {
 
             }
         });
+
         messDetailRecyclerView.setAdapter(adapter);
 
         adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                selectedMsgDetailItem = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
-                if (arrMessDetail.get(position).getType() == 4){
-                    selectedMsgDetailItem.setBackgroundResource(R.drawable.selected_my_msg_box);
-                } else {
-                    selectedMsgDetailItem.setBackgroundResource(R.drawable.selected_msg_box);
-                }
+                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(senderID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
                 relativeLayoutContextMenu.startAnimation(enter_from_bottom);
@@ -224,14 +218,6 @@ public class ChatFragment extends Fragment {
                     Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                     relativeLayoutContextMenu.setVisibility(View.GONE);
                     relativeLayoutContextMenu.startAnimation(context_menu_exit);
-                    if (!isDeleted) {
-                        if (arrMessDetail.get(selectedPosition).getType() == 4) {
-                            selectedMsgDetailItem.setBackgroundResource(R.drawable.my_message_box);
-                        } else {
-                            selectedMsgDetailItem.setBackgroundResource(R.drawable.rounded_corner);
-                        }
-                    }
-                    isDeleted = false;
                 }
             }
         });
@@ -256,13 +242,27 @@ public class ChatFragment extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
-                Toast.makeText(getContext(), "Delete " + arrMessDetail.get(selectedPosition).getText(), Toast.LENGTH_LONG).show();
-                arrMessDetail.remove(selectedPosition);
-                adapter.notifyDataSetChanged();
                 Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
+                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
+                Topic topic = MessageDataManager.getInstance().getTopic(senderID);
+                if (isDeleted) {
+                    Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
+                }
+                if (selectedPosition == arrMessDetail.size()-1){
+                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+                    MessageDataManager.getInstance().updateTopic(topic, getContext());
+//                    if (!MessageDataManager.getInstance().isFollow(senderID)){
+//                        Topic unfollowTopic = MessageDataManager.getInstance().getTopic(-1);
+//                        if (unfollowTopic.getUserId() == senderID){
+//                            unfollowTopic.setLastMess(MessageDataManager.getInstance().getUser(senderID, getContext()).getName() + ": " + arrMessDetail.get(selectedPosition-1).getText());
+//                        }
+//                        MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+//                    }
+                }
+                arrMessDetail.remove(selectedPosition);
+                adapter.notifyDataSetChanged();
             }
         });
 

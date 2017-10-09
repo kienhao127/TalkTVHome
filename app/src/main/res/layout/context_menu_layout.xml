@@ -3,13 +3,38 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:clickable="true"
     android:id="@+id/contextMenu"
-    android:visibility="gone">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal" android:layout_width="match_parent"
+    android:visibility="gone"
+    >
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
+        android:id="@+id/seletedMsgDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/view_left_border"
+        android:textSize="17dp"
+        android:paddingLeft="7dp"
+        android:textColor="#000"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_above="@+id/line"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        />
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e8e8e8"
+        android:layout_above="@+id/linearLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
 
         <Button
             android:id="@+id/btnCopy"
@@ -17,7 +42,7 @@
             android:layout_height="wrap_content"
             android:drawableTop="@mipmap/ic_copy"
             android:text="Sao chép"
-            android:background="#FFF"
+            android:background="#f8f8f8"
             android:textColor="#9d9d9d"
             android:layout_weight="1.0"
             android:textAllCaps="false"
@@ -28,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
-            android:background="#FFF"
+            android:background="#f8f8f8"
             android:drawableTop="@mipmap/ic_share"
             android:text="Chuyển tiếp"
             android:textAllCaps="false"
@@ -41,7 +66,7 @@
             android:layout_height="wrap_content"
             android:drawableTop="@mipmap/ic_delete"
             android:text="Xóa"
-            android:background="#FFF"
+            android:background="#f8f8f8"
             android:textColor="#9d9d9d"
             android:layout_weight="1.0"
             android:textAllCaps="false"

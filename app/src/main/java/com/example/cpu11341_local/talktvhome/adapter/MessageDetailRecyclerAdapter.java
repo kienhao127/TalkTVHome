@@ -42,7 +42,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     boolean isLoading;
     private int firstVisibleItem;
-    int itemType1Count = 0,itemType2Count = 0, itemType3Count = 0, itemType4Count = 0;
     RecyclerView recyclerView;
 
     public MessageDetailRecyclerAdapter(Context context, ArrayList<MessageDetail> arrMessDetail, RecyclerView recyclerView){
@@ -74,21 +73,18 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.i("onCreateViewHolder", "Message Detail Recycler Adapter");
         switch (viewType) {
             case 1:{
-                itemType1Count++;
                 return new EventHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
             }
             case 2:{
-                itemType2Count++;
                 return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
             }
             case 3:{
-                itemType3Count++;
                 return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
             }
             case 4:{
-                itemType4Count++;
                 return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
             }
             default:{
@@ -123,6 +119,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
             case 3:
+                Log.i("onBindViewHolder", "Message Detail Recycler Adapter");
                 MessageHolder messageHolder = (MessageHolder) holder;
                 if (position == 0){
                     messageHolder.textViewDate.setVisibility(View.VISIBLE);
@@ -223,10 +220,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 break;
             }
         }
-        recyclerView.getRecycledViewPool().setMaxRecycledViews(1, itemType1Count);
-        recyclerView.getRecycledViewPool().setMaxRecycledViews(2, itemType2Count);
-        recyclerView.getRecycledViewPool().setMaxRecycledViews(3, itemType3Count);
-        recyclerView.getRecycledViewPool().setMaxRecycledViews(4, itemType4Count);
     }
 
     public interface OnItemClickListener {
@@ -306,8 +299,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
-                    textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
                     if (textViewDate.getVisibility() == View.VISIBLE) {
                         Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
                         textViewDate.setVisibility(View.GONE);
@@ -351,8 +342,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
-                    textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
                     if (textViewDate.getVisibility() == View.VISIBLE) {
                         Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
                         textViewDate.setVisibility(View.GONE);
