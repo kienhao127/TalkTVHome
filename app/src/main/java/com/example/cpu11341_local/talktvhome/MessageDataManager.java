@@ -111,13 +111,12 @@ public class MessageDataManager {
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
-        ArrayList<Topic> arrTopic = DatabaseHelper.getInstance(context).getListTopic();
+        ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
         }
         for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()) {
             if (isFollow(topic.getUserId()) == isFollow) {
-                topic.setDate(topic.getDate());
                 arrTopic.add(topic);
                 linkedHashMapTopic.put(topic.getUserId(), topic);
             }
@@ -195,11 +194,6 @@ public class MessageDataManager {
                 dataListener.onDataChanged(newTopic, messageDetail);
             }
         }
-
-        long t = System.currentTimeMillis();
-        linkedHashMapTopic = sortTopicByValue(linkedHashMapTopic);
-        long d = System.currentTimeMillis() - t;
-        Log.i("Time: ", String.valueOf(d));
         return true;
     }
 

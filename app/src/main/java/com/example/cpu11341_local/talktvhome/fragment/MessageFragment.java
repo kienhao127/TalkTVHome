@@ -134,14 +134,14 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.message_fragment,container,false);
+        View view = inflater.inflate(R.layout.message_fragment, container, false);
 
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         mTitle.setText(toolbarTitle);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -151,7 +151,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        if (arrTopic == null){
+        if (arrTopic == null) {
 
         } else {
 
@@ -207,34 +207,33 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (arrTopic != null) {
-            arrTopic.clear();
+        if (arrTopic == null) {
             arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
-            MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
-                @Override
-                public void onDataChanged(Topic topic, MessageDetail messageDetail) {
-                    if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
-                        Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
-                        unFollowTopic.setHasNewMessage(true);
-                        MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
-                        arrTopic.clear();
-                        arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
-                        if (adapter != null) {
-                            adapter.notifyDataSetChanged();
-                        }
-                    }
-                    topic.setHasNewMessage(true);
-                    MessageDataManager.getInstance().updateTopic(topic, getContext());
+        }
+        MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
+            @Override
+            public void onDataChanged(Topic topic, MessageDetail messageDetail) {
+                if (!MessageDataManager.getInstance().isFollow(topic.getUserId())) {
+                    Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                    unFollowTopic.setHasNewMessage(true);
+                    MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
                     arrTopic.clear();
                     arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
                 }
-            });
-        }
+                topic.setHasNewMessage(true);
+                MessageDataManager.getInstance().updateTopic(topic, getContext());
+                arrTopic.clear();
+                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
     }
 }
