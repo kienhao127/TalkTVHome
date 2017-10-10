@@ -63,12 +63,12 @@ public class ChatFragment extends Fragment {
     ImageView imageViewSend;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     TextView textViewLoading;
+    TalkTextView selectedMsgDetail;
     int scrollTimes = 0;
     boolean isAllMsg = false, isResume = false;
     RelativeLayout relativeLayoutContextMenu;
     int selectedPosition;
-    TalkTextView selectedMsgDetail;
-    Button btnCopy, btnShare, btnDelete;
+    Button btnCopy, btnDelete;
 
     public ChatFragment(String toolbarTitle, int senderID) {
         this.toolbarTitle = toolbarTitle;
@@ -83,7 +83,7 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         Log.i("OnCreateView", "ASDASD");
-        View view = inflater.inflate(R.layout.chat_fragment, container, false);
+        final View view = inflater.inflate(R.layout.chat_fragment, container, false);
         textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -91,10 +91,8 @@ public class ChatFragment extends Fragment {
         editText = (EditText) view.findViewById(R.id.editText);
         relativeLayoutContextMenu = (RelativeLayout) view.findViewById(R.id.contextMenu);
         btnCopy = (Button) view.findViewById(R.id.btnCopy);
-        btnShare = (Button) view.findViewById(R.id.btnShare);
         btnDelete = (Button) view.findViewById(R.id.btnDelete);
         selectedMsgDetail = (TalkTextView) view.findViewById(R.id.seletedMsgDetail);
-
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -165,7 +163,34 @@ public class ChatFragment extends Fragment {
         });
 
         messDetailRecyclerView.setAdapter(adapter);
-
+        adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                TalkTextView textViewDate = (TalkTextView) view.findViewById(R.id.textViewDateTime);
+                TalkTextView textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
+                if (textViewDate.getVisibility() == View.VISIBLE) {
+                    Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
+                    textViewDate.setVisibility(View.GONE);
+                    textViewDate.startAnimation(showOff);
+                    if (arrMessDetail.get(position).getType()==4){
+                        textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
+                    } else {
+                        textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
+                    }
+                } else {
+                    Animation showUp = AnimationUtils.loadAnimation(getContext(), R.anim.show_up);
+                    Animation slide_down = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
+                    textViewDate.setVisibility(View.VISIBLE);
+                    textViewDate.startAnimation(showUp);
+                    textViewMessDetail.startAnimation(slide_down);
+                    if (arrMessDetail.get(position).getType()==4) {
+                        textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
+                    } else {
+                        textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
+                    }
+                }
+            }
+        });
         adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
@@ -232,34 +257,24 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        btnShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Share " + arrMessDetail.get(selectedPosition).getText(), Toast.LENGTH_LONG).show();
-            }
-        });
-
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
-                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
                 Topic topic = MessageDataManager.getInstance().getTopic(senderID);
+                if (selectedPosition == arrMessDetail.size()-1){
+                    if (selectedPosition == 0){
+                        MessageDataManager.getInstance().deleteTopic(topic, getContext());
+                    }else {
+                        topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+                        MessageDataManager.getInstance().updateTopic(topic, getContext());
+                    }
+                }
+                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), senderID, selectedPosition, getContext());
                 if (isDeleted) {
                     Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
-                }
-                if (selectedPosition == arrMessDetail.size()-1){
-                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
-                    MessageDataManager.getInstance().updateTopic(topic, getContext());
-//                    if (!MessageDataManager.getInstance().isFollow(senderID)){
-//                        Topic unfollowTopic = MessageDataManager.getInstance().getTopic(-1);
-//                        if (unfollowTopic.getUserId() == senderID){
-//                            unfollowTopic.setLastMess(MessageDataManager.getInstance().getUser(senderID, getContext()).getName() + ": " + arrMessDetail.get(selectedPosition-1).getText());
-//                        }
-//                        MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
-//                    }
                 }
                 arrMessDetail.remove(selectedPosition);
                 adapter.notifyDataSetChanged();
@@ -287,7 +302,6 @@ public class ChatFragment extends Fragment {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 if (senderID == topic.getUserId()) {
-                    Log.i("SnederID", String.valueOf(senderID));
                     topic.setHasNewMessage(false);
                     MessageDataManager.getInstance().updateTopic(topic, getContext());
                     arrMessDetail.add(messageDetail);

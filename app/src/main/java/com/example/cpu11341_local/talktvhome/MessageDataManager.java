@@ -4,9 +4,11 @@ import android.app.Fragment;
 import android.content.Context;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
+import android.provider.ContactsContract;
 import android.support.v4.app.FragmentManager;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
@@ -91,16 +93,29 @@ public class MessageDataManager {
         return arrMessageDetailOfSender;
     }
 
-    public boolean deleteMessage(int id, Context context){
+    public boolean deleteMessage(int id, int senderId, int position, Context context){
+        linkedHashMapTopic = sortTopicByValue(linkedHashMapTopic);
+        if (!isFollow(senderId)){
+            for(LinkedHashMap.Entry<Integer,Topic> mapEntry : linkedHashMapTopic.entrySet()){
+                int key = mapEntry.getKey();
+                Topic value = mapEntry.getValue();
+                if (!isFollow(key)){
+                    Topic unFollowTopic = linkedHashMapTopic.get(-1);
+                    unFollowTopic.setLastMess(value.getName() + ": " + value.getLastMess());
+                    unFollowTopic.setDate(value.getDate());
+                    DatabaseHelper.getInstance(context).updateTopic(unFollowTopic);
+                }
+            }
+        }
         return DatabaseHelper.getInstance(context).deleteMessage(id);
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
-        ArrayList<Topic> arrTopic = new ArrayList<>();
+        ArrayList<Topic> arrTopic = DatabaseHelper.getInstance(context).getListTopic();
         if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
         }
-        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()){
+        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()) {
             if (isFollow(topic.getUserId()) == isFollow) {
                 topic.setDate(topic.getDate());
                 arrTopic.add(topic);
@@ -182,7 +197,7 @@ public class MessageDataManager {
         }
 
         long t = System.currentTimeMillis();
-        linkedHashMapTopic = sortByValue(linkedHashMapTopic);
+        linkedHashMapTopic = sortTopicByValue(linkedHashMapTopic);
         long d = System.currentTimeMillis() - t;
         Log.i("Time: ", String.valueOf(d));
         return true;
@@ -193,6 +208,10 @@ public class MessageDataManager {
         return true;
     }
 
+    public boolean deleteTopic(Topic topic, Context context){
+        linkedHashMapTopic.remove(topic.getUserId());
+        return DatabaseHelper.getInstance(context).deleteTopic(topic);
+    }
 
     public interface DataListener{
         void onDataChanged(Topic topic, MessageDetail messageDetail);
@@ -209,7 +228,7 @@ public class MessageDataManager {
         return true;
     }
 
-    private static Map<Integer, Topic> sortByValue(Map<Integer, Topic> unsortMap) {
+    public static Map<Integer, Topic> sortTopicByValue(Map<Integer, Topic> unsortMap) {
 
         // 1. Convert Map to List of Map
         Topic topicSystem = unsortMap.get(0);

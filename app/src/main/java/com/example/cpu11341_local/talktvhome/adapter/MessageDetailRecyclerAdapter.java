@@ -163,6 +163,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                 }
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
                 break;
             case 4:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
@@ -208,6 +209,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     myMessageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                 }
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
                 if (arrMessDetail.get(position).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 } else {
@@ -299,18 +301,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (textViewDate.getVisibility() == View.VISIBLE) {
-                        Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
-                        textViewDate.setVisibility(View.GONE);
-                        textViewDate.startAnimation(showOff);
-                        textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
-                    } else {
-                        Animation showUp = AnimationUtils.loadAnimation(context, R.anim.show_up);
-                        Animation slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
-                        textViewDate.setVisibility(View.VISIBLE);
-                        textViewDate.startAnimation(showUp);
-                        textViewMessDetail.startAnimation(slide_down);
-                        textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
+                    if (mItemClickListener != null){
+                        mItemClickListener.onItemClick(view, getAdapterPosition());
                     }
                 }
             });
@@ -342,18 +334,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (textViewDate.getVisibility() == View.VISIBLE) {
-                        Animation showOff = AnimationUtils.loadAnimation(context, R.anim.show_off);
-                        textViewDate.setVisibility(View.GONE);
-                        textViewDate.startAnimation(showOff);
-                        textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
-                    } else {
-                        Animation showUp = AnimationUtils.loadAnimation(context, R.anim.show_up);
-                        Animation slide_down = AnimationUtils.loadAnimation(context, R.anim.slide_down);
-                        textViewDate.setVisibility(View.VISIBLE);
-                        textViewDate.startAnimation(showUp);
-                        textViewMessDetail.startAnimation(slide_down);
-                        textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
+                    if (mItemClickListener != null){
+                        mItemClickListener.onItemClick(view, getAdapterPosition());
                     }
                 }
             });

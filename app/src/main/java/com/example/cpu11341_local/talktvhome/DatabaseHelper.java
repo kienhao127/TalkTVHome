@@ -133,6 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
         linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
         linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put(3, new User(3, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi 2"));
         linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
 //        String selectQuery = "SELECT  *" +
 //                " FROM " + USER_TABLE_NAME +
@@ -195,7 +196,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Topic> getListTopic(){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
-                " FROM " + TOPIC_TABLE_NAME;
+                " FROM " + TOPIC_TABLE_NAME ;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
@@ -236,6 +237,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return topic;
         }
         return null;
+    }
+
+    public boolean deleteTopic(Topic topic){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_USERID + "=" + topic.getUserId(), null) > 0;
     }
 
     public boolean insertMessage(MessageDetail messageDetail) {
