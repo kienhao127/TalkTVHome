@@ -14,7 +14,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -242,16 +244,21 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
             ArrayList<Topic> arrListTopic = new ArrayList<>();
+            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext()) == null){
+                return null;
+            }
             arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
             return arrListTopic;
         }
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
-            arrTopic.clear();
-            arrTopic.addAll(result);
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
+            if (result!=null){
+                arrTopic.clear();
+                arrTopic.addAll(result);
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
             }
             textViewLoading.setVisibility(View.GONE);
         }

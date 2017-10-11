@@ -36,11 +36,6 @@ public class MessageDataManager {
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
     Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
     Map<Integer, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
-    int newestSenderTopicId;
-
-    public int getNewestSenderTopicId() {
-        return newestSenderTopicId;
-    }
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() throws ParseException {
@@ -131,13 +126,12 @@ public class MessageDataManager {
                 return Long.valueOf(o2.getDate()).compareTo(o1.getDate());
             }
         });
-        newestSenderTopicId = arrTopic.get(0).getUserId();
-        if (!isFollow){
+
+        if (!isFollow && arrTopic.size() != 0){
             unFollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
             unFollowTopic.setDate(arrTopic.get(0).getDate());
             updateTopic(unFollowTopic, context);
-        }
-        if (isFollow){
+        } else {
             if (unFollowTopic != null){
                 arrTopic.add(0, unFollowTopic);
             }

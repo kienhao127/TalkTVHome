@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -26,6 +29,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
 
     private Context context;
     private OnItemClickListener mItemClickListener;
+    private OnItemLongClickListener mItemLongClickListener;
     ArrayList<Topic> arrTopic = new ArrayList<>();
 
     public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
@@ -71,12 +75,20 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
         this.mItemClickListener = mItemClickListener;
     }
 
+    public interface OnItemLongClickListener {
+        public void onItemLongClick(View view, int position);
+    }
+
+    public void SetOnItemLongClickListener(final TopicRecyclerAdapter.OnItemLongClickListener mItemLongClickListener) {
+        this.mItemLongClickListener = mItemLongClickListener;
+    }
+
     @Override
     public int getItemCount() {
         return arrTopic.size();
     }
 
-    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
         ImageView imageViewAvatar;
         TextView textViewName;
         TextView textViewLastMess;
@@ -90,14 +102,40 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
             textViewLastMess = (TextView) view.findViewById(R.id.textViewLastMess);
             textViewDate = (TextView) view.findViewById(R.id.textViewDate);
             imageViewUnreadDot = (ImageView) view.findViewById(R.id.imageViewUnreadDot);
-            view.setOnClickListener(this);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mItemClickListener != null) {
+                        mItemClickListener.onItemClick(v, getAdapterPosition());
+                    }
+                }
+            });
+            view.setOnCreateContextMenuListener(this);
         }
 
         @Override
-        public void onClick(View v) {
-            if (mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getAdapterPosition());
-            }
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            MenuItem Delete = menu.add(0,0,0, "Xóa");
+            MenuItem Block = menu.add(0,1,0, "Chặn");
+            Delete.setOnMenuItemClickListener(onClickItem);
+            Block.setOnMenuItemClickListener(onClickItem);
         }
+
+        private final MenuItem.OnMenuItemClickListener onClickItem = new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case 0:
+                        Toast.makeText(context, "Xóa", Toast.LENGTH_LONG).show();
+                        break;
+
+                    case 1:
+                        Toast.makeText(context, "Chặn", Toast.LENGTH_LONG).show();
+                        break;
+                }
+                return true;
+            }
+        };
     }
+
 }
