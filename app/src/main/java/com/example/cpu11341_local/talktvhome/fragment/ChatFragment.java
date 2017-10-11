@@ -268,11 +268,12 @@ public class ChatFragment extends Fragment {
                     if (selectedPosition == 0){
                         MessageDataManager.getInstance().deleteTopic(topic, getContext());
                     }else {
+                        topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                         topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
                         MessageDataManager.getInstance().updateTopic(topic, getContext());
                     }
                 }
-                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), senderID, selectedPosition, getContext());
+                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
                 if (isDeleted) {
                     Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
                 }
@@ -345,7 +346,7 @@ public class ChatFragment extends Fragment {
                     textViewLoading.setVisibility(View.GONE);
                     isResume = true;
                 }
-            }, 150);
+            }, 100);
         }
     }
 

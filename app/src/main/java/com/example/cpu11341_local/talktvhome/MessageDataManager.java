@@ -36,6 +36,11 @@ public class MessageDataManager {
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
     Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
     Map<Integer, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
+    int newestSenderTopicId;
+
+    public int getNewestSenderTopicId() {
+        return newestSenderTopicId;
+    }
 
     private static MessageDataManager instance = null;
     protected MessageDataManager() throws ParseException {
@@ -93,32 +98,51 @@ public class MessageDataManager {
         return arrMessageDetailOfSender;
     }
 
-    public boolean deleteMessage(int id, int senderId, int position, Context context){
-        linkedHashMapTopic = sortTopicByValue(linkedHashMapTopic);
-        if (!isFollow(senderId)){
-            for(LinkedHashMap.Entry<Integer,Topic> mapEntry : linkedHashMapTopic.entrySet()){
-                int key = mapEntry.getKey();
-                Topic value = mapEntry.getValue();
-                if (!isFollow(key)){
-                    Topic unFollowTopic = linkedHashMapTopic.get(-1);
-                    unFollowTopic.setLastMess(value.getName() + ": " + value.getLastMess());
-                    unFollowTopic.setDate(value.getDate());
-                    DatabaseHelper.getInstance(context).updateTopic(unFollowTopic);
-                }
-            }
-        }
+    public boolean deleteMessage(int id, Context context){
         return DatabaseHelper.getInstance(context).deleteMessage(id);
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
+        Log.i("Get list topic", "Sort");
         ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
         }
+        Topic systemTopic = null, unFollowTopic = null;
         for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()) {
+            linkedHashMapTopic.put(topic.getUserId(), topic);
+            if (isFollow){
+                if (topic.getUserId() == 0){
+                    systemTopic = topic;
+                    continue;
+                }
+            }
+            if (topic.getUserId() == -1){
+                unFollowTopic = topic;
+                continue;
+            }
             if (isFollow(topic.getUserId()) == isFollow) {
                 arrTopic.add(topic);
-                linkedHashMapTopic.put(topic.getUserId(), topic);
+            }
+        }
+        Collections.sort(arrTopic, new Comparator<Topic>() {
+            @Override
+            public int compare(Topic o1, Topic o2) {
+                return Long.valueOf(o2.getDate()).compareTo(o1.getDate());
+            }
+        });
+        newestSenderTopicId = arrTopic.get(0).getUserId();
+        if (!isFollow){
+            unFollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
+            unFollowTopic.setDate(arrTopic.get(0).getDate());
+            updateTopic(unFollowTopic, context);
+        }
+        if (isFollow){
+            if (unFollowTopic != null){
+                arrTopic.add(0, unFollowTopic);
+            }
+            if (systemTopic != null){
+                arrTopic.add(0, systemTopic);
             }
         }
         return arrTopic;
@@ -204,6 +228,12 @@ public class MessageDataManager {
 
     public boolean deleteTopic(Topic topic, Context context){
         linkedHashMapTopic.remove(topic.getUserId());
+        for (Topic t: linkedHashMapTopic.values()) {
+            if (!isFollow(t.getUserId())){
+                return DatabaseHelper.getInstance(context).deleteTopic(topic);
+            }
+        }
+        DatabaseHelper.getInstance(context).deleteTopic(linkedHashMapTopic.get(-1));
         return DatabaseHelper.getInstance(context).deleteTopic(topic);
     }
 
@@ -222,38 +252,38 @@ public class MessageDataManager {
         return true;
     }
 
-    public static Map<Integer, Topic> sortTopicByValue(Map<Integer, Topic> unsortMap) {
-
-        // 1. Convert Map to List of Map
-        Topic topicSystem = unsortMap.get(0);
-        Topic topicUnfollowMsg = unsortMap.get(-1);
-        unsortMap.remove(0);
-        if (topicUnfollowMsg != null){
-            unsortMap.remove(-1);
-        }
-        List<Map.Entry<Integer, Topic>> list = new LinkedList<>(unsortMap.entrySet());
-
-        // 2. Sort list with Collections.sort(), provide a custom Comparator
-        //    Try switch the o1 o2 position for a different order
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Topic>>() {
-            public int compare(Map.Entry<Integer, Topic> o1,
-                               Map.Entry<Integer, Topic> o2) {
-                return (Long.valueOf(o2.getValue().getDate())).compareTo(o1.getValue().getDate());
-            }
-        });
-
-        // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
-        Map<Integer, Topic> sortedMap = new LinkedHashMap<Integer, Topic>();
-        if (topicSystem != null){
-            sortedMap.put(topicSystem.getUserId(), topicSystem);
-        }
-        if (topicUnfollowMsg != null){
-            sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
-        }
-        for (Map.Entry<Integer, Topic> entry : list) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
-    }
+//    public static Map<Integer, Topic> sortTopicByValue(Map<Integer, Topic> unsortMap) {
+//
+//        // 1. Convert Map to List of Map
+//        Topic topicSystem = unsortMap.get(0);
+//        Topic topicUnfollowMsg = unsortMap.get(-1);
+//        unsortMap.remove(0);
+//        if (topicUnfollowMsg != null){
+//            unsortMap.remove(-1);
+//        }
+//        List<Map.Entry<Integer, Topic>> list = new LinkedList<>(unsortMap.entrySet());
+//
+//        // 2. Sort list with Collections.sort(), provide a custom Comparator
+//        //    Try switch the o1 o2 position for a different order
+//        Collections.sort(list, new Comparator<Map.Entry<Integer, Topic>>() {
+//            public int compare(Map.Entry<Integer, Topic> o1,
+//                               Map.Entry<Integer, Topic> o2) {
+//                return (Long.valueOf(o2.getValue().getDate())).compareTo(o1.getValue().getDate());
+//            }
+//        });
+//
+//        // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
+//        Map<Integer, Topic> sortedMap = new LinkedHashMap<Integer, Topic>();
+//        if (topicSystem != null){
+//            sortedMap.put(topicSystem.getUserId(), topicSystem);
+//        }
+//        if (topicUnfollowMsg != null){
+//            sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
+//        }
+//        for (Map.Entry<Integer, Topic> entry : list) {
+//            sortedMap.put(entry.getKey(), entry.getValue());
+//        }
+//
+//        return sortedMap;
+//    }
 }

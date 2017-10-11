@@ -71,19 +71,19 @@ public class MainActivity extends AppCompatActivity {
         final Handler handler = new Handler();
         final int delay = 5000; //milliseconds
 
-        handler.postDelayed(new Runnable(){
-            int i=0;
-            public void run(){
-                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                String date = df.format(Calendar.getInstance().getTime());
-
-                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(2, getBaseContext()),
-                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-                i++;
-                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
+//        handler.postDelayed(new Runnable(){
+//            int i=0;
+//            public void run(){
+//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+//                String date = df.format(Calendar.getInstance().getTime());
+//
+//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(2, getBaseContext()),
+//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//                i++;
+//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
+//                handler.postDelayed(this, delay);
+//            }
+//        }, delay);
 
 //        handler.postDelayed(new Runnable(){
 //            int i=0;

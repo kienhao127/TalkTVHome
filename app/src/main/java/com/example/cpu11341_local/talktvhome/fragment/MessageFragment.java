@@ -2,6 +2,7 @@ package com.example.cpu11341_local.talktvhome.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -44,9 +45,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
-    MessageDataManager.DataListener dataListener;
-    FragmentManager.OnBackStackChangedListener onBackStackChangedListener;
-    Activity mActivity;
+    TextView textViewLoading;
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -129,13 +128,12 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.message_fragment, container, false);
-
+        textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -207,12 +205,11 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (arrTopic == null) {
-            arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
+        if (arrTopic != null){
+            LoadTopicTask loadTopicTask = new LoadTopicTask();
+            loadTopicTask.execute();
         }
+
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
@@ -220,8 +217,12 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                     Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
                     unFollowTopic.setHasNewMessage(true);
                     MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
-                    arrTopic.clear();
-                    arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                    for (int i=0; i <arrTopic.size(); i++){
+                        if (arrTopic.get(i).getUserId() == -1){
+                            arrTopic.set(i, unFollowTopic);
+                            break;
+                        }
+                    }
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -235,5 +236,24 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                 }
             }
         });
+    }
+
+    private class LoadTopicTask extends AsyncTask<String, Void, ArrayList<Topic>> {
+        @Override
+        protected ArrayList<Topic> doInBackground(String... urls) {
+            ArrayList<Topic> arrListTopic = new ArrayList<>();
+            arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+            return arrListTopic;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<Topic> result) {
+            arrTopic.clear();
+            arrTopic.addAll(result);
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+            textViewLoading.setVisibility(View.GONE);
+        }
     }
 }

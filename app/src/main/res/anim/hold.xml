@@ -3,5 +3,5 @@
     android:shareInterpolator="false">
     <translate
         android:zAdjustment="bottom"
-        android:duration="150"/>
+        android:duration="100"/>
 </set>
