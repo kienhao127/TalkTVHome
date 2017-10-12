@@ -16,9 +16,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +31,7 @@ import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.TopicRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import java.util.ArrayList;
 
@@ -47,7 +50,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     ArrayList<Topic> arrTopic = new ArrayList<>();
     Boolean isFollow;
     String activityName;
-    TextView textViewLoading;
+    TalkTextView textViewLoading;
+    TalkTextView textViewOver;
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -135,7 +139,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.message_fragment, container, false);
-        textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
+        textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
+        textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -156,6 +161,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         } else {
 
             topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
+            registerForContextMenu(topicRecyclerView);
             adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
 
             layoutManager = new LinearLayoutManager(getContext());
@@ -205,12 +211,58 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v == topicRecyclerView){
+            MenuInflater inflater = getActivity().getMenuInflater();
+            inflater.inflate(R.menu.menu_topic, menu);
+            for (int i = 0; i < menu.size(); ++i) {
+                MenuItem item = menu.getItem(i);
+                item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        onContextItemSelected(item);
+                        return true;
+                    }
+                });
+            }
+        }
+
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        int pos = adapter.getPosition();
+        switch (item.getItemId()) {
+            case R.id.mnDelete:
+                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getUserId(), getContext());
+                arrTopic.remove(pos);
+                if (pos == 0 && arrTopic.size() != 0){
+                    Topic unfollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                    unfollowTopic.setDate(arrTopic.get(0).getDate());
+                    unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
+                    MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+                }
+                if (adapter != null){
+                    adapter.notifyDataSetChanged();
+                }
+                if (arrTopic.size() == 0){
+                    textViewOver.setVisibility(View.VISIBLE);
+                }
+                Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.mnBlock:
+                Toast.makeText(getContext(), "Chặn" + arrTopic.get(pos).getName(), Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        if (arrTopic != null){
-            LoadTopicTask loadTopicTask = new LoadTopicTask();
-            loadTopicTask.execute();
-        }
+        LoadTopicTask loadTopicTask = new LoadTopicTask();
+        loadTopicTask.execute();
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
@@ -219,12 +271,6 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                     Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
                     unFollowTopic.setHasNewMessage(true);
                     MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
-                    for (int i=0; i <arrTopic.size(); i++){
-                        if (arrTopic.get(i).getUserId() == -1){
-                            arrTopic.set(i, unFollowTopic);
-                            break;
-                        }
-                    }
                     if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
@@ -243,6 +289,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     private class LoadTopicTask extends AsyncTask<String, Void, ArrayList<Topic>> {
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
+            Log.i("Get list topic", "DO IN BACKGROUND");
             ArrayList<Topic> arrListTopic = new ArrayList<>();
             if (MessageDataManager.getInstance().getListTopic(isFollow, getContext()) == null){
                 return null;
@@ -253,14 +300,19 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
+            arrTopic.clear();
             if (result!=null){
-                arrTopic.clear();
                 arrTopic.addAll(result);
-                if (adapter != null) {
-                    adapter.notifyDataSetChanged();
-                }
+            }
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
             }
             textViewLoading.setVisibility(View.GONE);
+            if (arrTopic.size() == 0){
+                textViewOver.setVisibility(View.VISIBLE);
+            } else {
+                textViewOver.setVisibility(View.GONE);
+            }
         }
     }
 }

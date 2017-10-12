@@ -1,10 +1,12 @@
 package com.example.cpu11341_local.talktvhome;
 
 import android.app.Activity;
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
-
+//
 //        handler.postDelayed(new Runnable(){
 //            int i=0;
 //            public void run(){
@@ -98,20 +100,32 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
-
-//        handler.postDelayed(new Runnable(){
-//            int i=0;
-//            public void run(){
-//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-//                String date = df.format(Calendar.getInstance().getTime());
 //
-//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
-//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-//                i++;
-//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
-//                handler.postDelayed(this, delay);
-//            }
-//        }, delay);
+        handler.postDelayed(new Runnable(){
+            int i=0;
+            public void run(){
+                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+                String date = df.format(Calendar.getInstance().getTime());
+
+                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
+                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+                i++;
+                InsertMessageTask insertMessageTask = new InsertMessageTask();
+                insertMessageTask.execute(messageDetail);
+                i++;
+
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
+    }
+
+    private class InsertMessageTask extends AsyncTask<MessageDetail, Void, Void> {
+
+        @Override
+        protected Void doInBackground(MessageDetail... messageDetail) {
+            MessageDataManager.getInstance().insertMessage(messageDetail[0], getApplicationContext());
+            return null;
+        }
     }
 
     @Override

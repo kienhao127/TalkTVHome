@@ -33,4 +33,17 @@
         android:layout_below="@+id/appbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <com.example.cpu11341_local.talktvhome.myview.TalkTextView
+        android:id="@+id/textViewOver"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFF"
+        android:gravity="center_horizontal"
+        android:text="Không có tin nhắn"
+        android:textSize="20dp"
+        android:layout_below="@+id/appbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:visibility="gone"/>
 </RelativeLayout>

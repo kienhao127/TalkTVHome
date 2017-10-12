@@ -62,7 +62,8 @@ public class ChatFragment extends Fragment {
     int senderID;
     ImageView imageViewSend;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
-    TextView textViewLoading;
+    TalkTextView textViewLoading;
+    TalkTextView textViewOver;
     TalkTextView selectedMsgDetail;
     int scrollTimes = 0;
     boolean isAllMsg = false, isResume = false;
@@ -84,7 +85,8 @@ public class ChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         Log.i("OnCreateView", "ASDASD");
         final View view = inflater.inflate(R.layout.chat_fragment, container, false);
-        textViewLoading = (TextView) view.findViewById(R.id.textViewLoading);
+        textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
+        textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -266,7 +268,7 @@ public class ChatFragment extends Fragment {
                 Topic topic = MessageDataManager.getInstance().getTopic(senderID);
                 if (selectedPosition == arrMessDetail.size()-1){
                     if (selectedPosition == 0){
-                        MessageDataManager.getInstance().deleteTopic(topic, getContext());
+                        MessageDataManager.getInstance().deleteTopic(senderID, getContext());
                     }else {
                         topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                         topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
@@ -278,6 +280,9 @@ public class ChatFragment extends Fragment {
                     Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
                 }
                 arrMessDetail.remove(selectedPosition);
+                if (arrMessDetail.size() == 0){
+                    textViewOver.setVisibility(View.VISIBLE);
+                }
                 adapter.notifyDataSetChanged();
             }
         });
@@ -345,6 +350,11 @@ public class ChatFragment extends Fragment {
                     messDetailRecyclerView.scrollToPosition(arrMessDetail.size() - 1);
                     textViewLoading.setVisibility(View.GONE);
                     isResume = true;
+                    if (arrMessDetail.size() == 0){
+                        textViewOver.setVisibility(View.VISIBLE);
+                    } else {
+                        textViewOver.setVisibility(View.GONE);
+                    }
                 }
             }, 100);
         }

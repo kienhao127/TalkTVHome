@@ -188,6 +188,7 @@ public class MessageDataManager {
             if (topic != null) {
                 topic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
                 topic.setDate(messageDetail.getDatetime());
+                DatabaseHelper.getInstance(context).updateTopic(topic);
             } else {
                 Topic unFollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, -1, true);
                 DatabaseHelper.getInstance(context).insertTopic(unFollowTopic);
@@ -220,15 +221,31 @@ public class MessageDataManager {
         return true;
     }
 
-    public boolean deleteTopic(Topic topic, Context context){
-        linkedHashMapTopic.remove(topic.getUserId());
-        for (Topic t: linkedHashMapTopic.values()) {
-            if (!isFollow(t.getUserId())){
-                return DatabaseHelper.getInstance(context).deleteTopic(topic);
+    public boolean deleteTopic(int senderID, Context context){
+        linkedHashMapTopic.remove(senderID);
+        if (senderID == -1){
+            for (Topic t: linkedHashMapTopic.values()){
+                if (!isFollow(t.getUserId())){
+                    DatabaseHelper.getInstance(context).deleteAllMessage(senderID);
+                    deleteTopic(t.getUserId(), context);
+                }
+            }
+            return DatabaseHelper.getInstance(context).deleteTopic(-1);
+        }
+        if (isFollow(senderID)){
+            DatabaseHelper.getInstance(context).deleteAllMessage(senderID);
+            return DatabaseHelper.getInstance(context).deleteTopic(senderID);
+        }
+        if (!isFollow(senderID)){
+            DatabaseHelper.getInstance(context).deleteAllMessage(senderID);
+            DatabaseHelper.getInstance(context).deleteTopic(senderID);
+            for (Topic t: linkedHashMapTopic.values()){
+                if (!isFollow(t.getUserId())){
+                    return true;
+                }
             }
         }
-        DatabaseHelper.getInstance(context).deleteTopic(linkedHashMapTopic.get(-1));
-        return DatabaseHelper.getInstance(context).deleteTopic(topic);
+        return DatabaseHelper.getInstance(context).deleteTopic(-1);
     }
 
     public interface DataListener{

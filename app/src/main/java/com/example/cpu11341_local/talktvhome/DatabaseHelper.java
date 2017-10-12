@@ -120,10 +120,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(USER_TABLE_NAME, null, values);
         if (result == -1){
-            db.close();
             return false;
         } else {
-            db.close();
             return true;
         }
     }
@@ -147,9 +145,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
 //            } while (cUser.moveToNext());
 //        }
-//        db.close();
         return linkedHashMapUser.get(userID);
     }
+
+
+    //TOPIC-----------------
 
     public boolean insertTopic(Topic topic){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -164,10 +164,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(TOPIC_TABLE_NAME, null, values);
         if (result == -1){
-            db.close();
             return false;
         } else {
-            db.close();
             return true;
         }
     }
@@ -185,10 +183,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_USERID + " = ?", new String[] {String.valueOf(topic.getUserId())});
         if (result == -1){
-            db.close();
             return false;
         } else {
-            db.close();
             return true;
         }
     }
@@ -212,7 +208,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 arrTopic.add(topic);
             } while (cTopic.moveToNext());
         }
-        db.close();
         return arrTopic;
     }
 
@@ -232,18 +227,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
             topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
         }
-        db.close();
         if (topic != null) {
             return topic;
         }
         return null;
     }
 
-    public boolean deleteTopic(Topic topic){
+    public boolean deleteTopic(int senderID){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_USERID + "=" + topic.getUserId(), null) > 0;
+        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_USERID + "=" + senderID, null) > 0;
     }
 
+
+    //MESSAGE-----------------
     public boolean insertMessage(MessageDetail messageDetail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -259,10 +255,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         long result = db.insert(MESSAGE_TABLE_NAME, null, values);
         if (result == -1){
-            db.close();
             return false;
         } else {
-            db.close();
             return true;
         }
     }
@@ -292,12 +286,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 arrMessDetail.add(messageDetail);
             } while (c.moveToNext());
         }
-        db.close();
         return arrMessDetail;
     }
 
     public boolean deleteMessage(int id){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
+    }
+
+    public boolean deleteAllMessage(int senderID){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "=" + senderID, null) > 0;
     }
 }

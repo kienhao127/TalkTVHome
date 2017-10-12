@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +32,20 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
     private OnItemClickListener mItemClickListener;
     private OnItemLongClickListener mItemLongClickListener;
     ArrayList<Topic> arrTopic = new ArrayList<>();
+    private int position;
 
     public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
         this.context = context;
         this.arrTopic = arrTopic;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     @Override
     public TopicRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -47,7 +56,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
     }
 
     @Override
-    public void onBindViewHolder(TopicRecyclerAdapter.RecyclerViewHolder holder, final int position) {
+    public void onBindViewHolder(final TopicRecyclerAdapter.RecyclerViewHolder holder, final int position) {
         Glide.with(context)
                 .load(arrTopic.get(position).getAvatar())
                 .apply(RequestOptions.circleCropTransform())
@@ -88,7 +97,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
         return arrTopic.size();
     }
 
-    public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
+    public class RecyclerViewHolder extends RecyclerView.ViewHolder {
         ImageView imageViewAvatar;
         TextView textViewName;
         TextView textViewLastMess;
@@ -110,32 +119,14 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
                     }
                 }
             });
-            view.setOnCreateContextMenuListener(this);
-        }
-
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            MenuItem Delete = menu.add(0,0,0, "Xóa");
-            MenuItem Block = menu.add(0,1,0, "Chặn");
-            Delete.setOnMenuItemClickListener(onClickItem);
-            Block.setOnMenuItemClickListener(onClickItem);
-        }
-
-        private final MenuItem.OnMenuItemClickListener onClickItem = new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case 0:
-                        Toast.makeText(context, "Xóa", Toast.LENGTH_LONG).show();
-                        break;
-
-                    case 1:
-                        Toast.makeText(context, "Chặn", Toast.LENGTH_LONG).show();
-                        break;
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    setPosition(getAdapterPosition());
+                    return false;
                 }
-                return true;
-            }
-        };
+            });
+        }
     }
 
 }
