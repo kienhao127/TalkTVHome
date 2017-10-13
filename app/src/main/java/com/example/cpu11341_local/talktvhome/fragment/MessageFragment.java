@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.DatabaseHelper;
+import com.example.cpu11341_local.talktvhome.MainActivity;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
@@ -267,18 +268,14 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
-                if (!MessageDataManager.getInstance().isFollow(topic.getUserId())) {
-                    Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
-                    unFollowTopic.setHasNewMessage(true);
-                    MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-                topic.setHasNewMessage(true);
-                MessageDataManager.getInstance().updateTopic(topic, getContext());
                 arrTopic.clear();
                 arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                if (arrTopic.size() == 0){
+                    textViewOver.setVisibility(View.VISIBLE);
+                } else {
+                    textViewOver.setVisibility(View.GONE);
+                }
+
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }

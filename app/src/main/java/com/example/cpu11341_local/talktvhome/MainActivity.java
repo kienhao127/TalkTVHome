@@ -24,7 +24,9 @@ import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.TabData;
+import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
+import com.example.cpu11341_local.talktvhome.data.Wrapper;
 import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.HomeFragment;
 
@@ -101,30 +103,37 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }, delay);
 //
-        handler.postDelayed(new Runnable(){
-            int i=0;
-            public void run(){
-                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                String date = df.format(Calendar.getInstance().getTime());
-
-                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
-                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-                i++;
-                InsertMessageTask insertMessageTask = new InsertMessageTask();
-                insertMessageTask.execute(messageDetail);
-                i++;
-
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
+//        handler.postDelayed(new Runnable(){
+//            int i=0;
+//            public void run(){
+//                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
+//                String date = df.format(Calendar.getInstance().getTime());
+//
+//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
+//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//                i++;
+//
+//                InsertMessageTask insertMessageTask = new InsertMessageTask();
+//                insertMessageTask.execute(messageDetail);
+//
+//                handler.postDelayed(this, delay);
+//            }
+//        }, delay);
     }
 
-    private class InsertMessageTask extends AsyncTask<MessageDetail, Void, Void> {
+    private class InsertMessageTask extends AsyncTask<MessageDetail, Void, Wrapper> {
+        @Override
+        protected Wrapper doInBackground(MessageDetail... messageDetail) {
+            Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail[0], getApplicationContext()), messageDetail[0]);
+            return wrapper;
+        }
 
         @Override
-        protected Void doInBackground(MessageDetail... messageDetail) {
-            MessageDataManager.getInstance().insertMessage(messageDetail[0], getApplicationContext());
-            return null;
+        protected void onPostExecute(Wrapper wrapper) {
+            super.onPostExecute(wrapper);
+            if (MessageDataManager.getInstance().dataListener != null){
+                MessageDataManager.getInstance().dataListener.onDataChanged(wrapper.getTopic(), wrapper.getMessageDetail());
+            }
         }
     }
 

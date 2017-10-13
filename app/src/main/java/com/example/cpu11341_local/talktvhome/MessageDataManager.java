@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class MessageDataManager {
     Map<Integer, Topic> linkedHashMapTopic = new LinkedHashMap();
-    DataListener dataListener;
+    public DataListener dataListener;
     DateFormat dateFormat = new SimpleDateFormat("d/MM/yy HH:mm:ss");
     Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
     Map<Integer, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
@@ -89,7 +89,6 @@ public class MessageDataManager {
         }
         linkedHashMapMsgDetail.put(senderID, arrMsgDetail);
         long d = System.currentTimeMillis() - t;
-        Log.i("Load msg time ", String.valueOf(d));
         return arrMessageDetailOfSender;
     }
 
@@ -98,7 +97,6 @@ public class MessageDataManager {
     }
 
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
-        Log.i("Get list topic", "Sort");
         ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
             return null;
@@ -128,6 +126,8 @@ public class MessageDataManager {
         });
 
         if (!isFollow && arrTopic.size() != 0){
+            Log.i("Arr size", String.valueOf(arrTopic.get(0).getName()));
+            Log.i("unFollowTopic", String.valueOf(unFollowTopic));
             unFollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
             unFollowTopic.setDate(arrTopic.get(0).getDate());
             updateTopic(unFollowTopic, context);
@@ -159,7 +159,7 @@ public class MessageDataManager {
         return linkedHashMapUser.get(5);
     }
 
-    public boolean insertMessage(MessageDetail messageDetail, Context context){
+    public Topic insertMessage(MessageDetail messageDetail, Context context){
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
         int senderID = messageDetail.getUser().getId();
         ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
@@ -170,13 +170,11 @@ public class MessageDataManager {
             arrMsgDetail.add(messageDetail);
         }
         linkedHashMapMsgDetail.put(senderID, arrMsgDetail);
-        insert_updateTopic(senderID, messageDetail, context);
-        return true;
+        return insert_updateTopic(senderID, messageDetail, context);
     }
 
-    public boolean insert_updateTopic(int senderID, MessageDetail messageDetail, Context context){
+    public Topic insert_updateTopic(int senderID, MessageDetail messageDetail, Context context){
         String strText = "";
-
         if (messageDetail.getType() == 4){
             strText = "Bạn: " + messageDetail.getText();
         } else {
@@ -200,20 +198,20 @@ public class MessageDataManager {
         if (topic.getName() != null){
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
+            topic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(topic);
             linkedHashMapTopic.put(senderID, topic);
-            if (dataListener!=null){
-                dataListener.onDataChanged(topic, messageDetail);
+            if (!isFollow(topic.getUserId())){
+                Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                unFollowTopic.setHasNewMessage(true);
+                MessageDataManager.getInstance().updateTopic(unFollowTopic, context);
             }
         } else {
-            Topic newTopic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true);
-            DatabaseHelper.getInstance(context).insertTopic(newTopic);
-            linkedHashMapTopic.put(senderID, newTopic);
-            if (dataListener!=null){
-                dataListener.onDataChanged(newTopic, messageDetail);
-            }
+            topic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, senderID, true);
+            DatabaseHelper.getInstance(context).insertTopic(topic);
+            linkedHashMapTopic.put(senderID, topic);
         }
-        return true;
+        return topic;
     }
 
     public boolean updateTopic(Topic topic, Context context){
@@ -245,6 +243,7 @@ public class MessageDataManager {
                 }
             }
         }
+        linkedHashMapTopic.remove(-1);
         return DatabaseHelper.getInstance(context).deleteTopic(-1);
     }
 

@@ -34,12 +34,14 @@ import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.DatabaseHelper;
+import com.example.cpu11341_local.talktvhome.MainActivity;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.data.Wrapper;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import org.w3c.dom.Text;
@@ -119,8 +121,10 @@ public class ChatFragment extends Fragment {
                 MessageDetail messageDetail = null;
                 messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID, getContext()),
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
-                MessageDataManager.getInstance().insertMessage(messageDetail, getContext());
-                messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
+                Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
+                if (MessageDataManager.getInstance().dataListener != null){
+                    MessageDataManager.getInstance().dataListener.onDataChanged(wrapper.getTopic(), wrapper.getMessageDetail());
+                }
                 editText.setText("");
             }
         });
@@ -307,23 +311,9 @@ public class ChatFragment extends Fragment {
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
-                if (senderID == topic.getUserId()) {
-                    topic.setHasNewMessage(false);
-                    MessageDataManager.getInstance().updateTopic(topic, getContext());
-                    arrMessDetail.add(messageDetail);
-                    if (adapter != null) {
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-                if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
-                    Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
-                    if (senderID == topic.getUserId()){
-                        unFollowTopic.setHasNewMessage(false);
-                    } else {
-                        unFollowTopic.setHasNewMessage(true);
-                    }
-                    MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
-                }
+                Wrapper wrapper = new Wrapper(topic, messageDetail);
+                LoadMessageTask loadMessageTask = new LoadMessageTask();
+                loadMessageTask.execute(wrapper);
             }
         });
     }
@@ -385,6 +375,47 @@ public class ChatFragment extends Fragment {
             arrMessDetail.addAll(0, result);
             adapter.notifyItemRangeInserted(0, result.size()-1);
             adapter.setLoaded();
+        }
+    }
+
+    private class LoadMessageTask extends AsyncTask<Wrapper, Void, Void>{
+        @Override
+        protected Void doInBackground(Wrapper... wrappers) {
+            Log.i("Do in background", "Chat Fragment");
+            if (senderID == wrappers[0].getTopic().getUserId()) {
+                wrappers[0].getTopic().setHasNewMessage(false);
+                MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
+                arrMessDetail.add(wrappers[0].getMessageDetail());
+            }
+            if (!MessageDataManager.getInstance().isFollow(wrappers[0].getTopic().getUserId())){
+                Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                if (senderID == wrappers[0].getTopic().getUserId()){
+                    unFollowTopic.setHasNewMessage(false);
+                } else {
+                    unFollowTopic.setHasNewMessage(true);
+                }
+                MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            if (arrMessDetail.size() == 0){
+                textViewOver.setVisibility(View.VISIBLE);
+            } else {
+                textViewOver.setVisibility(View.GONE);
+            }
+            long t = System.currentTimeMillis();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+            if (arrMessDetail.get(arrMessDetail.size()-1).getType() == 4){
+                messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
+            }
+            t = System.currentTimeMillis() - t;
+            Log.i("Time ", String.valueOf(t));
         }
     }
 }
