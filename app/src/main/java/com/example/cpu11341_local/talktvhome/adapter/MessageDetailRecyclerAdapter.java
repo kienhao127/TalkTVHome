@@ -73,7 +73,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.i("onCreateViewHolder", "Message Detail Recycler Adapter");
         switch (viewType) {
             case 1:{
                 return new EventHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
@@ -119,7 +118,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
             case 3:
-                Log.i("onBindViewHolder", "Message Detail Recycler Adapter");
                 MessageHolder messageHolder = (MessageHolder) holder;
                 if (position == 0){
                     messageHolder.textViewDate.setVisibility(View.VISIBLE);

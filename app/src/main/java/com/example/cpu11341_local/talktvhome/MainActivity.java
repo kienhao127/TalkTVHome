@@ -119,6 +119,46 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
+
+        MessageDetail messageDetail = new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+                "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra");
+        InsertMessageTask insertMessageTask = new InsertMessageTask();
+        insertMessageTask.execute(messageDetail);
+
+        messageDetail = new MessageDetail(2, 2, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+                "Nhắc nhở 1",  Calendar.getInstance().getTimeInMillis(), "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra");
+        InsertMessageTask insertMessageTask2 = new InsertMessageTask();
+        insertMessageTask2.execute(messageDetail);
+
+        messageDetail = new MessageDetail(3, 3, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+                Calendar.getInstance().getTimeInMillis(), "Nội dung thông báo", false);
+        InsertMessageTask insertMessageTask3 = new InsertMessageTask();
+        insertMessageTask3.execute(messageDetail);
+
+        for (int i=0; i<5; i++) {
+            messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
+                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+
+            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
+            insertMessageTask4.execute(messageDetail);
+        }
+
+        for (int i=0; i<5; i++) {
+            messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(2, getBaseContext()),
+                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+
+            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
+            insertMessageTask4.execute(messageDetail);
+        }
+
+        for (int i=0; i<5; i++) {
+            messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1, getBaseContext()),
+                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+
+            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
+            insertMessageTask4.execute(messageDetail);
+        }
+
     }
 
     private class InsertMessageTask extends AsyncTask<MessageDetail, Void, Wrapper> {
