@@ -53,6 +53,8 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     String activityName;
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
+    int scrollTimes;
+    boolean isAllMsg = false, isResume = false;
 
     public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
@@ -163,13 +165,10 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
             topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
             registerForContextMenu(topicRecyclerView);
-            adapter = new TopicRecyclerAdapter(getContext(), arrTopic);
-
             layoutManager = new LinearLayoutManager(getContext());
             topicRecyclerView.setLayoutManager(layoutManager);
+            adapter = new TopicRecyclerAdapter(getContext(), arrTopic, topicRecyclerView);
             topicRecyclerView.setAdapter(adapter);
-
-            topicRecyclerView.scrollToPosition(adapter.getItemCount() - 1);
 
             adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener() {
                 @Override
@@ -205,6 +204,18 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
                             break;
                     }
+                }
+            });
+
+            adapter.setOnLoadMoreListener(new TopicRecyclerAdapter.OnLoadMoreListener() {
+                @Override
+                public void onLoadMore() {
+                    if (!isAllMsg) {
+                        new LoadMoreDataTask().execute();
+                    } else {
+                        Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_LONG).show();
+                    }
+
                 }
             });
         }
@@ -269,7 +280,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 arrTopic.clear();
-                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes));
                 if (arrTopic.size() == 0){
                     textViewOver.setVisibility(View.VISIBLE);
                 } else {
@@ -288,10 +299,10 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         protected ArrayList<Topic> doInBackground(String... urls) {
             Log.i("Get list topic", "DO IN BACKGROUND");
             ArrayList<Topic> arrListTopic = new ArrayList<>();
-            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext()) == null){
+            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes) == null){
                 return null;
             }
-            arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext()));
+            arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes));
             return arrListTopic;
         }
 
@@ -310,6 +321,34 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             } else {
                 textViewOver.setVisibility(View.GONE);
             }
+        }
+    }
+
+    private class LoadMoreDataTask extends AsyncTask<String, Void, ArrayList<Topic>> {
+        @Override
+        protected void onPreExecute() {
+            arrTopic.add(null);
+            adapter.notifyItemInserted(arrTopic.size());
+            scrollTimes++;
+        }
+
+        @Override
+        protected ArrayList<Topic> doInBackground(String... urls) {
+            Log.i("LoadMoreData", "ASDASD");
+            ArrayList<Topic> arrNewMsgDetail = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
+            return arrNewMsgDetail;
+        }
+
+        @Override
+        protected void onPostExecute(final ArrayList<Topic> result) {
+            if (result.size() < 30) {
+                isAllMsg = true;
+            }
+            arrTopic.remove(arrTopic.size()-1);
+            adapter.notifyItemRemoved(arrTopic.size()-1);
+            arrTopic.addAll(result);
+            adapter.notifyItemRangeInserted(arrTopic.size(), result.size()-1);
+            adapter.setLoaded();
         }
     }
 }

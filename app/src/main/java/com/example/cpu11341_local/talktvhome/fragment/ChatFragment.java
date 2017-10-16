@@ -381,7 +381,6 @@ public class ChatFragment extends Fragment {
     private class LoadMessageTask extends AsyncTask<Wrapper, Void, Void>{
         @Override
         protected Void doInBackground(Wrapper... wrappers) {
-            Log.i("Do in background", "Chat Fragment");
             if (senderID == wrappers[0].getTopic().getUserId()) {
                 wrappers[0].getTopic().setHasNewMessage(false);
                 MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
@@ -409,7 +408,8 @@ public class ChatFragment extends Fragment {
             }
             long t = System.currentTimeMillis();
             if (adapter != null) {
-                adapter.notifyDataSetChanged();
+                adapter.notifyItemRangeChanged(arrMessDetail.size()-2,2);
+                adapter.notifyItemInserted(arrMessDetail.size());
             }
             if (arrMessDetail.get(arrMessDetail.size()-1).getType() == 4){
                 messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());

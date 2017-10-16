@@ -96,13 +96,13 @@ public class MessageDataManager {
         return DatabaseHelper.getInstance(context).deleteMessage(id);
     }
 
-    public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
+    public ArrayList<Topic> getListTopic(boolean isFollow, Context context, int scrollTimes) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
-        if (DatabaseHelper.getInstance(context).getListTopic().size() == 0){
+        if (DatabaseHelper.getInstance(context).getListTopic(scrollTimes).size() == 0){
             return null;
         }
         Topic systemTopic = null, unFollowTopic = null;
-        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic()) {
+        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic(scrollTimes)) {
             linkedHashMapTopic.put(topic.getUserId(), topic);
             if (isFollow){
                 if (topic.getUserId() == 0){

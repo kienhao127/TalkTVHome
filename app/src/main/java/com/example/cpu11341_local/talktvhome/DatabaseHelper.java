@@ -189,10 +189,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<Topic> getListTopic(){
+    public ArrayList<Topic> getListTopic(int scrollTimes){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
-                " FROM " + TOPIC_TABLE_NAME ;
+                " FROM " + TOPIC_TABLE_NAME +
+                " LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {

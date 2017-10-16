@@ -2,6 +2,7 @@ package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,17 +28,37 @@ import java.util.ArrayList;
  * Created by CPU11341-local on 9/1/2017.
  */
 
-public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdapter.RecyclerViewHolder> {
+public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context context;
     private OnItemClickListener mItemClickListener;
     private OnItemLongClickListener mItemLongClickListener;
     ArrayList<Topic> arrTopic = new ArrayList<>();
     private int position;
+    boolean isLoading;
+    private int lastVisibleItem;
+    RecyclerView recyclerView;
 
-    public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic){
+    public TopicRecyclerAdapter(Context context, final ArrayList<Topic> arrTopic, RecyclerView recyclerView){
         this.context = context;
         this.arrTopic = arrTopic;
+        this.recyclerView = recyclerView;
+        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (linearLayoutManager != null){
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && lastVisibleItem == arrTopic.size()-1) {
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
+                        }
+                        isLoading = true;
+                    }
+                }
+            }
+        });
     }
 
     public int getPosition() {
@@ -47,33 +69,50 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
         this.position = position;
     }
 
-    @Override
-    public TopicRecyclerAdapter.RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.topic_layout,parent,false);
-
-        TopicRecyclerAdapter.RecyclerViewHolder recyclerViewHolder = new TopicRecyclerAdapter.RecyclerViewHolder(view);
-        return recyclerViewHolder;
+    public int getItemViewType(int position) {
+        return arrTopic.get(position) == null ? -1 : 0;
     }
 
     @Override
-    public void onBindViewHolder(final TopicRecyclerAdapter.RecyclerViewHolder holder, final int position) {
-        Glide.with(context)
-                .load(arrTopic.get(position).getAvatar())
-                .apply(RequestOptions.circleCropTransform())
-                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                .apply(RequestOptions.errorOf(R.drawable.grid_item
-                ))
-                .into(holder.imageViewAvatar);
-        holder.textViewName.setText(arrTopic.get(position).getName());
-        holder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
-        holder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
-        if (arrTopic.get(position).isHasNewMessage()){
-            holder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
-            holder.textViewDate.setTypeface(null, Typeface.BOLD);
-            holder.textViewLastMess.setTypeface(null, Typeface.BOLD);
-            holder.textViewName.setTypeface(null, Typeface.BOLD);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case 0:{
+                return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.topic_layout,parent,false));
+            }
+            default:{
+                return new LoadingHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_layout,parent,false));
+            }
         }
-        holder.setIsRecyclable(false);
+    }
+
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        switch (holder.getItemViewType()) {
+            case 0:
+                RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) holder;
+                Glide.with(context)
+                        .load(arrTopic.get(position).getAvatar())
+                        .apply(RequestOptions.circleCropTransform())
+                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                        .apply(RequestOptions.errorOf(R.drawable.grid_item
+                        ))
+                        .into(recyclerViewHolder.imageViewAvatar);
+                recyclerViewHolder.textViewName.setText(arrTopic.get(position).getName());
+                recyclerViewHolder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
+                recyclerViewHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
+                if (arrTopic.get(position).isHasNewMessage()) {
+                    recyclerViewHolder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
+                    recyclerViewHolder.textViewDate.setTypeface(null, Typeface.BOLD);
+                    recyclerViewHolder.textViewLastMess.setTypeface(null, Typeface.BOLD);
+                    recyclerViewHolder.textViewName.setTypeface(null, Typeface.BOLD);
+                }
+                break;
+            default: {
+                LoadingHolder loadingHolder = (LoadingHolder) holder;
+                loadingHolder.progressBar.setIndeterminate(true);
+                break;
+            }
+        }
     }
 
     public interface OnItemClickListener {
@@ -95,6 +134,10 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
     @Override
     public int getItemCount() {
         return arrTopic.size();
+    }
+
+    public void setLoaded() {
+        isLoading = false;
     }
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder {
@@ -129,4 +172,19 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<TopicRecyclerAdap
         }
     }
 
+    public class LoadingHolder extends RecyclerView.ViewHolder{
+        public ProgressBar progressBar;
+        public LoadingHolder(View view){
+            super(view);
+            progressBar = (ProgressBar) view.findViewById(R.id.progressBarLoadMoreMsg);
+        }
+    }
+
+    public interface OnLoadMoreListener {
+        void onLoadMore();
+    }
+    private OnLoadMoreListener onLoadMoreListener;
+    public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
+        this.onLoadMoreListener = mOnLoadMoreListener;
+    }
 }
