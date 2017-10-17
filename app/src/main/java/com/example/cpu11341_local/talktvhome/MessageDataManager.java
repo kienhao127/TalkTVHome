@@ -224,7 +224,7 @@ public class MessageDataManager {
         if (senderID == -1){
             for (Topic t: linkedHashMapTopic.values()){
                 if (!isFollow(t.getUserId())){
-                    DatabaseHelper.getInstance(context).deleteAllMessage(senderID);
+                    DatabaseHelper.getInstance(context).deleteAllMessage(t.getUserId());
                     DatabaseHelper.getInstance(context).deleteTopic(t.getUserId());
                 }
             }
