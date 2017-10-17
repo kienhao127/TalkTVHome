@@ -142,8 +142,8 @@ public class MessageDataManager {
         return arrTopic;
     }
 
-    public Topic getTopic(int senderID){
-        return linkedHashMapTopic.get(senderID);
+    public Topic getTopic(int senderID, Context context){
+        return DatabaseHelper.getInstance(context).getTopic(senderID);
     }
 
 //    public boolean insertUser(User user, Context context){
@@ -202,7 +202,7 @@ public class MessageDataManager {
             DatabaseHelper.getInstance(context).updateTopic(topic);
             linkedHashMapTopic.put(senderID, topic);
             if (!isFollow(topic.getUserId())){
-                Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1, context);
                 unFollowTopic.setHasNewMessage(true);
                 MessageDataManager.getInstance().updateTopic(unFollowTopic, context);
             }
@@ -219,13 +219,13 @@ public class MessageDataManager {
         return true;
     }
 
-    public boolean deleteTopic(int senderID, Context context){
+    public boolean deleteTopic(int senderID, Context context, ArrayList<Topic> arrFollowTopic){
         linkedHashMapTopic.remove(senderID);
         if (senderID == -1){
             for (Topic t: linkedHashMapTopic.values()){
                 if (!isFollow(t.getUserId())){
                     DatabaseHelper.getInstance(context).deleteAllMessage(senderID);
-                    deleteTopic(t.getUserId(), context);
+                    DatabaseHelper.getInstance(context).deleteTopic(t.getUserId());
                 }
             }
             return DatabaseHelper.getInstance(context).deleteTopic(-1);
@@ -244,6 +244,11 @@ public class MessageDataManager {
             }
         }
         linkedHashMapTopic.remove(-1);
+        for (int i=0; i<arrFollowTopic.size(); i++){
+            if (arrFollowTopic.get(i).getUserId() == -1){
+                arrFollowTopic.remove(i);
+            }
+        }
         return DatabaseHelper.getInstance(context).deleteTopic(-1);
     }
 

@@ -1,14 +1,9 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,12 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.cpu11341_local.talktvhome.DatabaseHelper;
-import com.example.cpu11341_local.talktvhome.MainActivity;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
@@ -35,12 +28,14 @@ import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by CPU11341-local on 9/1/2017.
  */
 
-public class MessageFragment extends android.support.v4.app.Fragment {
+public class TopicFragment extends android.support.v4.app.Fragment {
 
     RecyclerView topicRecyclerView;
     TopicRecyclerAdapter adapter;
@@ -55,11 +50,20 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     TalkTextView textViewOver;
     int scrollTimes;
     boolean isAllMsg = false, isResume = false;
+    ArrayList<Topic> arrFollowTopic = new ArrayList<>();
+    int i = 0;
 
-    public MessageFragment(String toolbarTitle, boolean isFollow, String activityName) {
+    public TopicFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
         this.isFollow = isFollow;
         this.activityName = activityName;
+    }
+
+    public TopicFragment(String toolbarTitle, boolean isFollow, String activityName, ArrayList<Topic> arrFollowTopic) {
+        this.toolbarTitle = toolbarTitle;
+        this.isFollow = isFollow;
+        this.activityName = activityName;
+        this.arrFollowTopic = arrFollowTopic;
     }
 
 //    private String loadJSONFromAsset() {
@@ -159,10 +163,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        if (arrTopic == null) {
-
-        } else {
-
+        if (arrTopic != null) {
             topicRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewMessage);
             registerForContextMenu(topicRecyclerView);
             layoutManager = new LinearLayoutManager(getContext());
@@ -174,12 +175,17 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                 @Override
                 public void onItemClick(View view, int position) {
                     arrTopic.get(position).setHasNewMessage(false);
-                    DatabaseHelper.getInstance(getContext()).updateTopic(arrTopic.get(position));
+                    MessageDataManager.getInstance().updateTopic(arrTopic.get(position), getContext());
                     adapter.notifyDataSetChanged();
                     switch (arrTopic.get(position).getAction_type()) {
                         case 1:
                         case 3:
-                            ChatFragment chatFragment = new ChatFragment(arrTopic.get(position).getName(), arrTopic.get(position).getUserId());
+                            ChatFragment chatFragment;
+                            if (MessageDataManager.getInstance().isFollow(arrTopic.get(position).getUserId())){
+                                chatFragment = new ChatFragment(arrTopic, position);
+                            } else {
+                                chatFragment = new ChatFragment(arrTopic, position, arrFollowTopic);
+                            }
                             FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
                                 Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
@@ -191,14 +197,14 @@ public class MessageFragment extends android.support.v4.app.Fragment {
                                     .commit();
                             break;
                         case 2:
-                            MessageFragment messageFragment = new MessageFragment("Tin nhắn chưa theo dõi", false, activityName);
+                            TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName, arrTopic);
                             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
                                 ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
                             } else {
                                 ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
                             }
-                            ft.add(R.id.fragment_container, messageFragment, "MessFrag")
+                            ft.add(R.id.fragment_container, topicFragment, "MessFrag")
                                     .addToBackStack(null)
                                     .commit();
 
@@ -247,10 +253,10 @@ public class MessageFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
-                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getUserId(), getContext());
-                arrTopic.remove(pos);
-                if (pos == 0 && arrTopic.size() != 0){
-                    Topic unfollowTopic = MessageDataManager.getInstance().getTopic(-1);
+                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getUserId(), getContext(), arrFollowTopic);
+                Topic removedTopic = arrTopic.remove(pos);
+                if (pos == 0 && arrTopic.size() != 0 && !MessageDataManager.getInstance().isFollow(removedTopic.getUserId())){
+                    Topic unfollowTopic = MessageDataManager.getInstance().getTopic(-1, getContext());
                     unfollowTopic.setDate(arrTopic.get(0).getDate());
                     unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
                     MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
@@ -273,15 +279,38 @@ public class MessageFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LoadTopicTask loadTopicTask = new LoadTopicTask();
-        loadTopicTask.execute();
+        if (!isResume) {
+            LoadTopicTask loadTopicTask = new LoadTopicTask();
+            loadTopicTask.execute();
+        } else {
+            sortTopic(arrTopic);
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
-                arrTopic.clear();
-                arrTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes));
-                if (arrTopic.size() == 0){
+                boolean isTopicExists = false;
+                if (isFollow){
+                    if (!MessageDataManager.getInstance().isFollow(topic.getUserId())){
+                        topic = MessageDataManager.getInstance().getTopic(-1, getContext());
+                    }
+                }
+
+                for (int i = 0; i < arrTopic.size(); i++) {
+                    if (arrTopic.get(i).getUserId() == topic.getUserId()) {
+                        arrTopic.set(i, topic);
+                        isTopicExists = true;
+                    }
+                }
+
+                if (!isTopicExists) {
+                    arrTopic.add(topic);
+                }
+
+                if (arrTopic.size() == 0) {
                     textViewOver.setVisibility(View.VISIBLE);
                 } else {
                     textViewOver.setVisibility(View.GONE);
@@ -315,6 +344,7 @@ public class MessageFragment extends android.support.v4.app.Fragment {
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
+            isResume = true;
             textViewLoading.setVisibility(View.GONE);
             if (arrTopic.size() == 0){
                 textViewOver.setVisibility(View.VISIBLE);
@@ -341,14 +371,47 @@ public class MessageFragment extends android.support.v4.app.Fragment {
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
-            if (result.size() < 30) {
+            int pos = arrTopic.size()-1;
+            arrTopic.remove(pos);
+            adapter.notifyItemRemoved(pos);
+            if (result != null){
+                if (result.size() < 30) {
+                    isAllMsg = true;
+                }
+                arrTopic.addAll(pos, result);
+                adapter.notifyItemRangeInserted(pos, result.size()-1);
+            } else {
                 isAllMsg = true;
             }
-            arrTopic.remove(arrTopic.size()-1);
-            adapter.notifyItemRemoved(arrTopic.size()-1);
-            arrTopic.addAll(result);
-            adapter.notifyItemRangeInserted(arrTopic.size(), result.size()-1);
             adapter.setLoaded();
+        }
+    }
+
+    void sortTopic(ArrayList<Topic> arrTopic){
+        Topic systemTopic = null, unFollowTopic = null;
+        for (int i=0; i < arrTopic.size (); i++){
+            if (arrTopic.get(i).getUserId() == 0){
+                systemTopic = arrTopic.get(i);
+                arrTopic.remove(i);
+            }
+            if (arrTopic.get(i).getUserId() == -1){
+                unFollowTopic = arrTopic.get(i);
+                arrTopic.remove(i);
+            }
+        }
+
+        Collections.sort(arrTopic, new Comparator<Topic>() {
+            @Override
+            public int compare(Topic o1, Topic o2) {
+                return Long.valueOf(o2.getDate()).compareTo(o1.getDate());
+            }
+        });
+
+        if (unFollowTopic != null){
+            arrTopic.add(0, unFollowTopic);
+        }
+        if (systemTopic != null){
+            arrTopic.add(0, systemTopic);
         }
     }
 }

@@ -24,6 +24,8 @@ import com.example.cpu11341_local.talktvhome.data.Topic;
 
 import java.util.ArrayList;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
+
 /**
  * Created by CPU11341-local on 9/1/2017.
  */
@@ -39,22 +41,24 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     private int lastVisibleItem;
     RecyclerView recyclerView;
 
-    public TopicRecyclerAdapter(Context context, final ArrayList<Topic> arrTopic, RecyclerView recyclerView){
+    public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic, RecyclerView recyclerView){
         this.context = context;
         this.arrTopic = arrTopic;
         this.recyclerView = recyclerView;
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (linearLayoutManager != null){
-                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (!isLoading && lastVisibleItem == arrTopic.size()-1) {
-                        if (onLoadMoreListener != null) {
-                            onLoadMoreListener.onLoadMore();
+            public void onScrollStateChanged (RecyclerView recyclerView, int newState){
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == SCROLL_STATE_DRAGGING){
+                    if (linearLayoutManager != null){
+                        lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                        if (!isLoading && lastVisibleItem > getItemCount()-5) {
+                            if (onLoadMoreListener != null) {
+                                onLoadMoreListener.onLoadMore();
+                            }
+                            isLoading = true;
                         }
-                        isLoading = true;
                     }
                 }
             }
@@ -101,10 +105,15 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 recyclerViewHolder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
                 recyclerViewHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
                 if (arrTopic.get(position).isHasNewMessage()) {
-                    recyclerViewHolder.imageViewUnreadDot.setImageResource(R.drawable.unread_dot);
+                    recyclerViewHolder.imageViewUnreadDot.setVisibility(View.VISIBLE);
                     recyclerViewHolder.textViewDate.setTypeface(null, Typeface.BOLD);
                     recyclerViewHolder.textViewLastMess.setTypeface(null, Typeface.BOLD);
                     recyclerViewHolder.textViewName.setTypeface(null, Typeface.BOLD);
+                } else {
+                    recyclerViewHolder.imageViewUnreadDot.setVisibility(View.GONE);
+                    recyclerViewHolder.textViewDate.setTypeface(null, Typeface.NORMAL);
+                    recyclerViewHolder.textViewLastMess.setTypeface(null, Typeface.NORMAL);
+                    recyclerViewHolder.textViewName.setTypeface(null, Typeface.NORMAL);
                 }
                 break;
             default: {

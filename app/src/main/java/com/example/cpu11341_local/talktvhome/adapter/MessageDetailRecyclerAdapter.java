@@ -55,7 +55,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 super.onScrolled(recyclerView, dx, dy);
                 if (linearLayoutManager != null){
                     firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
-                    if (!isLoading && firstVisibleItem == 0) {
+                    if (!isLoading && firstVisibleItem < 5) {
                         if (onLoadMoreListener != null) {
                             onLoadMoreListener.onLoadMore();
                         }

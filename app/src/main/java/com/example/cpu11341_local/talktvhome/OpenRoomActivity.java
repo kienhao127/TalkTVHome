@@ -1,32 +1,24 @@
 package com.example.cpu11341_local.talktvhome;
 
-import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.support.v4.app.Fragment;
 
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
-import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
-
-import java.util.ArrayList;
+import com.example.cpu11341_local.talktvhome.fragment.TopicFragment;
 
 public class OpenRoomActivity extends AppCompatActivity {
     ImageView imageView;
     boolean isLayoutGone = true;
     boolean isMessShowed = false;
-    MessageFragment messFragment;
+    TopicFragment messFragment;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +64,7 @@ public class OpenRoomActivity extends AppCompatActivity {
                     }
 
                     // Add the fragment to the 'fragment_container' FrameLayout
-                    ChatFragment chatFragment = new ChatFragment("Tên user", 1);
+                    ChatFragment chatFragment = new ChatFragment(new Topic("", "Tên User", "", 0,0,1,false));
                     getSupportFragmentManager().beginTransaction()
                             .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
                             .add(R.id.fragment_container, chatFragment)
@@ -89,7 +81,7 @@ public class OpenRoomActivity extends AppCompatActivity {
         if (isMessShowed) {
             getSupportFragmentManager().popBackStack();
 
-            messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+            messFragment = new TopicFragment("Tin nhắn", true, getClass().getName());
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
@@ -105,9 +97,9 @@ public class OpenRoomActivity extends AppCompatActivity {
                 super.onBackPressed();
             }
             if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-                MessageFragment messageFragment =  (MessageFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
-                if (messageFragment != null){
-                    messageFragment.onResume();
+                TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
+                if (topicFragment != null){
+                    topicFragment.onResume();
                 }
             } else {
                 this.onResume();

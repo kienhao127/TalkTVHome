@@ -1,28 +1,13 @@
 package com.example.cpu11341_local.talktvhome;
 
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 
-import com.example.cpu11341_local.talktvhome.data.MessageDetail;
-import com.example.cpu11341_local.talktvhome.data.Topic;
-import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
-import com.example.cpu11341_local.talktvhome.fragment.MessageFragment;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
+import com.example.cpu11341_local.talktvhome.fragment.TopicFragment;
 
 public class MessageActivity extends AppCompatActivity {
-    MessageFragment messFragment;
+    TopicFragment messFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +25,7 @@ public class MessageActivity extends AppCompatActivity {
             }
 
             // Create a new Fragment to be placed in the activity layout
-            messFragment = new MessageFragment("Tin nhắn", true, getClass().getName());
+            messFragment = new TopicFragment("Tin nhắn", true, getClass().getName());
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
@@ -59,9 +44,9 @@ public class MessageActivity extends AppCompatActivity {
         }
         overridePendingTransition(0, R.anim.exit_to_right);
         if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-            MessageFragment messageFragment =  (MessageFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
-            if (messageFragment != null){
-                messageFragment.onResume();
+            TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
+            if (topicFragment != null){
+                topicFragment.onResume();
             }
         } else {
             this.onResume();
