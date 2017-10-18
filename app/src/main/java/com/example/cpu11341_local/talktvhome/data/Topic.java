@@ -14,8 +14,9 @@ public class Topic {
     int action_type; //1: system, 2: not follow, 3: Chat
     int userId;
     boolean hasNewMessage;
+    boolean isFollow;
 
-    public Topic(String avatar, String name, String lastMess, long date, int action_type, int userId, boolean hasNewMessage) {
+    public Topic(String avatar, String name, String lastMess, long date, int action_type, int userId, boolean hasNewMessage, boolean isFollow) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
@@ -23,6 +24,7 @@ public class Topic {
         this.action_type = action_type;
         this.userId = userId;
         this.hasNewMessage = hasNewMessage;
+        this.isFollow = isFollow;
     }
 
     public Topic() {
@@ -82,5 +84,13 @@ public class Topic {
 
     public void setHasNewMessage(boolean hasNewMessage) {
         this.hasNewMessage = hasNewMessage;
+    }
+
+    public boolean isFollow() {
+        return isFollow;
+    }
+
+    public void setFollow(boolean follow) {
+        isFollow = follow;
     }
 }

@@ -75,16 +75,20 @@ public class MainActivity extends AppCompatActivity {
         final Handler handler = new Handler();
         final int delay = 5000; //milliseconds
 
+
 //        handler.postDelayed(new Runnable(){
 //            int i=0;
 //            public void run(){
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
-//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1, getBaseContext()),
+//                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(3, getBaseContext()),
 //                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //                i++;
-//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
+//
+//                InsertMessageTask insertMessageTask = new InsertMessageTask();
+//                insertMessageTask.execute(messageDetail);
+//
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
@@ -98,27 +102,13 @@ public class MainActivity extends AppCompatActivity {
 //                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(2, getBaseContext()),
 //                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //                i++;
-//                MessageDataManager.getInstance().insertMessage(messageDetail, getApplicationContext());
+//
+//                InsertMessageTask insertMessageTask = new InsertMessageTask();
+//                insertMessageTask.execute(messageDetail);
+//
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
-//
-        handler.postDelayed(new Runnable(){
-            int i=0;
-            public void run(){
-                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
-                String date = df.format(Calendar.getInstance().getTime());
-
-                MessageDetail messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(2, getBaseContext()),
-                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-                i++;
-
-                InsertMessageTask insertMessageTask = new InsertMessageTask();
-                insertMessageTask.execute(messageDetail);
-
-                handler.postDelayed(this, delay);
-            }
-        }, delay);
 
 //        MessageDetail messageDetail = new MessageDetail(1, 1, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
 //                "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra");
@@ -153,14 +143,6 @@ public class MainActivity extends AppCompatActivity {
 //
 //        for (int i=0; i<5; i++) {
 //            messageDetail = new MessageDetail(3, 2, MessageDataManager.getInstance().getUser(1, getBaseContext()),
-//                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-//
-//            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
-//            insertMessageTask4.execute(messageDetail);
-//        }
-
-//        for (int i=0; i<150; i++) {
-//            MessageDetail messageDetail = new MessageDetail(3, 2, new User(i+6, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();

@@ -48,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TOPIC_COLUMN_NAME_DATETIME = "datetime";
     public static final String TOPIC_COLUMN_NAME_ACTIONTYPE = "actiontype";
     public static final String TOPIC_COLUMN_NAME_HASNEWMSG = "hasnewmsg";
+    public static final String TOPIC_COLUMN_NAME_ISFOLLOW = "isfollow";
 
 
     private static final String MESSAGE_TABLE_CREATE =
@@ -80,7 +81,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     TOPIC_COLUMN_NAME_AVATAR + " TEXT, " +
                     TOPIC_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
                     TOPIC_COLUMN_NAME_DATETIME + " TEXT, " +
-                    TOPIC_COLUMN_NAME_HASNEWMSG + " INTEGER" +
+                    TOPIC_COLUMN_NAME_HASNEWMSG + " INTEGER, " +
+                    TOPIC_COLUMN_NAME_ISFOLLOW + " INTEGER" +
                     ");";
 
     private static DatabaseHelper instance = null;
@@ -161,7 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
         values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
         values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
-
+        values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
         long result = db.insert(TOPIC_TABLE_NAME, null, values);
         if (result == -1){
             return false;
@@ -180,6 +182,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
         values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
         values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
+        values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
 
         long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_USERID + " = ?", new String[] {String.valueOf(topic.getUserId())});
         if (result == -1){
@@ -189,10 +192,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<Topic> getListTopic(int scrollTimes){
+    public ArrayList<Topic> getListTopic(int scrollTimes, boolean isFollow){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
                 " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) +
                 " LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
@@ -206,6 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
                 topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
                 topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+                topic.setFollow((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ISFOLLOW)) == 1)?true:false);
                 arrTopic.add(topic);
             } while (cTopic.moveToNext());
         }
@@ -227,6 +232,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
             topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+            topic.setFollow((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ISFOLLOW)) == 1)?true:false);
         }
         if (topic != null) {
             return topic;

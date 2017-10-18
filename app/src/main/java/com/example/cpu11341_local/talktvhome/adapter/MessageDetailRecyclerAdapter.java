@@ -137,7 +137,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 if (position < arrMessDetail.size() - 1){
                     if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
                         messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                        messageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
                     } else {
                         messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                         Glide.with(context)
@@ -147,7 +146,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                                 .apply(RequestOptions.circleCropTransform())
                                 .into(messageHolder.imageViewAvatar);
                         messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                        messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                     }
                 } else {
                     messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
@@ -158,7 +156,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .apply(RequestOptions.circleCropTransform())
                             .into(messageHolder.imageViewAvatar);
                     messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    messageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                 }
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
@@ -183,7 +180,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 if (position < arrMessDetail.size() - 1){
                     if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
                         myMessageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                        myMessageHolder.imageViewMsgArrow.setVisibility(View.INVISIBLE);
                     } else {
                         myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                         Glide.with(context)
@@ -193,7 +189,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                                 .apply(RequestOptions.circleCropTransform())
                                 .into(myMessageHolder.imageViewAvatar);
                         myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                        myMessageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                     }
                 } else {
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
@@ -204,7 +199,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .apply(RequestOptions.circleCropTransform())
                             .into(myMessageHolder.imageViewAvatar);
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    myMessageHolder.imageViewMsgArrow.setVisibility(View.VISIBLE);
                 }
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
@@ -288,14 +282,12 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         TextView textViewMessDetail;
         TextView textViewDate;
         ImageView imageViewWarningDot;
-        ImageView imageViewMsgArrow;
         public MessageHolder(final View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
-            imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -321,14 +313,12 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         TextView textViewMessDetail;
         TextView textViewDate;
         ImageView imageViewWarningDot;
-        ImageView imageViewMsgArrow;
         public MyMessageHolder(final View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
             textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
             imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
-            imageViewMsgArrow = (ImageView) view.findViewById(R.id.imageViewMessageboxArrow);
             textViewMessDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

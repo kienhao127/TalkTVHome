@@ -11,7 +11,45 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <include layout="@layout/toolbar_layout"/>
+        <RelativeLayout
+            android:id="@+id/relativeLayoutFollowNoti"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appbar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:background="#FFF"
+            android:orientation="horizontal"
+            android:visibility="gone">
+            <com.example.cpu11341_local.talktvhome.myview.TalkTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chưa theo dõi"
+                android:gravity="center_vertical"
+                android:textColor="#444444"
+                android:layout_marginLeft="11dp"
+                android:id="@+id/textViewNotiUnfollow"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="11dp" />
 
+            <com.example.cpu11341_local.talktvhome.myview.TalkTextView
+                android:id="@+id/textViewFollow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="+ Theo dõi"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginRight="8dp"
+                android:padding="5dp"
+                android:textSize="12dp"
+                android:background="@drawable/follow_textview_background"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                />
+        </RelativeLayout>
     </android.support.design.widget.AppBarLayout>
 
 

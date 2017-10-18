@@ -70,6 +70,8 @@ public class ChatFragment extends Fragment {
     Button btnCopy, btnDelete;
     int currentTopicPosition;
     ArrayList<Topic> arrFollowTopic = new ArrayList<>();
+    RelativeLayout relativeLayoutFollowNoti;
+    TalkTextView textViewFollow;
 
     public ChatFragment(ArrayList<Topic> arrTopic, int pos) {
         this.toolbarTitle = arrTopic.get(pos).getName();
@@ -110,6 +112,32 @@ public class ChatFragment extends Fragment {
         btnCopy = (Button) view.findViewById(R.id.btnCopy);
         btnDelete = (Button) view.findViewById(R.id.btnDelete);
         selectedMsgDetail = (TalkTextView) view.findViewById(R.id.seletedMsgDetail);
+        relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
+        textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
+
+        if (!MessageDataManager.getInstance().isFollow(senderID)) {
+            relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
+            textViewFollow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    arrTopic.get(currentTopicPosition).setFollow(true);
+                    MessageDataManager.getInstance().updateTopic(arrTopic.get(currentTopicPosition), getContext());
+                    if (currentTopicPosition == 0 && arrTopic.size() > 1) {
+                        int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, -1);
+                        arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(unfollowTopicIndex).getName() + ": " + arrTopic.get(unfollowTopicIndex).getLastMess());
+                        arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(unfollowTopicIndex).getDate());
+                        MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
+                    }
+                    arrFollowTopic.add(arrTopic.remove(currentTopicPosition));
+                    if (arrTopic.size() == 0) {
+                        arrFollowTopic.remove(1);
+                        MessageDataManager.getInstance().deleteTopic(-1, getContext(), arrFollowTopic);
+                    }
+                    relativeLayoutFollowNoti.setVisibility(View.GONE);
+                }
+            });
+        }
+
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -291,10 +319,12 @@ public class ChatFragment extends Fragment {
                         topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                         topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
                         arrTopic.set(currentTopicPosition, topic);
-                        if (currentTopicPosition == 0 && !MessageDataManager.getInstance().isFollow(topic.getUserId())){
-                            Topic unfollowTopic = arrFollowTopic.get(1);
-                            unfollowTopic.setLastMess(topic.getName() + ": " + topic.getLastMess());
-                            unfollowTopic.setDate(topic.getDate());
+                        if (currentTopicPosition == 0 && !topic.isFollow()){
+                            int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, -1);
+                            Topic unfollowTopic = arrFollowTopic.get(unfollowTopicIndex);
+                            TopicFragment.sortTopic(arrTopic);
+                            unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
+                            unfollowTopic.setDate(arrTopic.get(0).getDate());
                             MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
                         }
                         MessageDataManager.getInstance().updateTopic(topic, getContext());
@@ -405,17 +435,27 @@ public class ChatFragment extends Fragment {
             if (senderID == wrappers[0].getTopic().getUserId()) {
                 wrappers[0].getTopic().setHasNewMessage(false);
                 currentTopic = wrappers[0].getTopic();
+                arrTopic.get(currentTopicPosition).setDate(wrappers[0].getTopic().getDate());
+                arrTopic.get(currentTopicPosition).setLastMess(wrappers[0].getTopic().getLastMess());
                 MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
                 arrMessDetail.add(wrappers[0].getMessageDetail());
             }
-            if (!MessageDataManager.getInstance().isFollow(wrappers[0].getTopic().getUserId())){
-                Topic unFollowTopic = MessageDataManager.getInstance().getTopic(-1, getContext());
-                if (senderID == wrappers[0].getTopic().getUserId()){
-                    unFollowTopic.setHasNewMessage(false);
+            if (!wrappers[0].getTopic().isFollow()){
+                int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, -1);
+                if (unfollowTopicIndex == -1){
+                    arrFollowTopic.add(MessageDataManager.getInstance().getTopic(-1, getContext()));
+                    arrTopic.add(wrappers[0].getTopic());
+                    unfollowTopicIndex = arrFollowTopic.size()-1;
                 } else {
-                    unFollowTopic.setHasNewMessage(true);
+                    arrFollowTopic.get(unfollowTopicIndex).setDate(wrappers[0].getTopic().getDate());
+                    arrFollowTopic.get(unfollowTopicIndex).setLastMess(wrappers[0].getTopic().getName() + ": " + wrappers[0].getTopic().getLastMess());
                 }
-                MessageDataManager.getInstance().updateTopic(unFollowTopic, getContext());
+                if (senderID == wrappers[0].getTopic().getUserId()){
+                    arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(false);
+                } else {
+                    arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(true);
+                }
+                MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
             }
             return null;
         }

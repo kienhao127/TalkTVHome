@@ -27,22 +27,14 @@
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_toRightOf="@+id/imageViewMessageboxArrow"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/imageViewAvatar"
+            android:layout_toRightOf="@+id/imageViewAvatar"
             android:background="@drawable/rounded_corner"
             android:padding="7dp"
             android:text="Nội dung tin nhắn"
             android:gravity="center"
             android:textColor="#000" />
-
-        <ImageView
-            android:id="@+id/imageViewMessageboxArrow"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_toEndOf="@+id/imageViewAvatar"
-            android:layout_toRightOf="@+id/imageViewAvatar"
-            android:src="@drawable/messagebox_arrow" />
     </RelativeLayout>
 </LinearLayout>

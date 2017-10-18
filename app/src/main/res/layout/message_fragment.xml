@@ -12,7 +12,6 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <include layout="@layout/toolbar_layout"/>
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView

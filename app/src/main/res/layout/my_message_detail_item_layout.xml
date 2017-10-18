@@ -33,7 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/imageViewMessageboxArrow"
+            android:layout_toLeftOf="@+id/imageViewAvatar"
+            android:layout_toStartOf="@+id/imageViewAvatar"
+            android:layout_marginRight="5dp"
             android:background="@drawable/my_message_box"
             android:padding="7dp"
             android:text="Nội dung tin nhắn"
@@ -48,16 +50,5 @@
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@+id/textViewMessDetail"
             android:src="@drawable/warning_dot" />
-
-        <ImageView
-            android:id="@+id/imageViewMessageboxArrow"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:src="@drawable/my_messagebox_arrow"
-            android:layout_marginTop="20dp"
-            android:layout_toLeftOf="@+id/imageViewAvatar"
-            android:layout_toStartOf="@+id/imageViewAvatar"
-            android:layout_marginRight="5dp"
-            android:layout_marginEnd="5dp" />
     </RelativeLayout>
 </LinearLayout>
