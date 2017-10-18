@@ -382,7 +382,6 @@ public class ChatFragment extends Fragment {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Log.i("LoadData", String.valueOf(result.size()));
                     arrMessDetail.clear();
                     arrMessDetail.addAll(result);
                     if (adapter != null) {
@@ -411,7 +410,6 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
-            Log.i("LoadMoreData", "ASDASD");
             ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
             return arrNewMsgDetail;
         }
@@ -435,9 +433,11 @@ public class ChatFragment extends Fragment {
             if (senderID == wrappers[0].getTopic().getUserId()) {
                 wrappers[0].getTopic().setHasNewMessage(false);
                 currentTopic = wrappers[0].getTopic();
-                arrTopic.get(currentTopicPosition).setDate(wrappers[0].getTopic().getDate());
-                arrTopic.get(currentTopicPosition).setLastMess(wrappers[0].getTopic().getLastMess());
-                MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
+                if (arrTopic.size() != 0){
+                    arrTopic.get(currentTopicPosition).setDate(wrappers[0].getTopic().getDate());
+                    arrTopic.get(currentTopicPosition).setLastMess(wrappers[0].getTopic().getLastMess());
+                    MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
+                }
                 arrMessDetail.add(wrappers[0].getMessageDetail());
             }
             if (!wrappers[0].getTopic().isFollow()){
