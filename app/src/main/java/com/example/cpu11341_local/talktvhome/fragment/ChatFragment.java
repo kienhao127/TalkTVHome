@@ -119,17 +119,17 @@ public class ChatFragment extends Fragment {
             textViewFollow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
                     arrTopic.get(currentTopicPosition).setFollow(true);
                     MessageDataManager.getInstance().updateTopic(arrTopic.get(currentTopicPosition), getContext());
                     if (currentTopicPosition == 0 && arrTopic.size() > 1) {
-                        int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
                         arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(unfollowTopicIndex).getName() + ": " + arrTopic.get(unfollowTopicIndex).getLastMess());
                         arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(unfollowTopicIndex).getDate());
                         MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
                     }
                     arrFollowTopic.add(arrTopic.remove(currentTopicPosition));
                     if (arrTopic.size() == 0) {
-                        arrFollowTopic.remove(1);
+                        arrFollowTopic.remove(unfollowTopicIndex);
                         MessageDataManager.getInstance().deleteTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext(), arrFollowTopic);
                     }
                     relativeLayoutFollowNoti.setVisibility(View.GONE);
@@ -311,16 +311,16 @@ public class ChatFragment extends Fragment {
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
                 Topic topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
-                if (selectedPosition == arrMessDetail.size()-1){
-                    if (selectedPosition == 0){
+                if (selectedPosition == arrMessDetail.size()-1 && arrTopic.size() > 0) {
+                    if (selectedPosition == 0) {
                         arrTopic.remove(currentTopicPosition);
                         MessageDataManager.getInstance().deleteTopic(topicID, getContext(), arrFollowTopic);
-                    }else {
-                        topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
-                        topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+                    } else {
+                        topic.setDate(arrMessDetail.get(selectedPosition - 1).getDatetime());
+                        topic.setLastMess(arrMessDetail.get(selectedPosition - 1).getText());
                         arrTopic.set(currentTopicPosition, topic);
-                        if (currentTopicPosition == 0 && !topic.isFollow()){
-                            int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_5");
+                        if (currentTopicPosition == 0 && !topic.isFollow()) {
+                            int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, "-1_5");
                             Topic unfollowTopic = arrFollowTopic.get(unfollowTopicIndex);
                             TopicFragment.sortTopic(arrTopic, getContext());
                             unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());

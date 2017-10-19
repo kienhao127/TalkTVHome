@@ -119,7 +119,7 @@ public class MessageDataManager {
         } else {
             strText = messageDetail.getText();
         }
-
+        User userOfTopic = DatabaseHelper.getInstance(context).getUser(splitSenderID(messageDetail.getTopicID())[0]);
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
         if (topic.getName() != null) {
             topic.setLastMess(strText);
@@ -133,36 +133,40 @@ public class MessageDataManager {
 
             if (!topic.isFollow()) {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_"+getCurrentUser(context).getId());
-                if (unfollowTopic != null) {
+                if (unfollowTopic.getName() != null) {
                     unfollowTopic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
                     unfollowTopic.setDate(messageDetail.getDatetime());
                     unfollowTopic.setHasNewMessage(true);
                     DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
                 } else {
-                    unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, "-1_"+getCurrentUser(context).getId(), true, true);
+                    unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
+                            userOfTopic.getName() + ": " + strText,
+                            messageDetail.getDatetime(), 2, "-1_"+getCurrentUser(context).getId(), true, true);
                     DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
                 }
                 MessageDataManager.getInstance().updateTopic(unfollowTopic, context);
             }
         } else {
-            if (topicID.equals("0_"+getCurrentUser(context).getId())) {
-                topic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, topicID, true, true);
+            topic = new Topic(userOfTopic.getAvatar(), userOfTopic.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
+            if (messageDetail.getType() == 4) {
+                topic.setHasNewMessage(false);
             } else {
-                topic = new Topic(DatabaseHelper.getInstance(context).getUser(splitSenderID(messageDetail.getTopicID())[0]).getAvatar(),
-                        DatabaseHelper.getInstance(context).getUser(splitSenderID(messageDetail.getTopicID())[0]).getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
-                if (isFollow(topic.getTopicID())) {
-                    topic.setFollow(true);
+                topic.setHasNewMessage(true);
+            }
+            if (isFollow(topic.getTopicID())) {
+                topic.setFollow(true);
+            } else {
+                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
+                if (unfollowTopic.getName() != null) {
+                    unfollowTopic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
+                    unfollowTopic.setDate(messageDetail.getDatetime());
+                    unfollowTopic.setHasNewMessage(true);
+                    DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
                 } else {
-                    Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
-                    if (unfollowTopic.getName() != null) {
-                        unfollowTopic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
-                        unfollowTopic.setDate(messageDetail.getDatetime());
-                        unfollowTopic.setHasNewMessage(true);
-                        DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
-                    } else {
-                        unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn", messageDetail.getUser().getName() + ": " + strText, messageDetail.getDatetime(), 2, "-1_"+getCurrentUser(context).getId(), true, true);
-                        DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
-                    }
+                    unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
+                            userOfTopic.getName() + ": " + strText,
+                            messageDetail.getDatetime(), 2, "-1_" + getCurrentUser(context).getId(), true, true);
+                    DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
                 }
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
