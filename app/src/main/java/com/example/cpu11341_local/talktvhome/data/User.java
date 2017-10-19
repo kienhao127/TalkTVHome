@@ -6,10 +6,10 @@ package com.example.cpu11341_local.talktvhome.data;
 
 public class User {
     String avatar;
-    int id;
+    String id;
     String name;
 
-    public User(int id, String avatar, String name) {
+    public User(String id, String avatar, String name) {
         this.avatar = avatar;
         this.id = id;
         this.name = name;
@@ -23,7 +23,7 @@ public class User {
         return avatar;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -35,7 +35,7 @@ public class User {
         this.avatar = avatar;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

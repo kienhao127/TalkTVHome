@@ -34,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MESSAGE_COLUMN_NAME_ACTIONTITLE = "actiontitle";
     public static final String MESSAGE_COLUMN_NAME_ACTIONEXTRA = "actionextra";
     public static final String MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
+    public static final String MESSAGE_COLUMN_NAME_TOPICID = "topicid";
 
     public static final String USER_TABLE_NAME = "user";
     public static final String USER_COLUMN_NAME_ID = "id";
@@ -41,7 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String USER_COLUMN_NAME_AVATAR = "avatar";
 
     public static final String TOPIC_TABLE_NAME = "topic";
-    public static final String TOPIC_COLUMN_NAME_USERID = "userid";
+    public static final String TOPIC_COLUMN_NAME_TOPICID = "topicid";
     public static final String TOPIC_COLUMN_NAME_NAME = "name";
     public static final String TOPIC_COLUMN_NAME_AVATAR = "avatar";
     public static final String TOPIC_COLUMN_NAME_LASTMSG = "lastmsg";
@@ -63,7 +64,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
                     MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
                     MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER" +
+                    MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER, " +
+                    MESSAGE_COLUMN_NAME_TOPICID + " TEXT" +
                     ");";
 
     private static final String USER_TABLE_CREATE =
@@ -75,7 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TOPIC_TABLE_CREATE =
             "CREATE TABLE " + TOPIC_TABLE_NAME + " (" +
-                    TOPIC_COLUMN_NAME_USERID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    TOPIC_COLUMN_NAME_TOPICID + " TEXT PRIMARY KEY, " +
                     TOPIC_COLUMN_NAME_NAME + " TEXT, " +
                     TOPIC_COLUMN_NAME_LASTMSG + " TEXT, " +
                     TOPIC_COLUMN_NAME_AVATAR + " TEXT, " +
@@ -128,13 +130,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public User getUser(int userID){
-        Map<Integer, User> linkedHashMapUser = new LinkedHashMap();
-        linkedHashMapUser.put(0, new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
-        linkedHashMapUser.put(1, new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
-        linkedHashMapUser.put(2, new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
-        linkedHashMapUser.put(3, new User(3, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi 2"));
-        linkedHashMapUser.put(5, new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
+    public User getUser(String userID){
+        Map<String, User> linkedHashMapUser = new LinkedHashMap();
+        linkedHashMapUser.put("0", new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
+        linkedHashMapUser.put("1", new User("1", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
+        linkedHashMapUser.put("2", new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
+        linkedHashMapUser.put("3", new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi 2"));
+        linkedHashMapUser.put("5", new User("5", "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
 //        String selectQuery = "SELECT  *" +
 //                " FROM " + USER_TABLE_NAME +
 //                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
@@ -162,7 +164,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
         values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
-        values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
+        values.put(TOPIC_COLUMN_NAME_TOPICID, topic.getTopicID());
         values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
         long result = db.insert(TOPIC_TABLE_NAME, null, values);
         if (result == -1){
@@ -181,10 +183,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
         values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
-        values.put(TOPIC_COLUMN_NAME_USERID, topic.getUserId());
+        values.put(TOPIC_COLUMN_NAME_TOPICID, topic.getTopicID());
         values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
 
-        long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_USERID + " = ?", new String[] {String.valueOf(topic.getUserId())});
+        long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_TOPICID + " = ?", new String[] {topic.getTopicID()});
         if (result == -1){
             return false;
         } else {
@@ -203,7 +205,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cTopic.moveToFirst()) {
             do {
                 Topic topic = new Topic();
-                topic.setUserId(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID)));
+                topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
                 topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
                 topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
                 topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
@@ -217,15 +219,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrTopic;
     }
 
-    public Topic getTopic(int senderID){
-        Topic topic = new Topic();
+    public ArrayList<Topic> getListTopic(boolean isFollow){
+        ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
                 " FROM " + TOPIC_TABLE_NAME +
-                " WHERE " + TOPIC_COLUMN_NAME_USERID + " = " + senderID;
+                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
-            topic.setUserId(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID)));
+            do {
+                Topic topic = new Topic();
+                topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
+                topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
+                topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+                topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
+                topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
+                topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
+                topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+                topic.setFollow((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ISFOLLOW)) == 1)?true:false);
+                topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
+                arrTopic.add(topic);
+            } while (cTopic.moveToNext());
+        }
+        return arrTopic;
+    }
+
+    public int isExistUnfollowTopic(){
+        ArrayList<Topic> arrTopic = new ArrayList<>();
+        String selectQuery = "SELECT COUNT(*)" +
+                " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        cTopic.moveToFirst();
+        int count= cTopic.getInt(0);
+        cTopic.close();
+        return count;
+    }
+
+    public Topic getTopic(String topicID){
+        Topic topic = new Topic();
+        String selectQuery = "SELECT *" +
+                " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_TOPICID + " = '" + topicID + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        if (cTopic.moveToFirst()) {
+            topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
             topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
             topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
             topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
@@ -240,9 +280,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public boolean deleteTopic(int senderID){
+    public boolean deleteTopic(String topicID){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_USERID + "=" + senderID, null) > 0;
+        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_TOPICID + "='" + topicID + "'", null) > 0;
     }
 
 
@@ -259,6 +299,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(MESSAGE_COLUMN_NAME_ACTIONTITLE, messageDetail.getAction_title());
         values.put(MESSAGE_COLUMN_NAME_ACTIONEXTRA, messageDetail.getAction_extra());
         values.put(MESSAGE_COLUMN_NAME_TYPE, messageDetail.getType());
+        values.put(MESSAGE_COLUMN_NAME_TOPICID, messageDetail.getTopicID());
 
         long result = db.insert(MESSAGE_TABLE_NAME, null, values);
         if (result == -1){
@@ -268,10 +309,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<MessageDetail> getListMessage(int senderID, int scrollTimes){
+    public ArrayList<MessageDetail> getListMessage(String topicID, int scrollTimes){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
-                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " WHERE " + MESSAGE_COLUMN_NAME_SENDERID + " = " + senderID + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
+                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " WHERE " + MESSAGE_COLUMN_NAME_TOPICID + " = '" + topicID + "'" + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
@@ -288,7 +329,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setAction_title(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTITLE)));
                 messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
                 messageDetail.setWarning(Boolean.parseBoolean(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ISWARNING))));
-                messageDetail.setUser(getUser(senderID));
+                messageDetail.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
+                messageDetail.setUser(getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID))));
 
                 arrMessDetail.add(messageDetail);
             } while (c.moveToNext());
@@ -301,8 +343,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
     }
 
-    public boolean deleteAllMessage(int senderID){
+    public boolean deleteAllMessage(String senderID, String topicID){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "=" + senderID, null) > 0;
+        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "='" + senderID + "'" + " and " + MESSAGE_COLUMN_NAME_TOPICID + "='" + topicID + "'" , null) > 0;
     }
 }

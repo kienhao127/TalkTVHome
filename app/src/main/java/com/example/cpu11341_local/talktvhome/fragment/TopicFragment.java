@@ -1,5 +1,6 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -181,7 +182,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                         case 1:
                         case 3:
                             ChatFragment chatFragment;
-                            if (arrTopic.get(position).isFollow()){
+                            if (arrTopic.get(position).isFollow()) {
                                 chatFragment = new ChatFragment(arrTopic, position);
                             } else {
                                 chatFragment = new ChatFragment(arrTopic, position, arrFollowTopic);
@@ -231,7 +232,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        if (v == topicRecyclerView){
+        if (v == topicRecyclerView) {
             MenuInflater inflater = getActivity().getMenuInflater();
             inflater.inflate(R.menu.menu_topic, menu);
             for (int i = 0; i < menu.size(); ++i) {
@@ -253,18 +254,18 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
-                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getUserId(), getContext(), arrFollowTopic);
+                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getTopicID(), getContext(), arrFollowTopic);
                 Topic removedTopic = arrTopic.remove(pos);
-                if (pos == 0 && arrTopic.size() != 0 && !removedTopic.isFollow()){
-                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, -1);
+                if (pos == 0 && arrTopic.size() != 0 && !removedTopic.isFollow()) {
+                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
                     arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
                     arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(0).getDate());
                     MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
                 }
-                if (adapter != null){
+                if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }
-                if (arrTopic.size() == 0){
+                if (arrTopic.size() == 0) {
                     textViewOver.setVisibility(View.VISIBLE);
                 }
                 Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_SHORT).show();
@@ -283,8 +284,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             LoadTopicTask loadTopicTask = new LoadTopicTask();
             loadTopicTask.execute();
         } else {
-            if (arrTopic.size()!=0){
-                sortTopic(arrTopic);
+            if (arrTopic.size() != 0) {
+                sortTopic(arrTopic, getContext());
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }
@@ -297,27 +298,23 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 boolean isTopicExists = false;
-                if (!isFollow){
-                    if (topic.isFollow()){
-                        for (int i=0; i<arrFollowTopic.size(); i++){
-                            if (arrFollowTopic.get(i).getUserId() == topic.getUserId()){
-                                arrFollowTopic.get(i).setDate(topic.getDate());
-                                arrFollowTopic.get(i).setLastMess(topic.getLastMess());
-                                MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(i), getContext());
-                                return;
-                            }
+                if (!isFollow && topic.isFollow()) {
+                    for (int i = 0; i < arrFollowTopic.size(); i++) {
+                        if (arrFollowTopic.get(i).getTopicID().equals(topic.getTopicID())) {
+                            arrFollowTopic.get(i).setDate(topic.getDate());
+                            arrFollowTopic.get(i).setLastMess(topic.getLastMess());
+                            MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(i), getContext());
+                            return;
                         }
                     }
                 }
 
-                if (isFollow){
-                    if (!topic.isFollow()){
-                        topic = MessageDataManager.getInstance().getTopic(-1, getContext());
-                    }
+                if (isFollow && !topic.isFollow()) {
+                    topic = MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
                 }
 
                 for (int i = 0; i < arrTopic.size(); i++) {
-                    if (arrTopic.get(i).getUserId() == topic.getUserId()) {
+                    if (arrTopic.get(i).getTopicID().equals(topic.getTopicID())) {
                         arrTopic.set(i, topic);
                         isTopicExists = true;
                     }
@@ -326,15 +323,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 if (!isTopicExists) {
                     arrTopic.add(topic);
                 }
+                sortTopic(arrTopic, getContext());
 
-                if (arrTopic.size()!=0) {
-                    sortTopic(arrTopic);
-                }
-
-                if (topic.getUserId() == arrTopic.get(0).getUserId() && !topic.isFollow()){
-                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, -1);
-                    if (unfollowTopicIndex == -1){
-                        arrFollowTopic.add(MessageDataManager.getInstance().getTopic(-1, getContext()));
+                if (topic.getTopicID().equals(arrTopic.get(0).getTopicID()) && !topic.isFollow()) {
+                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
+                    if (unfollowTopicIndex == -1) {
+                        arrFollowTopic.add(MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext()));
                     } else {
                         arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
                         arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(0).getDate());
@@ -355,7 +349,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         protected ArrayList<Topic> doInBackground(String... urls) {
             Log.i("Get list topic", "DO IN BACKGROUND");
             ArrayList<Topic> arrListTopic = new ArrayList<>();
-            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes) == null){
+            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes) == null) {
                 return null;
             }
             arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes));
@@ -365,7 +359,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
             arrTopic.clear();
-            if (result!=null){
+            if (result != null) {
                 arrTopic.addAll(result);
             }
             if (adapter != null) {
@@ -373,7 +367,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             }
             isResume = true;
             textViewLoading.setVisibility(View.GONE);
-            if (arrTopic.size() == 0){
+            if (arrTopic.size() == 0) {
                 textViewOver.setVisibility(View.VISIBLE);
             } else {
                 textViewOver.setVisibility(View.GONE);
@@ -398,15 +392,15 @@ public class TopicFragment extends android.support.v4.app.Fragment {
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
-            int pos = arrTopic.size()-1;
+            int pos = arrTopic.size() - 1;
             arrTopic.remove(pos);
             adapter.notifyItemRemoved(pos);
-            if (result != null){
+            if (result != null) {
                 if (result.size() < 30) {
                     isAllMsg = true;
                 }
                 arrTopic.addAll(pos, result);
-                adapter.notifyItemRangeInserted(pos, result.size()-1);
+                adapter.notifyItemRangeInserted(pos, result.size() - 1);
             } else {
                 isAllMsg = true;
             }
@@ -414,22 +408,20 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         }
     }
 
-    public static void sortTopic(ArrayList<Topic> arrTopic){
+    public static void sortTopic(ArrayList<Topic> arrTopic, Context context) {
         Topic systemTopic = null, unFollowTopic = null;
 
-        int i=0;
-        while (arrTopic.size()!=0 && i < arrTopic.size()){
-            if (arrTopic.get(i).getUserId() == 0){
+        int i = 0;
+        while (arrTopic.size() != 0 && i < arrTopic.size()) {
+            if (arrTopic.get(i).getTopicID().equals("0_"+MessageDataManager.getInstance().getCurrentUser(context).getId())) {
                 systemTopic = arrTopic.get(i);
                 arrTopic.remove(i);
-                i++;
-                break;
+                continue;
             }
-            if (arrTopic.get(i).getUserId() == -1){
+            if (arrTopic.get(i).getTopicID().equals("-1_"+MessageDataManager.getInstance().getCurrentUser(context).getId())) {
                 unFollowTopic = arrTopic.get(i);
                 arrTopic.remove(i);
-                i++;
-                break;
+                continue;
             }
             i++;
         }
@@ -441,17 +433,17 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        if (unFollowTopic != null){
+        if (unFollowTopic != null) {
             arrTopic.add(0, unFollowTopic);
         }
-        if (systemTopic != null){
+        if (systemTopic != null) {
             arrTopic.add(0, systemTopic);
         }
     }
 
-    public static int findTopicByID(ArrayList<Topic> arrTopic, int userID){
-        for (int i=0; i < arrTopic.size(); i++){
-            if (arrTopic.get(i).getUserId() == userID){
+    public static int findTopicByID(ArrayList<Topic> arrTopic, String topicID) {
+        for (int i = 0; i < arrTopic.size(); i++) {
+            if (arrTopic.get(i).getTopicID().equals(topicID)) {
                 return i;
             }
         }

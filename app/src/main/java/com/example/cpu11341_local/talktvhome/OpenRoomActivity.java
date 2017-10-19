@@ -64,7 +64,7 @@ public class OpenRoomActivity extends AppCompatActivity {
                     }
 
                     // Add the fragment to the 'fragment_container' FrameLayout
-                    ChatFragment chatFragment = new ChatFragment(new Topic("", "Tên User", "", 0,0,2,false, false));
+                    ChatFragment chatFragment = new ChatFragment(new Topic("", "Tên User", "", 0,0,"2_5",false, false));
                     getSupportFragmentManager().beginTransaction()
                             .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
                             .add(R.id.fragment_container, chatFragment)

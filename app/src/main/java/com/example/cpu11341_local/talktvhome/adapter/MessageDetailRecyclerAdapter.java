@@ -183,7 +183,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     } else {
                         myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                         Glide.with(context)
-                                .load(MessageDataManager.getInstance().getCurrentUser().getAvatar())
+                                .load(MessageDataManager.getInstance().getCurrentUser(context).getAvatar())
                                 .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                                 .apply(RequestOptions.errorOf(R.drawable.grid_item))
                                 .apply(RequestOptions.circleCropTransform())
@@ -193,7 +193,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 } else {
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                     Glide.with(context)
-                            .load(MessageDataManager.getInstance().getCurrentUser().getAvatar())
+                            .load(MessageDataManager.getInstance().getCurrentUser(context).getAvatar())
                             .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                             .apply(RequestOptions.errorOf(R.drawable.grid_item))
                             .apply(RequestOptions.circleCropTransform())

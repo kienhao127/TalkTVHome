@@ -56,7 +56,7 @@ public class ChatFragment extends Fragment {
     TextView mTitle;
     EditText editText;
     String toolbarTitle;
-    int senderID;
+    String topicID;
     ImageView imageViewSend;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     ArrayList<Topic> arrTopic = new ArrayList<>();
@@ -75,14 +75,14 @@ public class ChatFragment extends Fragment {
 
     public ChatFragment(ArrayList<Topic> arrTopic, int pos) {
         this.toolbarTitle = arrTopic.get(pos).getName();
-        this.senderID = arrTopic.get(pos).getUserId();
+        this.topicID = arrTopic.get(pos).getTopicID();
         this.arrTopic = arrTopic;
         this.currentTopicPosition = pos;
     }
 
     public ChatFragment(ArrayList<Topic> arrTopic, int pos, ArrayList<Topic> arrFollowTopic) {
         this.toolbarTitle = arrTopic.get(pos).getName();
-        this.senderID = arrTopic.get(pos).getUserId();
+        this.topicID = arrTopic.get(pos).getTopicID();
         this.arrTopic = arrTopic;
         this.currentTopicPosition = pos;
         this.arrFollowTopic = arrFollowTopic;
@@ -90,7 +90,7 @@ public class ChatFragment extends Fragment {
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getName();
-        this.senderID = topic.getUserId();
+        this.topicID = topic.getTopicID();
     }
 
     @Override
@@ -100,7 +100,6 @@ public class ChatFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        Log.i("OnCreateView", "ASDASD");
         final View view = inflater.inflate(R.layout.chat_fragment, container, false);
         textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
         textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
@@ -115,7 +114,7 @@ public class ChatFragment extends Fragment {
         relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
         textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
 
-        if (!MessageDataManager.getInstance().isFollow(senderID)) {
+        if (!MessageDataManager.getInstance().isFollow(topicID)) {
             relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
             textViewFollow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -123,7 +122,7 @@ public class ChatFragment extends Fragment {
                     arrTopic.get(currentTopicPosition).setFollow(true);
                     MessageDataManager.getInstance().updateTopic(arrTopic.get(currentTopicPosition), getContext());
                     if (currentTopicPosition == 0 && arrTopic.size() > 1) {
-                        int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, -1);
+                        int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
                         arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(unfollowTopicIndex).getName() + ": " + arrTopic.get(unfollowTopicIndex).getLastMess());
                         arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(unfollowTopicIndex).getDate());
                         MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
@@ -131,7 +130,7 @@ public class ChatFragment extends Fragment {
                     arrFollowTopic.add(arrTopic.remove(currentTopicPosition));
                     if (arrTopic.size() == 0) {
                         arrFollowTopic.remove(1);
-                        MessageDataManager.getInstance().deleteTopic(-1, getContext(), arrFollowTopic);
+                        MessageDataManager.getInstance().deleteTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext(), arrFollowTopic);
                     }
                     relativeLayoutFollowNoti.setVisibility(View.GONE);
                 }
@@ -160,8 +159,9 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MessageDetail messageDetail = null;
-                messageDetail = new MessageDetail(4, 1, MessageDataManager.getInstance().getUser(senderID, getContext()),
+                messageDetail = new MessageDetail(4, MessageDataManager.getInstance().getCurrentUser(getContext()),
                         Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
+                messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
                 if (MessageDataManager.getInstance().dataListener != null){
                     MessageDataManager.getInstance().dataListener.onDataChanged(wrapper.getTopic(), wrapper.getMessageDetail());
@@ -242,7 +242,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(senderID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
+                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(topicID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
                 relativeLayoutContextMenu.startAnimation(enter_from_bottom);
@@ -310,19 +310,19 @@ public class ChatFragment extends Fragment {
                 Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
-                Topic topic = MessageDataManager.getInstance().getTopic(senderID, getContext());
+                Topic topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
                 if (selectedPosition == arrMessDetail.size()-1){
                     if (selectedPosition == 0){
                         arrTopic.remove(currentTopicPosition);
-                        MessageDataManager.getInstance().deleteTopic(senderID, getContext(), arrFollowTopic);
+                        MessageDataManager.getInstance().deleteTopic(topicID, getContext(), arrFollowTopic);
                     }else {
                         topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                         topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
                         arrTopic.set(currentTopicPosition, topic);
                         if (currentTopicPosition == 0 && !topic.isFollow()){
-                            int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, -1);
+                            int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_5");
                             Topic unfollowTopic = arrFollowTopic.get(unfollowTopicIndex);
-                            TopicFragment.sortTopic(arrTopic);
+                            TopicFragment.sortTopic(arrTopic, getContext());
                             unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
                             unfollowTopic.setDate(arrTopic.get(0).getDate());
                             MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
@@ -373,7 +373,7 @@ public class ChatFragment extends Fragment {
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
             ArrayList<MessageDetail> arrayListMessageDetail = new ArrayList<>();
-            arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes));
+            arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), scrollTimes));
             return arrayListMessageDetail;
         }
 
@@ -410,7 +410,7 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
-            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(senderID, getContext(), scrollTimes);
+            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), scrollTimes);
             return arrNewMsgDetail;
         }
 
@@ -430,7 +430,7 @@ public class ChatFragment extends Fragment {
     private class LoadMessageTask extends AsyncTask<Wrapper, Void, Void>{
         @Override
         protected Void doInBackground(Wrapper... wrappers) {
-            if (senderID == wrappers[0].getTopic().getUserId()) {
+            if (topicID.equals(wrappers[0].getTopic().getTopicID())) {
                 wrappers[0].getTopic().setHasNewMessage(false);
                 currentTopic = wrappers[0].getTopic();
                 if (arrTopic.size() != 0){
@@ -441,16 +441,16 @@ public class ChatFragment extends Fragment {
                 arrMessDetail.add(wrappers[0].getMessageDetail());
             }
             if (!wrappers[0].getTopic().isFollow()){
-                int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, -1);
+                int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
                 if (unfollowTopicIndex == -1){
-                    arrFollowTopic.add(MessageDataManager.getInstance().getTopic(-1, getContext()));
+                    arrFollowTopic.add(MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext()));
                     arrTopic.add(wrappers[0].getTopic());
                     unfollowTopicIndex = arrFollowTopic.size()-1;
                 } else {
                     arrFollowTopic.get(unfollowTopicIndex).setDate(wrappers[0].getTopic().getDate());
                     arrFollowTopic.get(unfollowTopicIndex).setLastMess(wrappers[0].getTopic().getName() + ": " + wrappers[0].getTopic().getLastMess());
                 }
-                if (senderID == wrappers[0].getTopic().getUserId()){
+                if (topicID.equals(wrappers[0].getTopic().getTopicID())){
                     arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(false);
                 } else {
                     arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(true);

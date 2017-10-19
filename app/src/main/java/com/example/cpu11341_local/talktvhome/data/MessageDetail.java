@@ -18,14 +18,14 @@ public class MessageDetail {
     String action_title;
     String action_extra;
     boolean isWarning;
+    String topicID;
 
     public MessageDetail(){
 
     }
 
     //Event
-    public MessageDetail(int type, int id, User user, String title, long datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
-        this.id = id;
+    public MessageDetail(int type, User user, String title, long datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
         this.user = user;
         this.title = title;
         this.datetime = datetime;
@@ -38,8 +38,7 @@ public class MessageDetail {
     }
 
     //Remind
-    public MessageDetail(int type, int id, User user, String title, long datetime, String text, int action_type, String action_title, String action_extra) {
-        this.id = id;
+    public MessageDetail(int type, User user, String title, long datetime, String text, int action_type, String action_title, String action_extra) {
         this.user = user;
         this.title = title;
         this.datetime = datetime;
@@ -51,8 +50,7 @@ public class MessageDetail {
     }
 
     //Message
-    public MessageDetail(int type, int id, User user, long datetime, String text, boolean isWarning) {
-        this.id = id;
+    public MessageDetail(int type, User user, long datetime, String text, boolean isWarning) {
         this.user = user;
         this.datetime = datetime;
         this.text = text;
@@ -146,5 +144,13 @@ public class MessageDetail {
 
     public void setWarning(boolean warning) {
         isWarning = warning;
+    }
+
+    public String getTopicID() {
+        return topicID;
+    }
+
+    public void setTopicID(String topicID) {
+        this.topicID = topicID;
     }
 }

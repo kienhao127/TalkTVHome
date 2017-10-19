@@ -12,17 +12,17 @@ public class Topic {
     String lastMess;
     long date;
     int action_type; //1: system, 2: not follow, 3: Chat
-    int userId;
+    String topicID;
     boolean hasNewMessage;
     boolean isFollow;
 
-    public Topic(String avatar, String name, String lastMess, long date, int action_type, int userId, boolean hasNewMessage, boolean isFollow) {
+    public Topic(String avatar, String name, String lastMess, long date, int action_type, String topicID, boolean hasNewMessage, boolean isFollow) {
         this.avatar = avatar;
         this.name = name;
         this.lastMess = lastMess;
         this.date = date;
         this.action_type = action_type;
-        this.userId = userId;
+        this.topicID = topicID;
         this.hasNewMessage = hasNewMessage;
         this.isFollow = isFollow;
     }
@@ -70,12 +70,12 @@ public class Topic {
         this.action_type = action_type;
     }
 
-    public int getUserId() {
-        return userId;
+    public String getTopicID() {
+        return topicID;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setTopicID(String topicID) {
+        this.topicID = topicID;
     }
 
     public boolean isHasNewMessage() {
