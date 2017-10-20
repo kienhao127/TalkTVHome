@@ -196,4 +196,9 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
         this.onLoadMoreListener = mOnLoadMoreListener;
     }
+
+    public void setData(ArrayList<Topic> arrTopic){
+        this.arrTopic = arrTopic;
+        notifyDataSetChanged();
+    }
 }

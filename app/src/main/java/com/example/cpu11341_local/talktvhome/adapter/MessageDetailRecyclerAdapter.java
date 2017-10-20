@@ -354,4 +354,9 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     public void setOnLoadMoreListener(OnLoadMoreListener mOnLoadMoreListener) {
         this.onLoadMoreListener = mOnLoadMoreListener;
     }
+
+    public void setData(ArrayList<MessageDetail> arrMessDetail){
+        this.arrMessDetail = arrMessDetail;
+        notifyDataSetChanged();
+    }
 }

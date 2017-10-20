@@ -56,10 +56,9 @@ public class ChatFragment extends Fragment {
     TextView mTitle;
     EditText editText;
     String toolbarTitle;
-    String topicID;
+    String topicID, userID;
     ImageView imageViewSend;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
-    ArrayList<Topic> arrTopic = new ArrayList<>();
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
     TalkTextView selectedMsgDetail;
@@ -68,29 +67,15 @@ public class ChatFragment extends Fragment {
     RelativeLayout relativeLayoutContextMenu;
     int selectedPosition;
     Button btnCopy, btnDelete;
-    int currentTopicPosition;
-    ArrayList<Topic> arrFollowTopic = new ArrayList<>();
+    Topic topic = new Topic();
     RelativeLayout relativeLayoutFollowNoti;
     TalkTextView textViewFollow;
-
-    public ChatFragment(ArrayList<Topic> arrTopic, int pos) {
-        this.toolbarTitle = arrTopic.get(pos).getName();
-        this.topicID = arrTopic.get(pos).getTopicID();
-        this.arrTopic = arrTopic;
-        this.currentTopicPosition = pos;
-    }
-
-    public ChatFragment(ArrayList<Topic> arrTopic, int pos, ArrayList<Topic> arrFollowTopic) {
-        this.toolbarTitle = arrTopic.get(pos).getName();
-        this.topicID = arrTopic.get(pos).getTopicID();
-        this.arrTopic = arrTopic;
-        this.currentTopicPosition = pos;
-        this.arrFollowTopic = arrFollowTopic;
-    }
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getName();
         this.topicID = topic.getTopicID();
+        this.userID = MessageDataManager.getInstance().splitTopicID(topicID)[0];
+        this.topic = topic;
     }
 
     @Override
@@ -119,19 +104,8 @@ public class ChatFragment extends Fragment {
             textViewFollow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int unfollowTopicIndex =  TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
-                    arrTopic.get(currentTopicPosition).setFollow(true);
-                    MessageDataManager.getInstance().updateTopic(arrTopic.get(currentTopicPosition), getContext());
-                    if (currentTopicPosition == 0 && arrTopic.size() > 1) {
-                        arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(unfollowTopicIndex).getName() + ": " + arrTopic.get(unfollowTopicIndex).getLastMess());
-                        arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(unfollowTopicIndex).getDate());
-                        MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
-                    }
-                    arrFollowTopic.add(arrTopic.remove(currentTopicPosition));
-                    if (arrTopic.size() == 0) {
-                        arrFollowTopic.remove(unfollowTopicIndex);
-                        MessageDataManager.getInstance().deleteTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext(), arrFollowTopic);
-                    }
+                    String[] strSplited = MessageDataManager.getInstance().splitTopicID(topicID);
+                    MessageDataManager.getInstance().followIdol(strSplited[0], strSplited[1], getContext());
                     relativeLayoutFollowNoti.setVisibility(View.GONE);
                 }
             });
@@ -242,7 +216,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(topicID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
+                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(userID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
                 relativeLayoutContextMenu.startAnimation(enter_from_bottom);
@@ -310,33 +284,18 @@ public class ChatFragment extends Fragment {
                 Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
-                Topic topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
-                if (selectedPosition == arrMessDetail.size()-1 && arrTopic.size() > 0) {
-                    if (selectedPosition == 0) {
-                        arrTopic.remove(currentTopicPosition);
-                        MessageDataManager.getInstance().deleteTopic(topicID, getContext(), arrFollowTopic);
-                    } else {
-                        topic.setDate(arrMessDetail.get(selectedPosition - 1).getDatetime());
-                        topic.setLastMess(arrMessDetail.get(selectedPosition - 1).getText());
-                        arrTopic.set(currentTopicPosition, topic);
-                        if (currentTopicPosition == 0 && !topic.isFollow()) {
-                            int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, "-1_5");
-                            Topic unfollowTopic = arrFollowTopic.get(unfollowTopicIndex);
-                            TopicFragment.sortTopic(arrTopic, getContext());
-                            unfollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
-                            unfollowTopic.setDate(arrTopic.get(0).getDate());
-                            MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
-                        }
-                        MessageDataManager.getInstance().updateTopic(topic, getContext());
-                    }
-                }
                 boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
                 if (isDeleted) {
                     Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
                 }
                 arrMessDetail.remove(selectedPosition);
                 if (arrMessDetail.size() == 0){
+                    MessageDataManager.getInstance().deleteTopic(topicID, getContext());
                     textViewOver.setVisibility(View.VISIBLE);
+                } else {
+                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
+                    MessageDataManager.getInstance().updateTopic(topic, getContext());
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -362,9 +321,8 @@ public class ChatFragment extends Fragment {
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
-                Wrapper wrapper = new Wrapper(topic, messageDetail);
                 LoadMessageTask loadMessageTask = new LoadMessageTask();
-                loadMessageTask.execute(wrapper);
+                loadMessageTask.execute(messageDetail);
             }
         });
     }
@@ -427,36 +385,10 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    private class LoadMessageTask extends AsyncTask<Wrapper, Void, Void>{
+    private class LoadMessageTask extends AsyncTask<MessageDetail, Void, Void>{
         @Override
-        protected Void doInBackground(Wrapper... wrappers) {
-            if (topicID.equals(wrappers[0].getTopic().getTopicID())) {
-                wrappers[0].getTopic().setHasNewMessage(false);
-                currentTopic = wrappers[0].getTopic();
-                if (arrTopic.size() != 0){
-                    arrTopic.get(currentTopicPosition).setDate(wrappers[0].getTopic().getDate());
-                    arrTopic.get(currentTopicPosition).setLastMess(wrappers[0].getTopic().getLastMess());
-                    MessageDataManager.getInstance().updateTopic(wrappers[0].getTopic(), getContext());
-                }
-                arrMessDetail.add(wrappers[0].getMessageDetail());
-            }
-            if (!wrappers[0].getTopic().isFollow()){
-                int unfollowTopicIndex = TopicFragment.findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
-                if (unfollowTopicIndex == -1){
-                    arrFollowTopic.add(MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext()));
-                    arrTopic.add(wrappers[0].getTopic());
-                    unfollowTopicIndex = arrFollowTopic.size()-1;
-                } else {
-                    arrFollowTopic.get(unfollowTopicIndex).setDate(wrappers[0].getTopic().getDate());
-                    arrFollowTopic.get(unfollowTopicIndex).setLastMess(wrappers[0].getTopic().getName() + ": " + wrappers[0].getTopic().getLastMess());
-                }
-                if (topicID.equals(wrappers[0].getTopic().getTopicID())){
-                    arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(false);
-                } else {
-                    arrFollowTopic.get(unfollowTopicIndex).setHasNewMessage(true);
-                }
-                MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
-            }
+        protected Void doInBackground(MessageDetail... messageDetails) {
+            arrMessDetail.add(messageDetails[0]);
             return null;
         }
 

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.cpu11341_local.talktvhome.data.Topic;
+import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
 import com.example.cpu11341_local.talktvhome.fragment.TopicFragment;
 
@@ -19,6 +20,7 @@ public class OpenRoomActivity extends AppCompatActivity {
     boolean isLayoutGone = true;
     boolean isMessShowed = false;
     TopicFragment messFragment;
+    String idolID;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,7 @@ public class OpenRoomActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.textView);
         Intent intent = getIntent();
         int roomID = intent.getIntExtra("RoomID", -1);
+        idolID = "2";
         if (roomID != -1){
             textView.setText("Room ID = " + String.valueOf(roomID));
         } else {
@@ -64,7 +67,10 @@ public class OpenRoomActivity extends AppCompatActivity {
                     }
 
                     // Add the fragment to the 'fragment_container' FrameLayout
-                    ChatFragment chatFragment = new ChatFragment(new Topic("", "Tên User", "", 0,0,"2_5",false, false));
+                    User user = MessageDataManager.getInstance().getUser(idolID, getApplicationContext());
+                    String topidID = user.getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId();
+                    Topic topic = new Topic(user.getAvatar(), user.getName(), "", 0, 3, topidID, false, MessageDataManager.getInstance().isFollow(topidID));
+                    ChatFragment chatFragment = new ChatFragment(topic);
                     getSupportFragmentManager().beginTransaction()
                             .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
                             .add(R.id.fragment_container, chatFragment)

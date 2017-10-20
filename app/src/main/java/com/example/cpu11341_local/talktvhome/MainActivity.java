@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
-////
+//
 //        handler.postDelayed(new Runnable(){
 //            int i=0;
 //            public void run(){

@@ -51,20 +51,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     TalkTextView textViewOver;
     int scrollTimes;
     boolean isAllMsg = false, isResume = false;
-    ArrayList<Topic> arrFollowTopic = new ArrayList<>();
     int i = 0;
 
     public TopicFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
         this.isFollow = isFollow;
         this.activityName = activityName;
-    }
-
-    public TopicFragment(String toolbarTitle, boolean isFollow, String activityName, ArrayList<Topic> arrFollowTopic) {
-        this.toolbarTitle = toolbarTitle;
-        this.isFollow = isFollow;
-        this.activityName = activityName;
-        this.arrFollowTopic = arrFollowTopic;
     }
 
 //    private String loadJSONFromAsset() {
@@ -181,12 +173,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                     switch (arrTopic.get(position).getAction_type()) {
                         case 1:
                         case 3:
-                            ChatFragment chatFragment;
-                            if (arrTopic.get(position).isFollow()) {
-                                chatFragment = new ChatFragment(arrTopic, position);
-                            } else {
-                                chatFragment = new ChatFragment(arrTopic, position, arrFollowTopic);
-                            }
+                            ChatFragment chatFragment = new ChatFragment(arrTopic.get(position));
                             FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
                                 Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
@@ -198,7 +185,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                                     .commit();
                             break;
                         case 2:
-                            TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName, arrTopic);
+                            TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName);
                             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
                                 ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
@@ -254,14 +241,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
-                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getTopicID(), getContext(), arrFollowTopic);
-                Topic removedTopic = arrTopic.remove(pos);
-                if (pos == 0 && arrTopic.size() != 0 && !removedTopic.isFollow()) {
-                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
-                    arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
-                    arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(0).getDate());
-                    MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
-                }
+                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getTopicID(), getContext());
+                arrTopic.remove(pos);
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }
@@ -284,10 +265,14 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             LoadTopicTask loadTopicTask = new LoadTopicTask();
             loadTopicTask.execute();
         } else {
+            if (isFollow){
+                Log.i("ASDSA", "ASDA");
+            }
+            arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
             if (arrTopic.size() != 0) {
                 sortTopic(arrTopic, getContext());
                 if (adapter != null) {
-                    adapter.notifyDataSetChanged();
+                    adapter.setData(arrTopic);
                 }
             } else {
                 textViewOver.setVisibility(View.VISIBLE);
@@ -298,16 +283,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 boolean isTopicExists = false;
-                if (!isFollow && topic.isFollow()) {
-                    for (int i = 0; i < arrFollowTopic.size(); i++) {
-                        if (arrFollowTopic.get(i).getTopicID().equals(topic.getTopicID())) {
-                            arrFollowTopic.get(i).setDate(topic.getDate());
-                            arrFollowTopic.get(i).setLastMess(topic.getLastMess());
-                            MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(i), getContext());
-                            return;
-                        }
-                    }
-                }
 
                 if (isFollow && !topic.isFollow()) {
                     topic = MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
@@ -324,17 +299,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                     arrTopic.add(topic);
                 }
                 sortTopic(arrTopic, getContext());
-
-                if (topic.getTopicID().equals(arrTopic.get(0).getTopicID()) && !topic.isFollow()) {
-                    int unfollowTopicIndex = findTopicByID(arrFollowTopic, "-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId());
-                    if (unfollowTopicIndex == -1) {
-                        arrFollowTopic.add(MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext()));
-                    } else {
-                        arrFollowTopic.get(unfollowTopicIndex).setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
-                        arrFollowTopic.get(unfollowTopicIndex).setDate(arrTopic.get(0).getDate());
-                        MessageDataManager.getInstance().updateTopic(arrFollowTopic.get(unfollowTopicIndex), getContext());
-                    }
-                }
                 textViewOver.setVisibility(View.GONE);
 
                 if (adapter != null) {
@@ -385,9 +349,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
 
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
-            Log.i("LoadMoreData", "ASDASD");
-            ArrayList<Topic> arrNewMsgDetail = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
-            return arrNewMsgDetail;
+            ArrayList<Topic> arrNewTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
+            return arrNewTopic;
         }
 
         @Override

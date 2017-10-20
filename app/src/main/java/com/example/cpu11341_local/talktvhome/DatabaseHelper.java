@@ -280,6 +280,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
+    public Topic getNewestUnfollowTopic(){
+        Topic topic = new Topic();
+        String selectQuery = "SELECT *" +
+                " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + 0 +
+                " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
+                " LIMIT 1";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        if (cTopic.moveToFirst()) {
+            topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
+            topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
+            topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+            topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
+            topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
+            topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
+            topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
+            topic.setFollow((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ISFOLLOW)) == 1)?true:false);
+        }
+        if (topic != null) {
+            return topic;
+        }
+        return null;
+    }
     public boolean deleteTopic(String topicID){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_TOPICID + "='" + topicID + "'", null) > 0;
@@ -312,7 +336,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<MessageDetail> getListMessage(String topicID, int scrollTimes){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
-                            " FROM (SELECT * FROM " + MESSAGE_TABLE_NAME + " WHERE " + MESSAGE_COLUMN_NAME_TOPICID + " = '" + topicID + "'" + " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
+                            " FROM (SELECT * " +
+                                    " FROM " + MESSAGE_TABLE_NAME +
+                                    " WHERE " + MESSAGE_COLUMN_NAME_TOPICID + " = '" + topicID + "'" +
+                                    " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC" +
+                                    " LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30) + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);

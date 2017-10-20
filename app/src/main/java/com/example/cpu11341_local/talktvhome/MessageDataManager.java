@@ -31,10 +31,11 @@ import java.util.Map;
  */
 
 public class MessageDataManager {
-//    Map<Integer, Topic> linkedHashMapTopic = new LinkedHashMap();
+    Map<String, Topic> linkedHashMapFollowTopic = new LinkedHashMap();
+    Map<String, Topic> linkedHashMapUnfollowTopic = new LinkedHashMap();
     public DataListener dataListener;
     Map<String, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
-
+    ArrayList<String> followID = new ArrayList<>();
     private static MessageDataManager instance = null;
 
     protected MessageDataManager() throws ParseException {
@@ -61,7 +62,8 @@ public class MessageDataManager {
 
 //        linkedHashMapTopic.put(0, new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", dateFormat.parse("18/08/17 10:47:03").getTime(), 1, 0, false));
 //        linkedHashMapTopic.put(1, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", dateFormat.parse("1/09/17 11:47:04").getTime(), 3, 1, false));
-
+        followID.add("0");
+        followID.add("1");
     }
 
     public static MessageDataManager getInstance() {
@@ -82,13 +84,6 @@ public class MessageDataManager {
         long t = System.currentTimeMillis();
         arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(topicID, scrollTimes);
         ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
-        if (linkedHashMapMsgDetail.get(topicID) != null) {
-            arrMsgDetail = linkedHashMapMsgDetail.get(topicID);
-            arrMsgDetail.addAll(0, arrMessageDetailOfSender);
-        } else {
-            arrMsgDetail.addAll(arrMessageDetailOfSender);
-        }
-        linkedHashMapMsgDetail.put(topicID, arrMsgDetail);
         long d = System.currentTimeMillis() - t;
         return arrMessageDetailOfSender;
     }
@@ -97,106 +92,115 @@ public class MessageDataManager {
         return DatabaseHelper.getInstance(context).deleteMessage(id);
     }
 
-
     public Topic insertMessage(MessageDetail messageDetail, Context context) {
-        String senderID = messageDetail.getUser().getId();
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
-        ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
-        if (linkedHashMapMsgDetail.get(messageDetail.getTopicID()) != null) {
-            arrMsgDetail = linkedHashMapMsgDetail.get(messageDetail.getTopicID());
-            arrMsgDetail.add(messageDetail);
-        } else {
-            arrMsgDetail.add(messageDetail);
-        }
-        linkedHashMapMsgDetail.put(messageDetail.getTopicID(), arrMsgDetail);
-        return insert_updateTopic(messageDetail.getTopicID(), messageDetail, context);
-    }
+        String topicID = messageDetail.getTopicID();
 
-    public Topic insert_updateTopic(String topicID, MessageDetail messageDetail, Context context) {
         String strText = "";
         if (messageDetail.getType() == 4) {
             strText = "Bạn: " + messageDetail.getText();
         } else {
             strText = messageDetail.getText();
         }
-        User userOfTopic = DatabaseHelper.getInstance(context).getUser(splitSenderID(messageDetail.getTopicID())[0]);
+        User userOfTopic = DatabaseHelper.getInstance(context).getUser(splitTopicID(messageDetail.getTopicID())[0]);
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
+        // Nếu topic đã tồn tại và chưa theo dõi,
+        // Cập nhật lại unfollowTopic
+        // Tại mới nếu unfollowTopic chưa có.
         if (topic.getName() != null) {
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
+            DatabaseHelper.getInstance(context).updateTopic(topic);
             if (messageDetail.getType() == 4) {
                 topic.setHasNewMessage(false);
             } else {
                 topic.setHasNewMessage(true);
             }
-            DatabaseHelper.getInstance(context).updateTopic(topic);
-
             if (!topic.isFollow()) {
-                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_"+getCurrentUser(context).getId());
-                if (unfollowTopic.getName() != null) {
-                    unfollowTopic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
-                    unfollowTopic.setDate(messageDetail.getDatetime());
-                    unfollowTopic.setHasNewMessage(true);
-                    DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
-                } else {
-                    unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
-                            userOfTopic.getName() + ": " + strText,
-                            messageDetail.getDatetime(), 2, "-1_"+getCurrentUser(context).getId(), true, true);
-                    DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
-                }
+                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
+                updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
                 MessageDataManager.getInstance().updateTopic(unfollowTopic, context);
+                if (messageDetail.getType() == 4) {
+                    unfollowTopic.setHasNewMessage(false);
+                } else {
+                    unfollowTopic.setHasNewMessage(true);
+                }
+                linkedHashMapUnfollowTopic.put(topicID, topic);
+                linkedHashMapFollowTopic.put(unfollowTopic.getTopicID(), unfollowTopic);
+            } else {
+                linkedHashMapFollowTopic.put(topicID, topic);
             }
         } else {
+            // Nếu topic chưa tồn tại => tạo mới,
+            // Nếu topic chưa theo dõi
+            // Cập nhật lại unfollowTopic
+            // Tại mới nếu unfollowTopic chưa có.
             topic = new Topic(userOfTopic.getAvatar(), userOfTopic.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
-            if (messageDetail.getType() == 4) {
-                topic.setHasNewMessage(false);
-            } else {
-                topic.setHasNewMessage(true);
-            }
             if (isFollow(topic.getTopicID())) {
                 topic.setFollow(true);
+                if (messageDetail.getType() == 4) {
+                    topic.setHasNewMessage(false);
+                } else {
+                    topic.setHasNewMessage(true);
+                }
+                linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
             } else {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
-                if (unfollowTopic.getName() != null) {
-                    unfollowTopic.setLastMess(messageDetail.getUser().getName() + ": " + strText);
-                    unfollowTopic.setDate(messageDetail.getDatetime());
-                    unfollowTopic.setHasNewMessage(true);
-                    DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
+                if (messageDetail.getType() == 4) {
+                    unfollowTopic.setHasNewMessage(false);
                 } else {
-                    unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
-                            userOfTopic.getName() + ": " + strText,
-                            messageDetail.getDatetime(), 2, "-1_" + getCurrentUser(context).getId(), true, true);
-                    DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
+                    unfollowTopic.setHasNewMessage(true);
                 }
+                updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
+                linkedHashMapUnfollowTopic.put(topic.getTopicID(), topic);
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
         }
         return topic;
     }
 
+    //update unfollowTopic sau khi insert
+    void updateUnfollowTopic(Topic unfollowTopic, MessageDetail messageDetail, Context context, User userOfTopic, String strText) {
+        if (unfollowTopic.getName() != null) {
+            unfollowTopic.setLastMess(userOfTopic.getName() + ": " + strText);
+            unfollowTopic.setDate(messageDetail.getDatetime());
+            unfollowTopic.setHasNewMessage(true);
+            DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
+            linkedHashMapFollowTopic.put(unfollowTopic.getTopicID(), unfollowTopic);
+        } else {
+            unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
+                    userOfTopic.getName() + ": " + strText,
+                    messageDetail.getDatetime(), 2, "-1_" + getCurrentUser(context).getId(), true, true);
+            linkedHashMapFollowTopic.put(unfollowTopic.getTopicID(), unfollowTopic);
+            DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
+        }
+    }
+
     //----------------TOPIC
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context, int scrollTimes) {
         ArrayList<Topic> arrTopic = new ArrayList<>();
-        if (!isFollow){
-            Log.i("asd","adsa");
-        }
         if (DatabaseHelper.getInstance(context).getListTopic(scrollTimes, isFollow).size() == 0) {
             return null;
         }
         Topic systemTopic = null, unFollowTopic = null;
         for (Topic topic : DatabaseHelper.getInstance(context).getListTopic(scrollTimes, isFollow)) {
-//            linkedHashMapTopic.put(topic.getUserId(), topic);
-            if (topic.getTopicID().equals("0_"+getCurrentUser(context).getId())) {
+            if (isFollow) {
+                linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
+            } else {
+                linkedHashMapUnfollowTopic.put(topic.getTopicID(), topic);
+            }
+
+            if (topic.getTopicID().equals("0_" + getCurrentUser(context).getId())) {
                 systemTopic = topic;
                 continue;
             }
             if (isFollow) {
-                if (topic.getTopicID().equals("-1_"+getCurrentUser(context).getId())) {
+                if (topic.getTopicID().equals("-1_" + getCurrentUser(context).getId())) {
                     unFollowTopic = topic;
                     continue;
                 }
             } else {
-                unFollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
+                unFollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
             }
             if (topic.isFollow() == isFollow) {
                 arrTopic.add(topic);
@@ -212,7 +216,8 @@ public class MessageDataManager {
         if (!isFollow && arrTopic.size() != 0) {
             unFollowTopic.setLastMess(arrTopic.get(0).getName() + ": " + arrTopic.get(0).getLastMess());
             unFollowTopic.setDate(arrTopic.get(0).getDate());
-            updateTopic(unFollowTopic, context);
+            DatabaseHelper.getInstance(context).updateTopic(unFollowTopic);
+            linkedHashMapFollowTopic.put(unFollowTopic.getTopicID(), unFollowTopic);
         } else {
             if (unFollowTopic != null) {
                 arrTopic.add(0, unFollowTopic);
@@ -230,44 +235,69 @@ public class MessageDataManager {
 
     public boolean updateTopic(Topic topic, Context context) {
         DatabaseHelper.getInstance(context).updateTopic(topic);
+        if (topic.isFollow()) {
+            linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
+        } else {
+            linkedHashMapUnfollowTopic.put(topic.getTopicID(), topic);
+        }
         return true;
     }
 
-    public boolean deleteTopic(String topicID, Context context, ArrayList<Topic> arrFollowTopic) {
+    public boolean deleteTopic(String topicID, Context context) {
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
-        if (topicID.equals("-1_"+getCurrentUser(context).getId())) {
+        if (topicID.equals("-1_" + getCurrentUser(context).getId())) {
             for (Topic t : DatabaseHelper.getInstance(context).getListTopic(false)) {
                 if (!t.isFollow()) {
-                    for (String str : splitSenderID(t.getTopicID())){
+                    for (String str : splitTopicID(t.getTopicID())) {
                         DatabaseHelper.getInstance(context).deleteAllMessage(str, t.getTopicID());
                     }
+                    linkedHashMapUnfollowTopic.remove(t.getTopicID());
                     DatabaseHelper.getInstance(context).deleteTopic(t.getTopicID());
                 }
             }
-            return DatabaseHelper.getInstance(context).deleteTopic("-1_"+getCurrentUser(context).getId());
+            linkedHashMapFollowTopic.remove("-1_" + getCurrentUser(context).getId());
+            return DatabaseHelper.getInstance(context).deleteTopic("-1_" + getCurrentUser(context).getId());
         }
         if (topic.isFollow()) {
-            for (String str : splitSenderID(topicID)){
+            for (String str : splitTopicID(topicID)) {
                 DatabaseHelper.getInstance(context).deleteAllMessage(str, topicID);
             }
+            linkedHashMapFollowTopic.remove(topicID);
             return DatabaseHelper.getInstance(context).deleteTopic(topicID);
         }
         if (!topic.isFollow()) {
-            for (String str : splitSenderID(topicID)){
+            for (String str : splitTopicID(topicID)) {
                 DatabaseHelper.getInstance(context).deleteAllMessage(str, topicID);
             }
+            linkedHashMapUnfollowTopic.remove(topicID);
             DatabaseHelper.getInstance(context).deleteTopic(topicID);
             if (DatabaseHelper.getInstance(context).isExistUnfollowTopic() != 0) {
+                updateUnfollowTopic(context);
                 return true;
             }
         }
-//        linkedHashMapTopic.remove(-1);
-        for (int i = 0; i < arrFollowTopic.size(); i++) {
-            if (arrFollowTopic.get(i).getTopicID().equals("-1_"+getCurrentUser(context).getId())) {
-                arrFollowTopic.remove(i);
-            }
+        linkedHashMapFollowTopic.remove("-1_" + getCurrentUser(context).getId());
+        return DatabaseHelper.getInstance(context).deleteTopic("-1_" + getCurrentUser(context).getId());
+    }
+
+    public ArrayList<Topic> getListTopic(boolean isFollow, Context context) {
+        if (isFollow) {
+            updateUnfollowTopic(context);
+            return new ArrayList<>(linkedHashMapFollowTopic.values());
         }
-        return DatabaseHelper.getInstance(context).deleteTopic("-1_"+getCurrentUser(context).getId());
+        return new ArrayList<>(linkedHashMapUnfollowTopic.values());
+    }
+
+    //update unfollowtopic sau khi delete topic
+    void updateUnfollowTopic(Context context) {
+        Topic unfollowTopic = linkedHashMapFollowTopic.get("-1_" + getCurrentUser(context).getId());
+        Topic newestUnfollowTopic = DatabaseHelper.getInstance(context).getNewestUnfollowTopic();
+        if (newestUnfollowTopic.getName() != null) {
+            unfollowTopic.setDate(newestUnfollowTopic.getDate());
+            unfollowTopic.setLastMess(newestUnfollowTopic.getName() + ": " + newestUnfollowTopic.getLastMess());
+            DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
+            linkedHashMapFollowTopic.put(("-1_" + getCurrentUser(context).getId()), unfollowTopic);
+        }
     }
 
     //------------USER
@@ -277,8 +307,7 @@ public class MessageDataManager {
 //        return true;
 //    }
 
-    public User getUser(String topicID, Context context) {
-        String userID = splitSenderID(topicID)[0];
+    public User getUser(String userID, Context context) {
         return DatabaseHelper.getInstance(context).getUser(userID);
     }
 
@@ -297,14 +326,33 @@ public class MessageDataManager {
     }
 
     public boolean isFollow(String topicID) {
-        String sender = splitSenderID(topicID)[0];
-        if (sender.equals("1") || sender.equals("0")) {
-            return true;
+        String senderID = splitTopicID(topicID)[0];
+        for (String id : followID){
+            if (senderID.equals(id)){
+                return true;
+            }
         }
         return false;
     }
 
-    String[] splitSenderID(String topicID){
+    //-------------ORTHER
+    public void followIdol(String IdolID, String userID, Context context) {
+        //Gọi lên server, userID theo dõi idolID
+        followID.add(IdolID);
+        Topic removedTopic = linkedHashMapUnfollowTopic.remove(IdolID + "_" + userID);
+        if (removedTopic != null) {
+            removedTopic.setFollow(true);
+            DatabaseHelper.getInstance(context).updateTopic(removedTopic);
+
+            if (linkedHashMapUnfollowTopic.size() == 0) {
+                linkedHashMapFollowTopic.remove("-1_" + getCurrentUser(context).getId());
+                deleteTopic("-1_" + getCurrentUser(context).getId(), context);
+            }
+            linkedHashMapFollowTopic.put(IdolID + "_" + userID, removedTopic);
+        }
+    }
+
+    public String[] splitTopicID(String topicID) {
         return topicID.split("_");
     }
 //    public static Map<Integer, Topic> sortTopicByValue(Map<Integer, Topic> unsortMap) {
