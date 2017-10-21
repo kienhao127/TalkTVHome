@@ -265,9 +265,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             LoadTopicTask loadTopicTask = new LoadTopicTask();
             loadTopicTask.execute();
         } else {
-            if (isFollow){
-                Log.i("ASDSA", "ASDA");
-            }
             arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
             if (arrTopic.size() != 0) {
                 sortTopic(arrTopic, getContext());
@@ -402,14 +399,5 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         if (systemTopic != null) {
             arrTopic.add(0, systemTopic);
         }
-    }
-
-    public static int findTopicByID(ArrayList<Topic> arrTopic, String topicID) {
-        for (int i = 0; i < arrTopic.size(); i++) {
-            if (arrTopic.get(i).getTopicID().equals(topicID)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

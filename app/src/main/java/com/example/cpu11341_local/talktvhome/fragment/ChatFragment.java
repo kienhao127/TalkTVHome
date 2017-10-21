@@ -389,6 +389,14 @@ public class ChatFragment extends Fragment {
         @Override
         protected Void doInBackground(MessageDetail... messageDetails) {
             arrMessDetail.add(messageDetails[0]);
+            if (messageDetails[0].getTopicID().equals(topicID)){
+                topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
+                topic.setHasNewMessage(false);
+                Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
+                unfollowTopic.setHasNewMessage(false);
+                MessageDataManager.getInstance().updateTopic(topic, getContext());
+                MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+            }
             return null;
         }
 

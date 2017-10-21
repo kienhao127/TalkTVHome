@@ -110,21 +110,11 @@ public class MessageDataManager {
         if (topic.getName() != null) {
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
+            topic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(topic);
-            if (messageDetail.getType() == 4) {
-                topic.setHasNewMessage(false);
-            } else {
-                topic.setHasNewMessage(true);
-            }
             if (!topic.isFollow()) {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
                 updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
-                MessageDataManager.getInstance().updateTopic(unfollowTopic, context);
-                if (messageDetail.getType() == 4) {
-                    unfollowTopic.setHasNewMessage(false);
-                } else {
-                    unfollowTopic.setHasNewMessage(true);
-                }
                 linkedHashMapUnfollowTopic.put(topicID, topic);
                 linkedHashMapFollowTopic.put(unfollowTopic.getTopicID(), unfollowTopic);
             } else {
@@ -138,19 +128,9 @@ public class MessageDataManager {
             topic = new Topic(userOfTopic.getAvatar(), userOfTopic.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (isFollow(topic.getTopicID())) {
                 topic.setFollow(true);
-                if (messageDetail.getType() == 4) {
-                    topic.setHasNewMessage(false);
-                } else {
-                    topic.setHasNewMessage(true);
-                }
                 linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
             } else {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
-                if (messageDetail.getType() == 4) {
-                    unfollowTopic.setHasNewMessage(false);
-                } else {
-                    unfollowTopic.setHasNewMessage(true);
-                }
                 updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
                 linkedHashMapUnfollowTopic.put(topic.getTopicID(), topic);
             }
@@ -355,38 +335,4 @@ public class MessageDataManager {
     public String[] splitTopicID(String topicID) {
         return topicID.split("_");
     }
-//    public static Map<Integer, Topic> sortTopicByValue(Map<Integer, Topic> unsortMap) {
-//
-//        // 1. Convert Map to List of Map
-//        Topic topicSystem = unsortMap.get(0);
-//        Topic topicUnfollowMsg = unsortMap.get(-1);
-//        unsortMap.remove(0);
-//        if (topicUnfollowMsg != null){
-//            unsortMap.remove(-1);
-//        }
-//        List<Map.Entry<Integer, Topic>> list = new LinkedList<>(unsortMap.entrySet());
-//
-//        // 2. Sort list with Collections.sort(), provide a custom Comparator
-//        //    Try switch the o1 o2 position for a different order
-//        Collections.sort(list, new Comparator<Map.Entry<Integer, Topic>>() {
-//            public int compare(Map.Entry<Integer, Topic> o1,
-//                               Map.Entry<Integer, Topic> o2) {
-//                return (Long.valueOf(o2.getValue().getDate())).compareTo(o1.getValue().getDate());
-//            }
-//        });
-//
-//        // 3. Loop the sorted list and put it into a new insertion order Map LinkedHashMap
-//        Map<Integer, Topic> sortedMap = new LinkedHashMap<Integer, Topic>();
-//        if (topicSystem != null){
-//            sortedMap.put(topicSystem.getUserId(), topicSystem);
-//        }
-//        if (topicUnfollowMsg != null){
-//            sortedMap.put(topicUnfollowMsg.getUserId(), topicUnfollowMsg);
-//        }
-//        for (Map.Entry<Integer, Topic> entry : list) {
-//            sortedMap.put(entry.getKey(), entry.getValue());
-//        }
-//
-//        return sortedMap;
-//    }
 }

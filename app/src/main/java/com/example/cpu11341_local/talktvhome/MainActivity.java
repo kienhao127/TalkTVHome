@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Random r = new Random();
         final Handler handler = new Handler();
-        final int delay = 5000; //milliseconds
+        final int delay = 10000; //milliseconds
 
 
 //        handler.postDelayed(new Runnable(){
