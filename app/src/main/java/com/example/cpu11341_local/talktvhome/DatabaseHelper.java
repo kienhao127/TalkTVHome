@@ -244,19 +244,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrTopic;
     }
 
-    public int isExistUnfollowTopic(){
-        ArrayList<Topic> arrTopic = new ArrayList<>();
-        String selectQuery = "SELECT COUNT(*)" +
-                " FROM " + TOPIC_TABLE_NAME +
-                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + 0;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cTopic = db.rawQuery(selectQuery, null);
-        cTopic.moveToFirst();
-        int count= cTopic.getInt(0);
-        cTopic.close();
-        return count;
-    }
-
     public Topic getTopic(String topicID){
         Topic topic = new Topic();
         String selectQuery = "SELECT *" +

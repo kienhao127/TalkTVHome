@@ -292,10 +292,19 @@ public class ChatFragment extends Fragment {
                 if (arrMessDetail.size() == 0){
                     MessageDataManager.getInstance().deleteTopic(topicID, getContext());
                     textViewOver.setVisibility(View.VISIBLE);
-                } else {
+                    adapter.notifyDataSetChanged();
+                    return;
+                }
+                if (selectedPosition == arrMessDetail.size()){
                     topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
                     topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                     MessageDataManager.getInstance().updateTopic(topic, getContext());
+                    if (!topic.isFollow()){
+                        Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
+                        unfollowTopic.setLastMess(topic.getLastMess());
+                        unfollowTopic.setDate(topic.getDate());
+                        MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -392,10 +401,13 @@ public class ChatFragment extends Fragment {
             if (messageDetails[0].getTopicID().equals(topicID)){
                 topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
                 topic.setHasNewMessage(false);
-                Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
-                unfollowTopic.setHasNewMessage(false);
                 MessageDataManager.getInstance().updateTopic(topic, getContext());
-                MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+                Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
+                if (!topic.isFollow()){
+                    unfollowTopic.setHasNewMessage(false);
+                    MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
+                }
+
             }
             return null;
         }

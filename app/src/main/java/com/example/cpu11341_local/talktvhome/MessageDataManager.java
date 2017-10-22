@@ -128,6 +128,7 @@ public class MessageDataManager {
             topic = new Topic(userOfTopic.getAvatar(), userOfTopic.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (isFollow(topic.getTopicID())) {
                 topic.setFollow(true);
+                updateTopic(topic, context);
                 linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
             } else {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
@@ -251,7 +252,7 @@ public class MessageDataManager {
             }
             linkedHashMapUnfollowTopic.remove(topicID);
             DatabaseHelper.getInstance(context).deleteTopic(topicID);
-            if (DatabaseHelper.getInstance(context).isExistUnfollowTopic() != 0) {
+            if (linkedHashMapUnfollowTopic.size() != 0) {
                 updateUnfollowTopic(context);
                 return true;
             }
@@ -307,8 +308,8 @@ public class MessageDataManager {
 
     public boolean isFollow(String topicID) {
         String senderID = splitTopicID(topicID)[0];
-        for (String id : followID){
-            if (senderID.equals(id)){
+        for (String id : followID) {
+            if (senderID.equals(id)) {
                 return true;
             }
         }
@@ -323,10 +324,11 @@ public class MessageDataManager {
         if (removedTopic != null) {
             removedTopic.setFollow(true);
             DatabaseHelper.getInstance(context).updateTopic(removedTopic);
-
             if (linkedHashMapUnfollowTopic.size() == 0) {
                 linkedHashMapFollowTopic.remove("-1_" + getCurrentUser(context).getId());
                 deleteTopic("-1_" + getCurrentUser(context).getId(), context);
+            } else {
+                updateUnfollowTopic(context);
             }
             linkedHashMapFollowTopic.put(IdolID + "_" + userID, removedTopic);
         }
