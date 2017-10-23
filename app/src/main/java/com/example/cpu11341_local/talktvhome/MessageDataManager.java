@@ -102,7 +102,6 @@ public class MessageDataManager {
         } else {
             strText = messageDetail.getText();
         }
-        User userOfTopic = DatabaseHelper.getInstance(context).getUser(splitTopicID(messageDetail.getTopicID())[0]);
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
         // Nếu topic đã tồn tại và chưa theo dõi,
         // Cập nhật lại unfollowTopic
@@ -114,7 +113,7 @@ public class MessageDataManager {
             DatabaseHelper.getInstance(context).updateTopic(topic);
             if (!topic.isFollow()) {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
-                updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
+                updateUnfollowTopic(unfollowTopic, messageDetail, context, messageDetail.getUser(), strText);
                 linkedHashMapUnfollowTopic.put(topicID, topic);
                 linkedHashMapFollowTopic.put(unfollowTopic.getTopicID(), unfollowTopic);
             } else {
@@ -125,14 +124,14 @@ public class MessageDataManager {
             // Nếu topic chưa theo dõi
             // Cập nhật lại unfollowTopic
             // Tại mới nếu unfollowTopic chưa có.
-            topic = new Topic(userOfTopic.getAvatar(), userOfTopic.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
+            topic = new Topic(messageDetail.getUser().getAvatar(), messageDetail.getUser().getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (isFollow(topic.getTopicID())) {
                 topic.setFollow(true);
                 updateTopic(topic, context);
                 linkedHashMapFollowTopic.put(topic.getTopicID(), topic);
             } else {
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
-                updateUnfollowTopic(unfollowTopic, messageDetail, context, userOfTopic, strText);
+                updateUnfollowTopic(unfollowTopic, messageDetail, context, messageDetail.getUser(), strText);
                 linkedHashMapUnfollowTopic.put(topic.getTopicID(), topic);
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
@@ -287,13 +286,13 @@ public class MessageDataManager {
 //        DatabaseHelper.getInstance(context).insertUser(user);
 //        return true;
 //    }
-
-    public User getUser(String userID, Context context) {
-        return DatabaseHelper.getInstance(context).getUser(userID);
-    }
+//
+//    public User getUser(String userID, Context context) {
+//        return DatabaseHelper.getInstance(context).getUser(userID);
+//    }
 
     public User getCurrentUser(Context context) {
-        return DatabaseHelper.getInstance(context).getUser("5");
+        return new User("5", "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui");
     }
 
 

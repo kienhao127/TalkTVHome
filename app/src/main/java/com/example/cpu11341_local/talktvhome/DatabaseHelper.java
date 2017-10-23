@@ -35,11 +35,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MESSAGE_COLUMN_NAME_ACTIONEXTRA = "actionextra";
     public static final String MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
     public static final String MESSAGE_COLUMN_NAME_TOPICID = "topicid";
-
-    public static final String USER_TABLE_NAME = "user";
-    public static final String USER_COLUMN_NAME_ID = "id";
-    public static final String USER_COLUMN_NAME_NAME = "name";
-    public static final String USER_COLUMN_NAME_AVATAR = "avatar";
+    public static final String MESSAGE_COLUMN_NAME_SENDERNAME = "sendername";
+    public static final String MESSAGE_COLUMN_NAME_SENDERAVATAR = "senderavatar";
 
     public static final String TOPIC_TABLE_NAME = "topic";
     public static final String TOPIC_COLUMN_NAME_TOPICID = "topicid";
@@ -57,6 +54,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     MESSAGE_COLUMN_NAME_TYPE + " INTEGER," +
                     MESSAGE_COLUMN_NAME_SENDERID + " INTEGER, " +
+                    MESSAGE_COLUMN_NAME_SENDERNAME + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_SENDERAVATAR + " TEXT, " +
                     MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
                     MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
                     MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
@@ -66,13 +65,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT, " +
                     MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER, " +
                     MESSAGE_COLUMN_NAME_TOPICID + " TEXT" +
-                    ");";
-
-    private static final String USER_TABLE_CREATE =
-            "CREATE TABLE " + USER_TABLE_NAME + " (" +
-                    USER_COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    USER_COLUMN_NAME_NAME + " TEXT," +
-                    USER_COLUMN_NAME_AVATAR + " TEXT" +
                     ");";
 
     private static final String TOPIC_TABLE_CREATE =
@@ -103,53 +95,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(MESSAGE_TABLE_CREATE);
-        db.execSQL(USER_TABLE_CREATE);
         db.execSQL(TOPIC_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS" + MESSAGE_TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS" + USER_TABLE_CREATE);
         db.execSQL("DROP TABLE IF EXISTS" + TOPIC_TABLE_CREATE);
         onCreate(db);
-    }
-
-    public boolean insertUser(User user){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(USER_COLUMN_NAME_ID, user.getId());
-        values.put(USER_COLUMN_NAME_NAME, user.getName());
-        values.put(USER_COLUMN_NAME_AVATAR, user.getAvatar());
-
-        long result = db.insert(USER_TABLE_NAME, null, values);
-        if (result == -1){
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public User getUser(String userID){
-        Map<String, User> linkedHashMapUser = new LinkedHashMap();
-        linkedHashMapUser.put("0", new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"));
-        linkedHashMapUser.put("1", new User("1", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"));
-        linkedHashMapUser.put("2", new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"));
-        linkedHashMapUser.put("3", new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi 2"));
-        linkedHashMapUser.put("5", new User("5", "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"));
-//        String selectQuery = "SELECT  *" +
-//                " FROM " + USER_TABLE_NAME +
-//                " WHERE " + USER_COLUMN_NAME_ID + " = " + userID;
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor cUser = db.rawQuery(selectQuery, null);
-//        if (cUser.moveToFirst()) {
-//            do {
-//                user.setId(cUser.getInt(cUser.getColumnIndex(USER_COLUMN_NAME_ID)));
-//                user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
-//                user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
-//            } while (cUser.moveToNext());
-//        }
-        return linkedHashMapUser.get(userID);
     }
 
 
@@ -302,6 +255,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(MESSAGE_COLUMN_NAME_SENDERID, messageDetail.getUser().getId());
+        values.put(MESSAGE_COLUMN_NAME_SENDERNAME, messageDetail.getUser().getName());
+        values.put(MESSAGE_COLUMN_NAME_SENDERAVATAR, messageDetail.getUser().getAvatar());
         values.put(MESSAGE_COLUMN_NAME_TITLE, messageDetail.getTitle());
         values.put(MESSAGE_COLUMN_NAME_DATETIME, messageDetail.getDatetime());
         values.put(MESSAGE_COLUMN_NAME_IMAGEURL, messageDetail.getImageURL());
@@ -345,7 +300,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
                 messageDetail.setWarning(Boolean.parseBoolean(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ISWARNING))));
                 messageDetail.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
-                messageDetail.setUser(getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID))));
+                User user = new User();
+                user.setId(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
+                user.setName(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERNAME)));
+                user.setAvatar(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERAVATAR)));
+                messageDetail.setUser(user);
 
                 arrMessDetail.add(messageDetail);
             } while (c.moveToNext());

@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 //        insertMessageTask3.execute(messageDetail);
 //
 //        for (int i=0; i<5; i++) {
-//            messageDetail = new MessageDetail(3, MessageDataManager.getInstance().getUser("3", getBaseContext()),
+//            messageDetail = new MessageDetail(3, new User("1", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //
 //        for (int i=0; i<5; i++) {
-//            messageDetail = new MessageDetail(3, MessageDataManager.getInstance().getUser("2", getBaseContext()),
+//            messageDetail = new MessageDetail(3, new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //
 //        for (int i=0; i<5; i++) {
-//            messageDetail = new MessageDetail(3, MessageDataManager.getInstance().getUser("1", getBaseContext()),
+//            messageDetail = new MessageDetail(3, new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();

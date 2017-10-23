@@ -16,6 +16,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -159,6 +160,9 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 }
                 messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
+                if (messageHolder.textViewMessDetail.getHeight() < (int) pxFromDp(context, 50)){
+                    messageHolder.textViewMessDetail.setHeight((int) pxFromDp(context, 50));
+                }
                 break;
             case 4:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
@@ -202,6 +206,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 }
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
+
                 if (arrMessDetail.get(position).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 } else {
@@ -214,6 +219,10 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 break;
             }
         }
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 
     public interface OnItemClickListener {
@@ -249,7 +258,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         TextView textViewDes;
         TextView textViewViewDetail;
 
-        public EventHolder(View view){
+        public EventHolder(final View view){
             super(view);
             textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
             textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
@@ -257,6 +266,15 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             imageViewEvent = (ImageView) view.findViewById(R.id.imageViewEvent);
             textViewDes = (TextView) view.findViewById(R.id.textViewDes);
             textViewViewDetail = (TextView) view.findViewById(R.id.textViewViewDetail);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mItemLongClickListener!=null){
+                        mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
+                    }
+                    return true;
+                }
+            });
         }
     }
 
@@ -267,13 +285,22 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         TextView textViewDes;
         TextView textViewViewDetail;
 
-        public RemindHolder(View view){
+        public RemindHolder(final View view){
             super(view);
             textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
             textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
             textViewDate = (TextView) view.findViewById(R.id.textViewDate);
             textViewDes = (TextView) view.findViewById(R.id.textViewDes);
             textViewViewDetail = (TextView) view.findViewById(R.id.textViewViewDetail);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mItemLongClickListener!=null){
+                        mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
+                    }
+                    return true;
+                }
+            });
         }
     }
 

@@ -26,7 +26,9 @@
         android:layout_toRightOf="@+id/imageViewAvatar"
         android:layout_below="@+id/textViewName"
         android:textSize="15dp"
-        android:text="Nội dung message"/>
+        android:text="Nội dung message"
+        android:ellipsize="end"
+        android:maxLines="1"/>
     <com.example.cpu11341_local.talktvhome.myview.TalkTextView
         android:id="@+id/textViewDate"
         android:layout_width="wrap_content"

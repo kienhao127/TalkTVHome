@@ -216,7 +216,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                selectedMsgDetail.setText(MessageDataManager.getInstance().getUser(userID, getContext()).getName() + ": " + arrMessDetail.get(position).getText());
+                selectedMsgDetail.setText(arrMessDetail.get(position).getUser().getName() + ": " + arrMessDetail.get(position).getText());
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
                 relativeLayoutContextMenu.startAnimation(enter_from_bottom);

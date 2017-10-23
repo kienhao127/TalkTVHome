@@ -31,7 +31,8 @@
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewMessDetail"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/imageViewAvatar"
             android:layout_toStartOf="@+id/imageViewAvatar"
@@ -39,7 +40,7 @@
             android:background="@drawable/my_message_box"
             android:padding="7dp"
             android:text="Nội dung tin nhắn"
-            android:gravity="center"
+            android:gravity="center|left"
             android:textColor="#FFF" />
 
         <ImageView
