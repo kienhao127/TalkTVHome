@@ -152,6 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String selectQuery = "SELECT *" +
                 " FROM " + TOPIC_TABLE_NAME +
                 " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) +
+                " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
                 " LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
