@@ -1,5 +1,6 @@
 package com.example.cpu11341_local.talktvhome.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,7 +53,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     int scrollTimes;
     boolean isAllMsg = false, isResume = false;
     int i = 0;
-
+    ProgressDialog progressDialog;
     public TopicFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
         this.isFollow = isFollow;
@@ -142,6 +143,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
         textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        progressDialog = new ProgressDialog(getActivity());
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
@@ -241,15 +243,9 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
-                MessageDataManager.getInstance().deleteTopic(arrTopic.get(pos).getTopicID(), getContext());
+                DeleteTopicTask deleteTopicTask = new DeleteTopicTask();
+                deleteTopicTask.execute(arrTopic.get(pos).getTopicID());
                 arrTopic.remove(pos);
-                if (adapter != null) {
-                    adapter.notifyDataSetChanged();
-                }
-                if (arrTopic.size() == 0) {
-                    textViewOver.setVisibility(View.VISIBLE);
-                }
-                Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mnBlock:
                 Toast.makeText(getContext(), "Chặn" + arrTopic.get(pos).getName(), Toast.LENGTH_SHORT).show();
@@ -365,6 +361,34 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 isAllMsg = true;
             }
             adapter.setLoaded();
+        }
+    }
+
+    private class DeleteTopicTask extends AsyncTask<String, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setCancelable(true);
+            progressDialog.setMessage("Loading ....");
+            progressDialog.show();
+            progressDialog.setContentView(R.layout.deleting_layout);
+        }
+
+        @Override
+        protected Void doInBackground(String... params) {
+            MessageDataManager.getInstance().deleteTopic(params[0], getContext());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (adapter != null) {
+                adapter.setData(arrTopic);
+            }
+            if (arrTopic.size() == 0) {
+                textViewOver.setVisibility(View.VISIBLE);
+            }
+            Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_SHORT).show();
+            progressDialog.cancel();
         }
     }
 
