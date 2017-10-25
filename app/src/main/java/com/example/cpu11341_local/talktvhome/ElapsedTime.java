@@ -5,6 +5,7 @@ import android.icu.util.Calendar;
 import android.icu.text.DateFormat;
 import android.icu.util.TimeZone;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -23,25 +24,30 @@ public class ElapsedTime {
 
         long elapsedDays = different / daysInMilli;
 
-        DateFormat df = new SimpleDateFormat("d/MM/yy HH:mm");
-
+        SimpleDateFormat df = new SimpleDateFormat("d/MM/yy HH:mm");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
         if (elapsedDays < 1) {
-            DateFormat sameDayDateFormat = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat  sameDayDateFormat = new SimpleDateFormat("HH:mm");
+            sameDayDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
             return sameDayDateFormat.format(date);
         }
         if (elapsedDays <= 7 && elapsedDays >= 1) {
-            DateFormat sameWeekDateFormat = new SimpleDateFormat("EEEE HH:mm");
+            SimpleDateFormat sameWeekDateFormat = new SimpleDateFormat("EEEE HH:mm");
+            sameWeekDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
             return sameWeekDateFormat.format(date);
         }
 
         if (elapsedDays > 7) {
-            DateFormat dateFormat = new SimpleDateFormat("yy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yy");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
             if (dateFormat.format(currentTime).equals(dateFormat.format(date))) {
-                DateFormat sameYearDateFormat = new SimpleDateFormat("d/MM HH:mm");
+                SimpleDateFormat sameYearDateFormat = new SimpleDateFormat("d/MM HH:mm");
+                sameYearDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
                 return sameYearDateFormat.format(date);
             }
             else {
-                DateFormat diffYearDateFormat = new SimpleDateFormat("d/MM/yy HH:mm");
+                SimpleDateFormat diffYearDateFormat = new SimpleDateFormat("d/MM/yy HH:mm");
+                diffYearDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
                 return diffYearDateFormat.format(date);
             }
         }
@@ -49,7 +55,8 @@ public class ElapsedTime {
     }
 
     public static int getDayOfDate(long date){
-        DateFormat df = new SimpleDateFormat("d");
+        SimpleDateFormat df = new SimpleDateFormat("d");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
         return Integer.valueOf(df.format(date));
     }
 }
