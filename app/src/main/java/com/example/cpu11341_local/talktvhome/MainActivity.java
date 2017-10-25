@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
-//                MessageDetail messageDetail = new MessageDetail(3, MessageDataManager.getInstance().getUser("2", getBaseContext()),
+//                MessageDetail messageDetail = new MessageDetail(3, new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
 //                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //                messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //                i++;
@@ -148,6 +148,14 @@ public class MainActivity extends AppCompatActivity {
 //
 //        for (int i=0; i<5; i++) {
 //            messageDetail = new MessageDetail(3, new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
+//                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
+//            insertMessageTask4.execute(messageDetail);
+//        }
+//
+//        for (int i=6; i<150; i++) {
+//            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();

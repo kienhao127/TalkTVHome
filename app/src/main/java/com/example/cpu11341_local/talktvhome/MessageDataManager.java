@@ -158,10 +158,6 @@ public class MessageDataManager {
 
     //----------------TOPIC
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context, int scrollTimes) {
-        if (scrollTimes == 0){
-            linkedHashMapFollowTopic.clear();
-            linkedHashMapUnfollowTopic.clear();
-        }
         ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic(scrollTimes, isFollow).size() == 0) {
             return null;
