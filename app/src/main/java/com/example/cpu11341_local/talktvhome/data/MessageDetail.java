@@ -12,6 +12,7 @@ public class MessageDetail {
     User user;
     String title;
     long datetime;
+    long eventDatetime;
     String imageURL;
     String text;
     int action_type; //1: go web, 2: go room
@@ -25,10 +26,11 @@ public class MessageDetail {
     }
 
     //Event
-    public MessageDetail(int type, User user, String title, long datetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, User user, String title, long datetime, long eventDatetime, String imageURL, String text, int action_type, String action_title, String action_extra) {
         this.user = user;
         this.title = title;
         this.datetime = datetime;
+        this.eventDatetime = eventDatetime;
         this.imageURL = imageURL;
         this.text = text;
         this.action_type = action_type;
@@ -38,10 +40,11 @@ public class MessageDetail {
     }
 
     //Remind
-    public MessageDetail(int type, User user, String title, long datetime, String text, int action_type, String action_title, String action_extra) {
+    public MessageDetail(int type, User user, String title, long datetime, long eventDatetime, String text, int action_type, String action_title, String action_extra) {
         this.user = user;
         this.title = title;
         this.datetime = datetime;
+        this.eventDatetime = eventDatetime;
         this.text = text;
         this.action_type = action_type;
         this.action_title = action_title;
@@ -152,5 +155,13 @@ public class MessageDetail {
 
     public void setTopicID(String topicID) {
         this.topicID = topicID;
+    }
+
+    public long getEventDatetime() {
+        return eventDatetime;
+    }
+
+    public void setEventDatetime(long eventDatetime) {
+        this.eventDatetime = eventDatetime;
     }
 }

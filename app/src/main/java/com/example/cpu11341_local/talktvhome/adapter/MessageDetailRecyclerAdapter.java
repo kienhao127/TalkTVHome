@@ -28,6 +28,8 @@ import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -98,9 +100,9 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
-                eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 eventHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
-                eventHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                eventHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getEventDatetime()));
                 Glide.with(context)
                         .load(arrMessDetail.get(position).getImageURL())
                         .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
@@ -113,8 +115,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             case 2:
                 RemindHolder remindHolder = (RemindHolder) holder;
                 remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getEventDatetime()));
                 remindHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
-                remindHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
                 break;
@@ -253,19 +255,19 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     public class EventHolder extends RecyclerView.ViewHolder {
         TextView textViewDateTime;
         TextView textViewTitle;
-        TextView textViewDate;
         ImageView imageViewEvent;
         TextView textViewDes;
         TextView textViewViewDetail;
+        TextView textViewEventDatetime;
 
         public EventHolder(final View view){
             super(view);
             textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
             textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
-            textViewDate = (TextView) view.findViewById(R.id.textViewDate);
             imageViewEvent = (ImageView) view.findViewById(R.id.imageViewEvent);
             textViewDes = (TextView) view.findViewById(R.id.textViewDes);
             textViewViewDetail = (TextView) view.findViewById(R.id.textViewViewDetail);
+            textViewEventDatetime = (TextView) view.findViewById(R.id.textViewEventDateTime);
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -275,23 +277,31 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     return true;
                 }
             });
+            textViewViewDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mItemClickListener != null){
+                        mItemClickListener.onItemClick(view, getAdapterPosition());
+                    }
+                }
+            });
         }
     }
 
     public class RemindHolder extends RecyclerView.ViewHolder {
         TextView textViewDateTime;
         TextView textViewTitle;
-        TextView textViewDate;
         TextView textViewDes;
         TextView textViewViewDetail;
+        TextView textViewEventDatetime;
 
         public RemindHolder(final View view){
             super(view);
             textViewDateTime = (TextView) view.findViewById(R.id.textViewDateTime);
             textViewTitle = (TextView) view.findViewById(R.id.textViewTitle);
-            textViewDate = (TextView) view.findViewById(R.id.textViewDate);
             textViewDes = (TextView) view.findViewById(R.id.textViewDes);
             textViewViewDetail = (TextView) view.findViewById(R.id.textViewViewDetail);
+            textViewEventDatetime = (TextView) view.findViewById(R.id.textViewEventDateTime);
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -299,6 +309,14 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
                     }
                     return true;
+                }
+            });
+            textViewViewDetail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mItemClickListener != null){
+                        mItemClickListener.onItemClick(view, getAdapterPosition());
+                    }
                 }
             });
         }

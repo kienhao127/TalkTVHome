@@ -28,6 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MESSAGE_COLUMN_NAME_SENDERID = "senderid";
     public static final String MESSAGE_COLUMN_NAME_TITLE = "title";
     public static final String MESSAGE_COLUMN_NAME_DATETIME = "timeofmsg";
+    public static final String MESSAGE_COLUMN_NAME_EVENTDATETIME = "timeofeventmsg";
     public static final String MESSAGE_COLUMN_NAME_IMAGEURL = "imageurl";
     public static final String MESSAGE_COLUMN_NAME_DESCRIPTION = "text";
     public static final String MESSAGE_COLUMN_NAME_ACTIONTYPE = "actiontype";
@@ -58,6 +59,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     MESSAGE_COLUMN_NAME_SENDERAVATAR + " TEXT, " +
                     MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
                     MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_EVENTDATETIME + " TEXT, " +
                     MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
                     MESSAGE_COLUMN_NAME_DESCRIPTION + " TEXT, " +
                     MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
@@ -260,6 +262,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(MESSAGE_COLUMN_NAME_SENDERAVATAR, messageDetail.getUser().getAvatar());
         values.put(MESSAGE_COLUMN_NAME_TITLE, messageDetail.getTitle());
         values.put(MESSAGE_COLUMN_NAME_DATETIME, messageDetail.getDatetime());
+        values.put(MESSAGE_COLUMN_NAME_EVENTDATETIME, messageDetail.getEventDatetime());
         values.put(MESSAGE_COLUMN_NAME_IMAGEURL, messageDetail.getImageURL());
         values.put(MESSAGE_COLUMN_NAME_DESCRIPTION, messageDetail.getText());
         values.put(MESSAGE_COLUMN_NAME_ACTIONTYPE, messageDetail.getAction_type());
@@ -294,6 +297,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
                 messageDetail.setTitle(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TITLE)));
                 messageDetail.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
+                messageDetail.setEventDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_EVENTDATETIME)));
                 messageDetail.setImageURL(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_IMAGEURL)));
                 messageDetail.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
                 messageDetail.setAction_type(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTYPE)));

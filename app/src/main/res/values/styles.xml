@@ -35,4 +35,7 @@
     <style name="AppTheme.Cursor" parent="AppTheme">
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
+    <style name="AppTheme.ColorAccent">
+        <item name="colorAccent">@color/colorPrimary</item> <!-- Whatever color you want-->
+    </style>
 </resources>

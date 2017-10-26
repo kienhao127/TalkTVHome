@@ -305,11 +305,14 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
             Log.i("Get list topic", "DO IN BACKGROUND");
+            long t = System.currentTimeMillis();
             ArrayList<Topic> arrListTopic = new ArrayList<>();
-            if (MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes) == null) {
+            arrListTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
+            if (arrListTopic == null) {
                 return null;
             }
-            arrListTopic.addAll(MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes));
+            long time = System.currentTimeMillis() - t;
+            Log.i("time get list topic", String.valueOf(time));
             return arrListTopic;
         }
 
@@ -367,8 +370,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     private class DeleteTopicTask extends AsyncTask<String, Void, Void> {
         @Override
         protected void onPreExecute() {
-            progressDialog.setCancelable(true);
-            progressDialog.setMessage("Loading ....");
             progressDialog.show();
             progressDialog.setContentView(R.layout.deleting_layout);
         }

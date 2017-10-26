@@ -113,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
 //        }, delay);
 //
 //        MessageDetail messageDetail = new MessageDetail(1, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-//                "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra");
+//                "Tên event 1", Calendar.getInstance().getTimeInMillis(), Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", "Mô tả", 1, "Xem chi tiết", "action_extra");
 //        messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //        InsertMessageTask insertMessageTask = new InsertMessageTask();
 //        insertMessageTask.execute(messageDetail);
 //
 //        messageDetail = new MessageDetail(2, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-//                "Nhắc nhở 1",  Calendar.getInstance().getTimeInMillis(), "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra");
+//                "Nhắc nhở 1",  Calendar.getInstance().getTimeInMillis(), Calendar.getInstance().getTimeInMillis(), "Nội dung nhắc nhở", 1, "Xem chi tiết", "action_extra");
 //        messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //        InsertMessageTask insertMessageTask2 = new InsertMessageTask();
 //        insertMessageTask2.execute(messageDetail);
@@ -154,13 +154,13 @@ public class MainActivity extends AppCompatActivity {
 //            insertMessageTask4.execute(messageDetail);
 //        }
 //
-        for (int i=6; i<150; i++) {
-            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
-                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
-            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
-            insertMessageTask4.execute(messageDetail);
-        }
+//        for (int i=6; i<150; i++) {
+//            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
+//                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
+//            insertMessageTask4.execute(messageDetail);
+//        }
 
     }
 

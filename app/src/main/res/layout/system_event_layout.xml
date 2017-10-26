@@ -27,7 +27,7 @@
             android:textSize="20dp"/>
 
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
-            android:id="@+id/textViewDate"
+            android:id="@+id/textViewEventDateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hôm qua"
@@ -44,7 +44,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:src="@drawable/nobanner"
-            android:layout_below="@+id/textViewDate"/>
+            android:layout_below="@+id/textViewEventDateTime"/>
 
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewDes"

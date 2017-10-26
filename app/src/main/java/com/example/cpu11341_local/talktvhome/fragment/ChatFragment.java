@@ -51,7 +51,6 @@ public class ChatFragment extends Fragment {
     RecyclerView messDetailRecyclerView;
     MessageDetailRecyclerAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
-    Topic currentTopic;
     Toolbar toolbar;
     TextView mTitle;
     EditText editText;
@@ -187,6 +186,14 @@ public class ChatFragment extends Fragment {
         adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                if (arrMessDetail.get(position).getType() == 1){
+                    Toast.makeText(getContext(), "Event" + arrMessDetail.get(position).getAction_extra(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (arrMessDetail.get(position).getType() == 2){
+                    Toast.makeText(getContext(), "Remind" + arrMessDetail.get(position).getAction_extra(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 TalkTextView textViewDate = (TalkTextView) view.findViewById(R.id.textViewDateTime);
                 TalkTextView textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
                 if (textViewDate.getVisibility() == View.VISIBLE) {
