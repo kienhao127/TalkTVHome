@@ -306,12 +306,6 @@ public class ChatFragment extends Fragment {
                     topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
                     topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
                     MessageDataManager.getInstance().updateTopic(topic, getContext());
-                    if (!topic.isFollow()){
-                        Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
-                        unfollowTopic.setLastMess(topic.getLastMess());
-                        unfollowTopic.setDate(topic.getDate());
-                        MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
-                    }
                 }
                 adapter.notifyDataSetChanged();
             }

@@ -51,6 +51,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
     int scrollTimes;
+    static int followScrollTimes;
+    static int unfollowScrollTimes;
     boolean isAllMsg = false, isResume = false;
     int i = 0;
     ProgressDialog progressDialog;
@@ -243,6 +245,9 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
+                if (arrTopic.get(pos).getTopicID() == "-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId()){
+                    unfollowScrollTimes = 0;
+                }
                 DeleteTopicTask deleteTopicTask = new DeleteTopicTask();
                 deleteTopicTask.execute(arrTopic.get(pos).getTopicID());
                 arrTopic.remove(pos);
@@ -257,12 +262,18 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (!isResume) {
+        if (isFollow){
+            scrollTimes = followScrollTimes;
+        } else {
+            scrollTimes = unfollowScrollTimes;
+        }
+        if (!isResume && scrollTimes == 0) {
             LoadTopicTask loadTopicTask = new LoadTopicTask();
             loadTopicTask.execute();
         } else {
             arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
             if (arrTopic.size() != 0) {
+                textViewLoading.setVisibility(View.GONE);
                 sortTopic(arrTopic, getContext());
                 if (adapter != null) {
                     adapter.setData(arrTopic);
@@ -340,6 +351,11 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         protected void onPreExecute() {
             arrTopic.add(null);
             adapter.notifyItemInserted(arrTopic.size());
+            if (isFollow){
+                followScrollTimes++;
+            } else {
+                unfollowScrollTimes++;
+            }
             scrollTimes++;
         }
 
@@ -361,6 +377,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 arrTopic.addAll(pos, result);
                 adapter.notifyItemRangeInserted(pos, result.size() - 1);
             } else {
+                if (isFollow){
+                    followScrollTimes--;
+                } else {
+                    unfollowScrollTimes--;
+                }
+                scrollTimes--;
                 isAllMsg = true;
             }
             adapter.setLoaded();
