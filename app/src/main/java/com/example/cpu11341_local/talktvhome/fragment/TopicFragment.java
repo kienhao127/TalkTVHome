@@ -50,9 +50,9 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     String activityName;
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
-    int scrollTimes;
-    static int followScrollTimes;
-    static int unfollowScrollTimes;
+    int loadMoreFrom = 30;
+    public static int followLoadMoreFrom = 30;
+    public static int unfollowLoadMoreFrom = 30;
     boolean isAllMsg = false, isResume = false;
     int i = 0;
     ProgressDialog progressDialog;
@@ -246,7 +246,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         switch (item.getItemId()) {
             case R.id.mnDelete:
                 if (arrTopic.get(pos).getTopicID() == "-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId()){
-                    unfollowScrollTimes = 0;
+                    unfollowLoadMoreFrom = 0;
+                }
+                if (isFollow){
+                    followLoadMoreFrom--;
+                } else {
+                    unfollowLoadMoreFrom--;
                 }
                 DeleteTopicTask deleteTopicTask = new DeleteTopicTask();
                 deleteTopicTask.execute(arrTopic.get(pos).getTopicID());
@@ -263,25 +268,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     public void onResume() {
         super.onResume();
         if (isFollow){
-            scrollTimes = followScrollTimes;
+            followLoadMoreFrom = 30;
         } else {
-            scrollTimes = unfollowScrollTimes;
+            unfollowLoadMoreFrom = 30;
         }
-        if (!isResume && scrollTimes == 0) {
-            LoadTopicTask loadTopicTask = new LoadTopicTask();
-            loadTopicTask.execute();
-        } else {
-            arrTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext());
-            if (arrTopic.size() != 0) {
-                textViewLoading.setVisibility(View.GONE);
-                sortTopic(arrTopic, getContext());
-                if (adapter != null) {
-                    adapter.setData(arrTopic);
-                }
-            } else {
-                textViewOver.setVisibility(View.VISIBLE);
-            }
-        }
+        LoadTopicTask loadTopicTask = new LoadTopicTask();
+        loadTopicTask.execute();
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
@@ -318,7 +310,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             Log.i("Get list topic", "DO IN BACKGROUND");
             long t = System.currentTimeMillis();
             ArrayList<Topic> arrListTopic = new ArrayList<>();
-            arrListTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
+            arrListTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), 0);
             if (arrListTopic == null) {
                 return null;
             }
@@ -351,17 +343,11 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         protected void onPreExecute() {
             arrTopic.add(null);
             adapter.notifyItemInserted(arrTopic.size());
-            if (isFollow){
-                followScrollTimes++;
-            } else {
-                unfollowScrollTimes++;
-            }
-            scrollTimes++;
         }
 
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
-            ArrayList<Topic> arrNewTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), scrollTimes);
+            ArrayList<Topic> arrNewTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), loadMoreFrom);
             return arrNewTopic;
         }
 
@@ -371,18 +357,18 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             arrTopic.remove(pos);
             adapter.notifyItemRemoved(pos);
             if (result != null) {
+                if (isFollow){
+                    followLoadMoreFrom += result.size();
+                } else {
+                    unfollowLoadMoreFrom += result.size();
+                }
+                loadMoreFrom += result.size();
                 if (result.size() < 30) {
                     isAllMsg = true;
                 }
                 arrTopic.addAll(pos, result);
                 adapter.notifyItemRangeInserted(pos, result.size() - 1);
             } else {
-                if (isFollow){
-                    followScrollTimes--;
-                } else {
-                    unfollowScrollTimes--;
-                }
-                scrollTimes--;
                 isAllMsg = true;
             }
             adapter.setLoaded();
@@ -392,6 +378,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     private class DeleteTopicTask extends AsyncTask<String, Void, Void> {
         @Override
         protected void onPreExecute() {
+            progressDialog.setCancelable(false);
             progressDialog.show();
             progressDialog.setContentView(R.layout.deleting_layout);
         }

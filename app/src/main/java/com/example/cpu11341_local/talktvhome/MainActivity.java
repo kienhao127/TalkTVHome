@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Random r = new Random();
         final Handler handler = new Handler();
-        final int delay = 10000; //milliseconds
+        final int delay = 5000; //milliseconds
 
 
 //        handler.postDelayed(new Runnable(){
@@ -154,12 +154,17 @@ public class MainActivity extends AppCompatActivity {
 //            insertMessageTask4.execute(messageDetail);
 //        }
 //
-//        for (int i=6; i<150; i++) {
+//        for (int i=3; i<150; i++) {
 //            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(messageDetail);
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 //        }
 
     }

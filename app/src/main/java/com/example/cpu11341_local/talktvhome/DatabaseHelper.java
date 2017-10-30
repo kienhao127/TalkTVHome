@@ -149,13 +149,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<Topic> getListTopic(int scrollTimes, boolean isFollow){
+    public ArrayList<Topic> getListTopic(int loadFrom, boolean isFollow){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
                 " FROM " + TOPIC_TABLE_NAME +
                 " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) +
                 " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
-                " LIMIT 30 OFFSET " + String.valueOf(scrollTimes*30);
+                " LIMIT 30 OFFSET " + loadFrom;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
@@ -250,6 +250,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteTopic(String topicID){
         SQLiteDatabase db = this.getReadableDatabase();
         return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_TOPICID + "='" + topicID + "'", null) > 0;
+    }
+
+    public boolean isEsixtUnfollowTopic(){
+        String selectQuery = "SELECT *" +
+                " FROM " + TOPIC_TABLE_NAME +
+                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + 0 +
+                " LIMIT 1";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cTopic = db.rawQuery(selectQuery, null);
+        if (cTopic.moveToFirst()) {
+            return true;
+        }
+        return false;
     }
 
 
