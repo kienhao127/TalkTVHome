@@ -120,7 +120,7 @@ public class ChatFragment extends Fragment {
                 if (s.length() > 0 && !("".equals(s.toString().trim()))) {
                     imageViewSend.setVisibility(View.VISIBLE);
                 } else {
-                    imageViewSend.setVisibility(View.INVISIBLE);
+                    imageViewSend.setVisibility(View.GONE);
                 }
             }
             @Override

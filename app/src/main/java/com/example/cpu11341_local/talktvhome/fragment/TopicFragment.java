@@ -253,6 +253,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 } else {
                     unfollowLoadMoreFrom--;
                 }
+                loadMoreFrom--;
                 DeleteTopicTask deleteTopicTask = new DeleteTopicTask();
                 deleteTopicTask.execute(arrTopic.get(pos).getTopicID());
                 arrTopic.remove(pos);
