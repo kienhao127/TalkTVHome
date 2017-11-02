@@ -78,10 +78,10 @@ public class MessageDataManager {
 
 
     //-----------MESSAGE
-    public ArrayList<MessageDetail> getListMessageFromDB(String topicID, Context context, int scrollTimes) {
+    public ArrayList<MessageDetail> getListMessageFromDB(String topicID, Context context, int loadMoreFrom) {
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
         long t = System.currentTimeMillis();
-        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(topicID, scrollTimes);
+        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(topicID, loadMoreFrom);
         ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
         long d = System.currentTimeMillis() - t;
         return arrMessageDetailOfSender;
@@ -124,11 +124,9 @@ public class MessageDataManager {
             // Tại mới nếu unfollowTopic chưa có.
             topic = new Topic(idol.getAvatar(), idol.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (isFollow(topic.getTopicID())) {
-                TopicFragment.followLoadMoreFrom++;
                 topic.setFollow(true);
                 updateTopic(topic, context);
             } else {
-                TopicFragment.unfollowLoadMoreFrom++;
                 Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
                 updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
             }

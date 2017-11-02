@@ -51,8 +51,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
     int loadMoreFrom = 30;
-    public static int followLoadMoreFrom = 30;
-    public static int unfollowLoadMoreFrom = 30;
+    int followLoadMoreFrom = 30;
+    int unfollowLoadMoreFrom = 30;
     boolean isAllMsg = false, isResume = false;
     int i = 0;
     ProgressDialog progressDialog;
@@ -268,11 +268,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (isFollow){
-            followLoadMoreFrom = 30;
-        } else {
-            unfollowLoadMoreFrom = 30;
-        }
         LoadTopicTask loadTopicTask = new LoadTopicTask();
         loadTopicTask.execute();
 
@@ -280,7 +275,6 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 boolean isTopicExists = false;
-
                 if (isFollow && !topic.isFollow()) {
                     topic = MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
                 }
@@ -293,6 +287,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 }
 
                 if (!isTopicExists) {
+                    if (isFollow){
+                        followLoadMoreFrom++;
+                    } else {
+                        unfollowLoadMoreFrom++;
+                    }
+                    loadMoreFrom++;
                     arrTopic.add(topic);
                 }
                 sortTopic(arrTopic, getContext());

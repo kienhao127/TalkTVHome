@@ -61,7 +61,7 @@ public class ChatFragment extends Fragment {
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
     TalkTextView selectedMsgDetail;
-    int scrollTimes = 0;
+    int loadMoreFrom = 30;
     boolean isAllMsg = false, isResume = false;
     RelativeLayout relativeLayoutContextMenu;
     int selectedPosition;
@@ -288,6 +288,7 @@ public class ChatFragment extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                loadMoreFrom--;
                 Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
                 relativeLayoutContextMenu.setVisibility(View.GONE);
                 relativeLayoutContextMenu.startAnimation(context_menu_exit);
@@ -331,6 +332,7 @@ public class ChatFragment extends Fragment {
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
+                loadMoreFrom++;
                 LoadMessageTask loadMessageTask = new LoadMessageTask();
                 loadMessageTask.execute(messageDetail);
             }
@@ -341,7 +343,7 @@ public class ChatFragment extends Fragment {
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
             ArrayList<MessageDetail> arrayListMessageDetail = new ArrayList<>();
-            arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), scrollTimes));
+            arrayListMessageDetail.addAll(MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), 0));
             return arrayListMessageDetail;
         }
 
@@ -373,12 +375,11 @@ public class ChatFragment extends Fragment {
         protected void onPreExecute() {
             arrMessDetail.add(0, null);
             adapter.notifyItemInserted(0);
-            scrollTimes++;
         }
 
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
-            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), scrollTimes);
+            ArrayList<MessageDetail> arrNewMsgDetail = MessageDataManager.getInstance().getListMessageFromDB(topicID, getContext(), loadMoreFrom);
             return arrNewMsgDetail;
         }
 
@@ -387,6 +388,7 @@ public class ChatFragment extends Fragment {
             if (result.size() < 30) {
                 isAllMsg = true;
             }
+            loadMoreFrom += result.size();
             arrMessDetail.remove(0);
             adapter.notifyItemRemoved(0);
             arrMessDetail.addAll(0, result);
