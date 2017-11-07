@@ -133,7 +133,7 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 MessageDetail messageDetail = null;
                 messageDetail = new MessageDetail(4, MessageDataManager.getInstance().getCurrentUser(getContext()),
-                        Calendar.getInstance().getTimeInMillis(), editText.getText().toString(), false);
+                        Calendar.getInstance().getTimeInMillis(), editText.getText().toString().trim(), false);
                 messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
                 if (MessageDataManager.getInstance().dataListener != null){
@@ -405,7 +405,7 @@ public class ChatFragment extends Fragment {
                 topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
                 topic.setHasNewMessage(false);
                 MessageDataManager.getInstance().updateTopic(topic, getContext());
-                Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
+                Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1", getContext());
                 if (!topic.isFollow()){
                     unfollowTopic.setHasNewMessage(false);
                     MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());

@@ -99,7 +99,7 @@ public class MessageDataManager {
         User idol = new User();
         if (messageDetail.getType() == 4) {
             strText = "Bạn: " + messageDetail.getText();
-            idol = MessageDataManager.getInstance().getUser(idolID);
+            idol = MessageDataManager.getInstance().getUser(idolID, context);
         } else {
             idol = messageDetail.getUser();
             strText = messageDetail.getText();
@@ -114,7 +114,7 @@ public class MessageDataManager {
             topic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(topic);
             if (!topic.isFollow()) {
-                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
+                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
                 updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
             }
         } else {
@@ -127,7 +127,7 @@ public class MessageDataManager {
                 topic.setFollow(true);
                 updateTopic(topic, context);
             } else {
-                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
+                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
                 updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
@@ -145,48 +145,17 @@ public class MessageDataManager {
         } else {
             unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
                     topicName + ": " + strText,
-                    messageDetail.getDatetime(), 2, "-1_" + getCurrentUser(context).getId(), true, true);
+                    messageDetail.getDatetime(), 2, "-1", true, true);
             DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
         }
     }
 
     //----------------TOPIC
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context, int loadFrom) {
-        ArrayList<Topic> arrTopic = new ArrayList<>();
         if (DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow).size() == 0) {
             return null;
         }
-        Topic systemTopic = null, unFollowTopic = null;
-        for (Topic topic : DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow)) {
-            if (topic.getTopicID().equals("0_" + getCurrentUser(context).getId())) {
-                systemTopic = topic;
-                continue;
-            }
-            if (isFollow) {
-                if (topic.getTopicID().equals("-1_" + getCurrentUser(context).getId())) {
-                    updateUnfollowTopic(context);
-                    unFollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
-                    continue;
-                }
-            }
-            if (topic.isFollow() == isFollow) {
-                arrTopic.add(topic);
-            }
-        }
-        Collections.sort(arrTopic, new Comparator<Topic>() {
-            @Override
-            public int compare(Topic o1, Topic o2) {
-                return Long.valueOf(o2.getDate()).compareTo(o1.getDate());
-            }
-        });
-
-        if (unFollowTopic != null) {
-            arrTopic.add(0, unFollowTopic);
-        }
-        if (systemTopic != null) {
-            arrTopic.add(0, systemTopic);
-        }
-        return arrTopic;
+        return DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow);
     }
 
     public Topic getTopic(String topicID, Context context) {
@@ -200,7 +169,7 @@ public class MessageDataManager {
 
     public boolean deleteTopic(String topicID, Context context) {
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
-        if (topicID.equals("-1_" + getCurrentUser(context).getId())) {
+        if (topicID.equals("-1")) {
             for (Topic t : DatabaseHelper.getInstance(context).getListTopic(false)) {
                 if (!t.isFollow()) {
                     for (String str : splitTopicID(t.getTopicID())) {
@@ -209,7 +178,7 @@ public class MessageDataManager {
                     DatabaseHelper.getInstance(context).deleteTopic(t.getTopicID());
                 }
             }
-            return DatabaseHelper.getInstance(context).deleteTopic("-1_" + getCurrentUser(context).getId());
+            return DatabaseHelper.getInstance(context).deleteTopic("-1");
         }
         if (topic.isFollow()) {
             for (String str : splitTopicID(topicID)) {
@@ -226,12 +195,12 @@ public class MessageDataManager {
                 return true;
             }
         }
-        return DatabaseHelper.getInstance(context).deleteTopic("-1_" + getCurrentUser(context).getId());
+        return DatabaseHelper.getInstance(context).deleteTopic("-1");
     }
 
     //update unfollowtopic sau khi delete topic
     void updateUnfollowTopic(Context context) {
-        Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1_" + getCurrentUser(context).getId());
+        Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
         Topic newestUnfollowTopic = DatabaseHelper.getInstance(context).getNewestUnfollowTopic();
         if (newestUnfollowTopic.getName() != null) {
             unfollowTopic.setDate(newestUnfollowTopic.getDate());
@@ -255,8 +224,8 @@ public class MessageDataManager {
         return new User("5", "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui");
     }
 
-    public User getUser(String userID) {
-        return new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady");
+    public User getUser(String userID, Context context) {
+        return DatabaseHelper.getInstance(context).getUser(userID);
     }
 
 
@@ -288,7 +257,7 @@ public class MessageDataManager {
             removedTopic.setFollow(true);
             DatabaseHelper.getInstance(context).updateTopic(removedTopic);
             if (!DatabaseHelper.getInstance(context).isEsixtUnfollowTopic()) {
-                deleteTopic("-1_" + getCurrentUser(context).getId(), context);
+                deleteTopic("-1", context);
             } else {
                 updateUnfollowTopic(context);
             }

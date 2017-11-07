@@ -245,7 +245,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         int pos = adapter.getPosition();
         switch (item.getItemId()) {
             case R.id.mnDelete:
-                if (arrTopic.get(pos).getTopicID() == "-1_" + MessageDataManager.getInstance().getCurrentUser(getContext()).getId()){
+                if (arrTopic.get(pos).getTopicID() == "-1"){
                     unfollowLoadMoreFrom = 0;
                 }
                 if (isFollow){
@@ -276,7 +276,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
                 boolean isTopicExists = false;
                 if (isFollow && !topic.isFollow()) {
-                    topic = MessageDataManager.getInstance().getTopic("-1_"+MessageDataManager.getInstance().getCurrentUser(getContext()).getId(), getContext());
+                    topic = MessageDataManager.getInstance().getTopic("-1", getContext());
                 }
 
                 for (int i = 0; i < arrTopic.size(); i++) {
@@ -376,6 +376,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
         }
     }
 
+
     private class DeleteTopicTask extends AsyncTask<String, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -408,12 +409,12 @@ public class TopicFragment extends android.support.v4.app.Fragment {
 
         int i = 0;
         while (arrTopic.size() != 0 && i < arrTopic.size()) {
-            if (arrTopic.get(i).getTopicID().equals("0_"+MessageDataManager.getInstance().getCurrentUser(context).getId())) {
+            if (arrTopic.get(i).getTopicID().equals("0")) {
                 systemTopic = arrTopic.get(i);
                 arrTopic.remove(i);
                 continue;
             }
-            if (arrTopic.get(i).getTopicID().equals("-1_"+MessageDataManager.getInstance().getCurrentUser(context).getId())) {
+            if (arrTopic.get(i).getTopicID().equals("-1")) {
                 unFollowTopic = arrTopic.get(i);
                 arrTopic.remove(i);
                 continue;

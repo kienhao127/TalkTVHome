@@ -3,8 +3,8 @@ package com.example.cpu11341_local.talktvhome;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
@@ -36,8 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String MESSAGE_COLUMN_NAME_ACTIONEXTRA = "actionextra";
     public static final String MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
     public static final String MESSAGE_COLUMN_NAME_TOPICID = "topicid";
-    public static final String MESSAGE_COLUMN_NAME_SENDERNAME = "sendername";
-    public static final String MESSAGE_COLUMN_NAME_SENDERAVATAR = "senderavatar";
 
     public static final String TOPIC_TABLE_NAME = "topic";
     public static final String TOPIC_COLUMN_NAME_TOPICID = "topicid";
@@ -49,14 +47,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TOPIC_COLUMN_NAME_HASNEWMSG = "hasnewmsg";
     public static final String TOPIC_COLUMN_NAME_ISFOLLOW = "isfollow";
 
+    public static final String USER_TABLE_NAME = "user";
+    public static final String USER_COLUMN_NAME_USERID = "userid";
+    public static final String USER_COLUMN_NAME_NAME = "name";
+    public static final String USER_COLUMN_NAME_AVATAR = "avatar";
 
     private static final String MESSAGE_TABLE_CREATE =
             "CREATE TABLE " + MESSAGE_TABLE_NAME + " (" +
                     MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     MESSAGE_COLUMN_NAME_TYPE + " INTEGER," +
-                    MESSAGE_COLUMN_NAME_SENDERID + " INTEGER, " +
-                    MESSAGE_COLUMN_NAME_SENDERNAME + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_SENDERAVATAR + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_SENDERID + " TEXT, " +
                     MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
                     MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
                     MESSAGE_COLUMN_NAME_EVENTDATETIME + " TEXT, " +
@@ -81,6 +81,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     TOPIC_COLUMN_NAME_ISFOLLOW + " INTEGER" +
                     ");";
 
+    private static final String USER_TABLE_CREATE =
+            "CREATE TABLE " + USER_TABLE_NAME + " (" +
+                    USER_COLUMN_NAME_USERID + " TEXT PRIMARY KEY, " +
+                    USER_COLUMN_NAME_NAME + " TEXT, " +
+                    USER_COLUMN_NAME_AVATAR + " TEXT" +
+                    ");";
+
     private static DatabaseHelper instance = null;
 
     private DatabaseHelper(Context context) {
@@ -98,15 +105,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(MESSAGE_TABLE_CREATE);
         db.execSQL(TOPIC_TABLE_CREATE);
+        db.execSQL(USER_TABLE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS" + MESSAGE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS" + TOPIC_TABLE_CREATE);
+        db.execSQL("DROP TABLE IF EXISTS" + USER_TABLE_CREATE);
         onCreate(db);
     }
 
+    //USER------------------
+    public boolean insertUser(User user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USER_COLUMN_NAME_USERID, user.getId());
+        values.put(USER_COLUMN_NAME_NAME, user.getName());
+        values.put(USER_COLUMN_NAME_AVATAR, user.getAvatar());
+        long result = db.insert(USER_TABLE_NAME, null, values);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public User getUser(String userID){
+        User user = new User();
+        String selectQuery = "SELECT *" +
+                " FROM " + USER_TABLE_NAME +
+                " WHERE " + USER_COLUMN_NAME_USERID + " = '" + userID + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cUser = db.rawQuery(selectQuery, null);
+        if (cUser.moveToFirst()) {
+            user.setId(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_USERID)));
+            user.setName(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_NAME)));
+            user.setAvatar(cUser.getString(cUser.getColumnIndex(USER_COLUMN_NAME_AVATAR)));
+        }
+        return user;
+    }
 
     //TOPIC-----------------
 
@@ -152,10 +190,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<Topic> getListTopic(int loadFrom, boolean isFollow){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
-                " FROM " + TOPIC_TABLE_NAME +
-                " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) +
-                " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
-                " LIMIT 30 OFFSET " + loadFrom;
+                " FROM ( SELECT * " +
+                        " FROM " + TOPIC_TABLE_NAME +
+                        " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) + " and (" + TOPIC_COLUMN_NAME_TOPICID + " = '-1' or " + TOPIC_COLUMN_NAME_TOPICID + " = '0')" +
+                        " ORDER BY " + TOPIC_COLUMN_NAME_TOPICID + " DESC" +
+                        " LIMIT 30 OFFSET " + loadFrom + " )" +
+
+                " UNION ALL" +
+
+                " SELECT *" +
+                " FROM ( SELECT *" +
+                        " FROM " + TOPIC_TABLE_NAME +
+                        " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) + " and " + TOPIC_COLUMN_NAME_TOPICID + " <> '-1' and " + TOPIC_COLUMN_NAME_TOPICID + " <> '0'" +
+                        " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
+                        " LIMIT 30 OFFSET " + loadFrom + " )";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
@@ -271,8 +319,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(MESSAGE_COLUMN_NAME_SENDERID, messageDetail.getUser().getId());
-        values.put(MESSAGE_COLUMN_NAME_SENDERNAME, messageDetail.getUser().getName());
-        values.put(MESSAGE_COLUMN_NAME_SENDERAVATAR, messageDetail.getUser().getAvatar());
         values.put(MESSAGE_COLUMN_NAME_TITLE, messageDetail.getTitle());
         values.put(MESSAGE_COLUMN_NAME_DATETIME, messageDetail.getDatetime());
         values.put(MESSAGE_COLUMN_NAME_EVENTDATETIME, messageDetail.getEventDatetime());
@@ -284,6 +330,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(MESSAGE_COLUMN_NAME_TYPE, messageDetail.getType());
         values.put(MESSAGE_COLUMN_NAME_TOPICID, messageDetail.getTopicID());
 
+        try {
+            insertUser(messageDetail.getUser());
+        } catch (SQLiteException e){
+
+        }
         long result = db.insert(MESSAGE_TABLE_NAME, null, values);
         if (result == -1){
             return false;
@@ -318,10 +369,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
                 messageDetail.setWarning(Boolean.parseBoolean(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ISWARNING))));
                 messageDetail.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
-                User user = new User();
-                user.setId(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
-                user.setName(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERNAME)));
-                user.setAvatar(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERAVATAR)));
+                User user = getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
                 messageDetail.setUser(user);
 
                 arrMessDetail.add(messageDetail);
