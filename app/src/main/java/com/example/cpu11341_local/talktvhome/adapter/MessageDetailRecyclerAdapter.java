@@ -24,7 +24,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
+import com.example.cpu11341_local.talktvhome.data.EventMessage;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.RemindMessage;
+import com.example.cpu11341_local.talktvhome.data.SimpleMessage;
 import com.example.cpu11341_local.talktvhome.data.User;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
@@ -100,25 +103,25 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         switch (holder.getItemViewType()) {
             case 1:
                 EventHolder eventHolder = (EventHolder) holder;
-                eventHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
+                eventHolder.textViewTitle.setText(((EventMessage)arrMessDetail.get(position)).getTitle());
                 eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                eventHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getEventDatetime()));
+                eventHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((EventMessage)arrMessDetail.get(position)).getEventDatetime()));
                 Glide.with(context)
-                        .load(arrMessDetail.get(position).getImageURL())
+                        .load(((EventMessage)arrMessDetail.get(position)).getImageURL())
                         .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                         .apply(RequestOptions.errorOf(R.drawable.grid_item
                         ))
                         .into(eventHolder.imageViewEvent);
                 eventHolder.textViewDes.setText(arrMessDetail.get(position).getText());
-                eventHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
+                eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case 2:
                 RemindHolder remindHolder = (RemindHolder) holder;
                 remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getEventDatetime()));
-                remindHolder.textViewTitle.setText(arrMessDetail.get(position).getTitle());
+                remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((RemindMessage)arrMessDetail.get(position)).getEventDatetime()));
+                remindHolder.textViewTitle.setText(((RemindMessage)arrMessDetail.get(position)).getTitle());
                 remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
-                remindHolder.textViewViewDetail.setText(arrMessDetail.get(position).getAction_title());
+                remindHolder.textViewViewDetail.setText(((RemindMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case 3:
                 MessageHolder messageHolder = (MessageHolder) holder;
@@ -209,7 +212,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
 
-                if (arrMessDetail.get(position).isWarning()) {
+                if (((SimpleMessage)arrMessDetail.get(position)).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
                 } else {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.INVISIBLE);

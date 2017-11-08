@@ -35,7 +35,10 @@ import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
+import com.example.cpu11341_local.talktvhome.data.EventMessage;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.RemindMessage;
+import com.example.cpu11341_local.talktvhome.data.SimpleMessage;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.Wrapper;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
@@ -132,8 +135,8 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MessageDetail messageDetail = null;
-                messageDetail = new MessageDetail(4, MessageDataManager.getInstance().getCurrentUser(getContext()),
-                        Calendar.getInstance().getTimeInMillis(), editText.getText().toString().trim(), false);
+                messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), editText.getText().toString().trim(),
+                        Calendar.getInstance().getTimeInMillis(), false);
                 messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
                 if (MessageDataManager.getInstance().dataListener != null){
@@ -187,11 +190,11 @@ public class ChatFragment extends Fragment {
             @Override
             public void onItemClick(View view, int position) {
                 if (arrMessDetail.get(position).getType() == 1){
-                    Toast.makeText(getContext(), "Event" + arrMessDetail.get(position).getAction_extra(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Event" + ((EventMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (arrMessDetail.get(position).getType() == 2){
-                    Toast.makeText(getContext(), "Remind" + arrMessDetail.get(position).getAction_extra(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Remind" + ((RemindMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
                     return;
                 }
                 TalkTextView textViewDate = (TalkTextView) view.findViewById(R.id.textViewDateTime);
@@ -288,27 +291,27 @@ public class ChatFragment extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadMoreFrom--;
-                Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
-                relativeLayoutContextMenu.setVisibility(View.GONE);
-                relativeLayoutContextMenu.startAnimation(context_menu_exit);
-                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
-                if (isDeleted) {
-                    Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
-                }
-                arrMessDetail.remove(selectedPosition);
-                if (arrMessDetail.size() == 0){
-                    MessageDataManager.getInstance().deleteTopic(topicID, getContext());
-                    textViewOver.setVisibility(View.VISIBLE);
-                    adapter.notifyDataSetChanged();
-                    return;
-                }
-                if (selectedPosition == arrMessDetail.size()){
-                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
-                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
-                    MessageDataManager.getInstance().updateTopic(topic, getContext());
-                }
-                adapter.notifyDataSetChanged();
+//                loadMoreFrom--;
+//                Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
+//                relativeLayoutContextMenu.setVisibility(View.GONE);
+//                relativeLayoutContextMenu.startAnimation(context_menu_exit);
+//                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
+//                if (isDeleted) {
+//                    Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
+//                }
+//                arrMessDetail.remove(selectedPosition);
+//                if (arrMessDetail.size() == 0){
+//                    MessageDataManager.getInstance().deleteTopic(topicID, getContext());
+//                    textViewOver.setVisibility(View.VISIBLE);
+//                    adapter.notifyDataSetChanged();
+//                    return;
+//                }
+//                if (selectedPosition == arrMessDetail.size()){
+//                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+//                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
+//                    MessageDataManager.getInstance().updateTopic(topic, getContext());
+//                }
+//                adapter.notifyDataSetChanged();
             }
         });
 

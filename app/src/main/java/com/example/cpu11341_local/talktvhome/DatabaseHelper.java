@@ -7,7 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.cpu11341_local.talktvhome.data.EventMessage;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
+import com.example.cpu11341_local.talktvhome.data.RemindMessage;
+import com.example.cpu11341_local.talktvhome.data.SimpleMessage;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
 
@@ -22,20 +25,35 @@ import java.util.Map;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "talktv.db";
-    public static final String MESSAGE_TABLE_NAME = "massage";
+
+    public static final String MESSAGE_TABLE_NAME = "message";
     public static final String MESSAGE_COLUMN_NAME_TYPE = "type";
     public static final String MESSAGE_COLUMN_NAME_ID = "id";
     public static final String MESSAGE_COLUMN_NAME_SENDERID = "senderid";
-    public static final String MESSAGE_COLUMN_NAME_TITLE = "title";
     public static final String MESSAGE_COLUMN_NAME_DATETIME = "timeofmsg";
-    public static final String MESSAGE_COLUMN_NAME_EVENTDATETIME = "timeofeventmsg";
-    public static final String MESSAGE_COLUMN_NAME_IMAGEURL = "imageurl";
-    public static final String MESSAGE_COLUMN_NAME_DESCRIPTION = "text";
-    public static final String MESSAGE_COLUMN_NAME_ACTIONTYPE = "actiontype";
-    public static final String MESSAGE_COLUMN_NAME_ACTIONTITLE = "actiontitle";
-    public static final String MESSAGE_COLUMN_NAME_ACTIONEXTRA = "actionextra";
-    public static final String MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
+    public static final String MESSAGE_COLUMN_NAME_TEXT = "text";
     public static final String MESSAGE_COLUMN_NAME_TOPICID = "topicid";
+
+    public static final String EVENT_MESSAGE_TABLE_NAME = "eventmessage";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_ID = "id";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_TITLE = "title";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_EVENTDATETIME = "timeofeventmsg";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_IMAGEURL = "imageurl";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_ACTIONTYPE = "actiontype";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_ACTIONTITLE = "actiontitle";
+    public static final String EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA = "actionextra";
+
+    public static final String REMIND_MESSAGE_TABLE_NAME = "remindmessage";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_ID = "id";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_TITLE = "remindtitle";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_REMINDATETIME = "timeofremindmsg";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_ACTIONTYPE = "remindactiontype";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE = "remindactiontitle";
+    public static final String REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA = "remindactionextra";
+
+    public static final String SIMPLE_MESSAGE_TABLE_NAME = "simplemassage";
+    public static final String SIMPLE_MESSAGE_COLUMN_NAME_ID = "id";
+    public static final String SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
 
     public static final String TOPIC_TABLE_NAME = "topic";
     public static final String TOPIC_COLUMN_NAME_TOPICID = "topicid";
@@ -55,18 +73,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String MESSAGE_TABLE_CREATE =
             "CREATE TABLE " + MESSAGE_TABLE_NAME + " (" +
                     MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    MESSAGE_COLUMN_NAME_TYPE + " INTEGER," +
-                    MESSAGE_COLUMN_NAME_SENDERID + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_EVENTDATETIME + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_DESCRIPTION + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
-                    MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT, " +
-                    MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER, " +
-                    MESSAGE_COLUMN_NAME_TOPICID + " TEXT" +
+                    MESSAGE_COLUMN_NAME_TYPE + "INTEGER, " +
+                    MESSAGE_COLUMN_NAME_SENDERID + "TEXT, " +
+                    MESSAGE_COLUMN_NAME_DATETIME + "TEXT, " +
+                    MESSAGE_COLUMN_NAME_TEXT + "TEXT, " +
+                    MESSAGE_COLUMN_NAME_TOPICID + "TEXT" +
+                    ");";
+
+    private static final String EVENT_MESSAGE_TABLE_CREATE =
+            "CREATE TABLE " + EVENT_MESSAGE_TABLE_NAME + " (" +
+                    EVENT_MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
+                    EVENT_MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
+                    EVENT_MESSAGE_COLUMN_NAME_EVENTDATETIME + " TEXT, " +
+                    EVENT_MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
+                    EVENT_MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
+                    EVENT_MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
+                    EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT" +
+                    ");";
+
+    private static final String REMIND_MESSAGE_TABLE_CREATE =
+            "CREATE TABLE " + REMIND_MESSAGE_TABLE_NAME + " (" +
+                    REMIND_MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
+                    REMIND_MESSAGE_COLUMN_NAME_TITLE + " TEXT, " +
+                    REMIND_MESSAGE_COLUMN_NAME_REMINDATETIME + " TEXT, " +
+                    REMIND_MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
+                    REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
+                    REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT" +
+                    ");";
+
+    private static final String SIMPLE_MESSAGE_TABLE_CREATE =
+            "CREATE TABLE " + SIMPLE_MESSAGE_TABLE_NAME + " (" +
+                    SIMPLE_MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
+                    SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER" +
                     ");";
 
     private static final String TOPIC_TABLE_CREATE =
@@ -104,6 +142,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(MESSAGE_TABLE_CREATE);
+        db.execSQL(EVENT_MESSAGE_TABLE_CREATE);
+        db.execSQL(REMIND_MESSAGE_TABLE_CREATE);
+        db.execSQL(SIMPLE_MESSAGE_TABLE_CREATE);
         db.execSQL(TOPIC_TABLE_CREATE);
         db.execSQL(USER_TABLE_CREATE);
     }
@@ -111,6 +152,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS" + MESSAGE_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS" + EVENT_MESSAGE_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS" + REMIND_MESSAGE_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS" + SIMPLE_MESSAGE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS" + TOPIC_TABLE_CREATE);
         db.execSQL("DROP TABLE IF EXISTS" + USER_TABLE_CREATE);
         onCreate(db);
@@ -315,18 +359,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //MESSAGE-----------------
-    public boolean insertMessage(MessageDetail messageDetail) {
+
+    public boolean insertMessage(MessageDetail messageDetail){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(MESSAGE_COLUMN_NAME_SENDERID, messageDetail.getUser().getId());
-        values.put(MESSAGE_COLUMN_NAME_TITLE, messageDetail.getTitle());
         values.put(MESSAGE_COLUMN_NAME_DATETIME, messageDetail.getDatetime());
-        values.put(MESSAGE_COLUMN_NAME_EVENTDATETIME, messageDetail.getEventDatetime());
-        values.put(MESSAGE_COLUMN_NAME_IMAGEURL, messageDetail.getImageURL());
-        values.put(MESSAGE_COLUMN_NAME_DESCRIPTION, messageDetail.getText());
-        values.put(MESSAGE_COLUMN_NAME_ACTIONTYPE, messageDetail.getAction_type());
-        values.put(MESSAGE_COLUMN_NAME_ACTIONTITLE, messageDetail.getAction_title());
-        values.put(MESSAGE_COLUMN_NAME_ACTIONEXTRA, messageDetail.getAction_extra());
+        values.put(MESSAGE_COLUMN_NAME_TEXT, messageDetail.getText());
         values.put(MESSAGE_COLUMN_NAME_TYPE, messageDetail.getType());
         values.put(MESSAGE_COLUMN_NAME_TOPICID, messageDetail.getTopicID());
 
@@ -335,7 +374,76 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (SQLiteException e){
 
         }
-        long result = db.insert(MESSAGE_TABLE_NAME, null, values);
+        long result = db.insert(EVENT_MESSAGE_TABLE_NAME, null, values);
+        String selectQuery = "select last_insert_rowid()";
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            int lastID = c.getInt(0);
+            switch (messageDetail.getType()){
+                case 1:{
+                    insertEventMessage(lastID, (EventMessage) messageDetail);
+                    break;
+                }
+                case 2:{
+                    insertRemindMessage(lastID, (RemindMessage) messageDetail);
+                    break;
+                }
+                case 3:
+                case 4:{
+                    insertSimpleMessage(lastID, (SimpleMessage) messageDetail);
+                    break;
+                }
+            }
+        }
+
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    boolean insertEventMessage(int id, EventMessage eventMessage) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(EVENT_MESSAGE_COLUMN_NAME_ID, id);
+        values.put(EVENT_MESSAGE_COLUMN_NAME_TITLE, eventMessage.getTitle());
+        values.put(EVENT_MESSAGE_COLUMN_NAME_EVENTDATETIME, eventMessage.getEventDatetime());
+        values.put(EVENT_MESSAGE_COLUMN_NAME_IMAGEURL, eventMessage.getImageURL());
+        values.put(EVENT_MESSAGE_COLUMN_NAME_ACTIONTYPE, eventMessage.getAction_type());
+        values.put(EVENT_MESSAGE_COLUMN_NAME_ACTIONTITLE, eventMessage.getAction_title());
+        values.put(EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA, eventMessage.getAction_extra());
+        long result = db.insert(EVENT_MESSAGE_TABLE_NAME, null, values);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    boolean insertRemindMessage(int id, RemindMessage remindMessage) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(REMIND_MESSAGE_COLUMN_NAME_ID, id);
+        values.put(REMIND_MESSAGE_COLUMN_NAME_TITLE, remindMessage.getTitle());
+        values.put(REMIND_MESSAGE_COLUMN_NAME_REMINDATETIME, remindMessage.getEventDatetime());
+        values.put(REMIND_MESSAGE_COLUMN_NAME_ACTIONTYPE, remindMessage.getAction_type());
+        values.put(REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE, remindMessage.getAction_title());
+        values.put(REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA, remindMessage.getAction_extra());
+        long result = db.insert(REMIND_MESSAGE_TABLE_NAME, null, values);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    boolean insertSimpleMessage(int id, SimpleMessage simpleMessage) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(SIMPLE_MESSAGE_COLUMN_NAME_ID, id);
+        values.put(SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING, (simpleMessage.isWarning()?1:0));
+        long result = db.insert(SIMPLE_MESSAGE_TABLE_NAME, null, values);
         if (result == -1){
             return false;
         } else {
@@ -347,8 +455,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT  *" +
                             " FROM (SELECT * " +
-                                    " FROM " + MESSAGE_TABLE_NAME +
-                                    " WHERE " + MESSAGE_COLUMN_NAME_TOPICID + " = '" + topicID + "'" +
+                                    " FROM " + EVENT_MESSAGE_TABLE_NAME + " e, " + REMIND_MESSAGE_TABLE_NAME + " r, " + SIMPLE_MESSAGE_TABLE_NAME + " s, " + MESSAGE_TABLE_NAME + " m " +
+                                    " WHERE m.id == e.id and m.id == r.id and m.id == s.id and m.topicid = " + topicID +
                                     " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC" +
                                     " LIMIT 30 OFFSET " + loadMoreFrom + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
@@ -356,35 +464,69 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
-                MessageDetail messageDetail = new MessageDetail();
-                messageDetail.setType(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_TYPE)));
-                messageDetail.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
-                messageDetail.setTitle(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TITLE)));
-                messageDetail.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
-                messageDetail.setEventDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_EVENTDATETIME)));
-                messageDetail.setImageURL(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_IMAGEURL)));
-                messageDetail.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_DESCRIPTION)));
-                messageDetail.setAction_type(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTYPE)));
-                messageDetail.setAction_title(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONTITLE)));
-                messageDetail.setAction_extra(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
-                messageDetail.setWarning(Boolean.parseBoolean(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_ISWARNING))));
-                messageDetail.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
-                User user = getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
-                messageDetail.setUser(user);
-
-                arrMessDetail.add(messageDetail);
+                switch (c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_TYPE))){
+                    case 1:{
+                        EventMessage eventMessage = new EventMessage();
+                        eventMessage.setType(1);
+                        eventMessage.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
+                        eventMessage.setTitle(c.getString(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_TITLE)));
+                        eventMessage.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
+                        eventMessage.setEventDatetime(c.getLong(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_EVENTDATETIME)));
+                        eventMessage.setImageURL(c.getString(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_IMAGEURL)));
+                        eventMessage.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TEXT)));
+                        eventMessage.setAction_type(c.getInt(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_ACTIONTYPE)));
+                        eventMessage.setAction_title(c.getString(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_ACTIONTITLE)));
+                        eventMessage.setAction_extra(c.getString(c.getColumnIndex(EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
+                        eventMessage.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
+                        User user = getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
+                        eventMessage.setUser(user);
+                        arrMessDetail.add(eventMessage);
+                        break;
+                    }
+                    case 2:{
+                        RemindMessage remindMessage = new RemindMessage();
+                        remindMessage.setType(2);
+                        remindMessage.setId(c.getInt(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_ID)));
+                        remindMessage.setTitle(c.getString(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_TITLE)));
+                        remindMessage.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
+                        remindMessage.setEventDatetime(c.getLong(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_REMINDATETIME)));
+                        remindMessage.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TEXT)));
+                        remindMessage.setAction_type(c.getInt(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_ACTIONTYPE)));
+                        remindMessage.setAction_title(c.getString(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE)));
+                        remindMessage.setAction_extra(c.getString(c.getColumnIndex(REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA)));
+                        remindMessage.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
+                        User user = getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
+                        remindMessage.setUser(user);
+                        arrMessDetail.add(remindMessage);
+                        break;
+                    }
+                    case 3:
+                    case 4:{
+                        SimpleMessage simpleMessage = new SimpleMessage();
+                        simpleMessage.setType(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_TYPE)));
+                        simpleMessage.setId(c.getInt(c.getColumnIndex(MESSAGE_COLUMN_NAME_ID)));
+                        simpleMessage.setDatetime(c.getLong(c.getColumnIndex(MESSAGE_COLUMN_NAME_DATETIME)));
+                        simpleMessage.setText(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TEXT)));
+                        simpleMessage.setTopicID(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_TOPICID)));
+                        User user = getUser(c.getString(c.getColumnIndex(MESSAGE_COLUMN_NAME_SENDERID)));
+                        simpleMessage.setUser(user);
+                        simpleMessage.setWarning((c.getInt(c.getColumnIndex(SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING)) == 1)?true:false);
+                        arrMessDetail.add(simpleMessage);
+                        break;
+                    }
+                }
             } while (c.moveToNext());
         }
         return arrMessDetail;
     }
 
-    public boolean deleteMessage(int id){
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
-    }
-
-    public boolean deleteAllMessage(String senderID, String topicID){
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "='" + senderID + "'" + " and " + MESSAGE_COLUMN_NAME_TOPICID + "='" + topicID + "'" , null) > 0;
-    }
+//    public boolean deleteMessage(int id){
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
+//    }
+//
+//    public boolean deleteAllMessage(String senderID, String topicID){
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "='" + senderID + "'" + " and " + MESSAGE_COLUMN_NAME_TOPICID + "='" + topicID + "'" , null) > 0;
+//    }
 }
