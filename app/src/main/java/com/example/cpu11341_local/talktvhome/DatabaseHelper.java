@@ -458,8 +458,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
         String selectQuery = "SELECT *" +
                             " FROM (SELECT * " +
-                                    " FROM message m, eventmessage e, remindmessage r, simplemessage s" +
-                                    " WHERE (m.id = e.id or m.id = r.id or m.id = s.id) and m.topicid = '" + topicID + "' " +
+                                    " FROM message m LEFT JOIN eventmessage e on m.id = e.id LEFT JOIN remindmessage r on m.id = r.id LEFT JOIN simplemessage s on m.id = s.id" +
+                                    " WHERE m.topicid = '" + topicID + "' " +
                                     " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC" +
                                     " LIMIT 30 OFFSET " + loadMoreFrom + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
