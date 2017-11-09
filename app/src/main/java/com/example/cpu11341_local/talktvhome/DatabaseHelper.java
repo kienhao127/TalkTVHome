@@ -51,7 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE = "remindactiontitle";
     public static final String REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA = "remindactionextra";
 
-    public static final String SIMPLE_MESSAGE_TABLE_NAME = "simplemassage";
+    public static final String SIMPLE_MESSAGE_TABLE_NAME = "simplemessage";
     public static final String SIMPLE_MESSAGE_COLUMN_NAME_ID = "id";
     public static final String SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING = "iswarning";
 
@@ -73,11 +73,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String MESSAGE_TABLE_CREATE =
             "CREATE TABLE " + MESSAGE_TABLE_NAME + " (" +
                     MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    MESSAGE_COLUMN_NAME_TYPE + "INTEGER, " +
-                    MESSAGE_COLUMN_NAME_SENDERID + "TEXT, " +
-                    MESSAGE_COLUMN_NAME_DATETIME + "TEXT, " +
-                    MESSAGE_COLUMN_NAME_TEXT + "TEXT, " +
-                    MESSAGE_COLUMN_NAME_TOPICID + "TEXT" +
+                    MESSAGE_COLUMN_NAME_TYPE + " INTEGER, " +
+                    MESSAGE_COLUMN_NAME_SENDERID + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_DATETIME + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_TEXT + " TEXT, " +
+                    MESSAGE_COLUMN_NAME_TOPICID + " TEXT" +
                     ");";
 
     private static final String EVENT_MESSAGE_TABLE_CREATE =
@@ -88,7 +88,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     EVENT_MESSAGE_COLUMN_NAME_IMAGEURL + " TEXT, " +
                     EVENT_MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
                     EVENT_MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
-                    EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT" +
+                    EVENT_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT, " +
+                    "FOREIGN KEY (id) REFERENCES message(id) " +
                     ");";
 
     private static final String REMIND_MESSAGE_TABLE_CREATE =
@@ -98,13 +99,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     REMIND_MESSAGE_COLUMN_NAME_REMINDATETIME + " TEXT, " +
                     REMIND_MESSAGE_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
                     REMIND_MESSAGE_COLUMN_NAME_ACTIONTITLE + " TEXT, " +
-                    REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT" +
+                    REMIND_MESSAGE_COLUMN_NAME_ACTIONEXTRA + " TEXT, " +
+                    "FOREIGN KEY (id) REFERENCES message(id) " +
                     ");";
 
     private static final String SIMPLE_MESSAGE_TABLE_CREATE =
             "CREATE TABLE " + SIMPLE_MESSAGE_TABLE_NAME + " (" +
                     SIMPLE_MESSAGE_COLUMN_NAME_ID + " INTEGER PRIMARY KEY, " +
-                    SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER" +
+                    SIMPLE_MESSAGE_COLUMN_NAME_ISWARNING + " INTEGER, " +
+                    "FOREIGN KEY (id) REFERENCES message(id) " +
                     ");";
 
     private static final String TOPIC_TABLE_CREATE =
@@ -374,8 +377,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (SQLiteException e){
 
         }
-        long result = db.insert(EVENT_MESSAGE_TABLE_NAME, null, values);
-        String selectQuery = "select last_insert_rowid()";
+        long result = db.insert(MESSAGE_TABLE_NAME, null, values);
+        String selectQuery = "SELECT MAX(id) FROM " + MESSAGE_TABLE_NAME;
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             int lastID = c.getInt(0);
@@ -453,10 +456,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<MessageDetail> getListMessage(String topicID, int loadMoreFrom){
         ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
-        String selectQuery = "SELECT  *" +
+        String selectQuery = "SELECT *" +
                             " FROM (SELECT * " +
-                                    " FROM " + EVENT_MESSAGE_TABLE_NAME + " e, " + REMIND_MESSAGE_TABLE_NAME + " r, " + SIMPLE_MESSAGE_TABLE_NAME + " s, " + MESSAGE_TABLE_NAME + " m " +
-                                    " WHERE m.id == e.id and m.id == r.id and m.id == s.id and m.topicid = " + topicID +
+                                    " FROM message m, eventmessage e, remindmessage r, simplemessage s" +
+                                    " WHERE (m.id = e.id or m.id = r.id or m.id = s.id) and m.topicid = '" + topicID + "' " +
                                     " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " DESC" +
                                     " LIMIT 30 OFFSET " + loadMoreFrom + ")" +
                             " ORDER BY " + MESSAGE_COLUMN_NAME_DATETIME + " ASC";
