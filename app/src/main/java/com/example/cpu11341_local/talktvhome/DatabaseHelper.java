@@ -523,13 +523,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrMessDetail;
     }
 
-//    public boolean deleteMessage(int id){
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null) > 0;
-//    }
-//
-//    public boolean deleteAllMessage(String senderID, String topicID){
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        return db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_SENDERID + "='" + senderID + "'" + " and " + MESSAGE_COLUMN_NAME_TOPICID + "='" + topicID + "'" , null) > 0;
-//    }
+    public void deleteMessage(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_ID + "=" + id, null);
+        db.delete(EVENT_MESSAGE_TABLE_NAME, EVENT_MESSAGE_COLUMN_NAME_ID + "=" + id, null);
+        db.delete(REMIND_MESSAGE_TABLE_NAME, REMIND_MESSAGE_COLUMN_NAME_ID + "=" + id, null);
+        db.delete(SIMPLE_MESSAGE_TABLE_NAME, SIMPLE_MESSAGE_COLUMN_NAME_ID + "=" + id, null);
+    }
+
+    public void deleteAllMessage(String topicID){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String queryString = "DELETE FROM " + EVENT_MESSAGE_TABLE_NAME + " WHERE id IN (SELECT m.id FROM message m WHERE m.topicid = '" + topicID + "')";
+        db.execSQL(queryString);
+        queryString = "DELETE FROM " + REMIND_MESSAGE_TABLE_NAME + " WHERE id IN (SELECT m.id FROM message m WHERE m.topicid = '" + topicID + "')";
+        db.execSQL(queryString);
+        queryString = "DELETE FROM " + SIMPLE_MESSAGE_TABLE_NAME + " WHERE id IN (SELECT m.id FROM message m WHERE m.topicid = '" + topicID + "')";
+        db.execSQL(queryString);
+        db.delete(MESSAGE_TABLE_NAME, MESSAGE_COLUMN_NAME_TOPICID + "='" + topicID + "'" , null);
+    }
 }

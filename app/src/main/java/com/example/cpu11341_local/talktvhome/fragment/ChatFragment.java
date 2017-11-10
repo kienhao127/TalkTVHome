@@ -291,27 +291,27 @@ public class ChatFragment extends Fragment {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                loadMoreFrom--;
-//                Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
-//                relativeLayoutContextMenu.setVisibility(View.GONE);
-//                relativeLayoutContextMenu.startAnimation(context_menu_exit);
-//                boolean isDeleted = MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
-//                if (isDeleted) {
-//                    Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
-//                }
-//                arrMessDetail.remove(selectedPosition);
-//                if (arrMessDetail.size() == 0){
-//                    MessageDataManager.getInstance().deleteTopic(topicID, getContext());
-//                    textViewOver.setVisibility(View.VISIBLE);
-//                    adapter.notifyDataSetChanged();
-//                    return;
-//                }
-//                if (selectedPosition == arrMessDetail.size()){
-//                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
-//                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
-//                    MessageDataManager.getInstance().updateTopic(topic, getContext());
-//                }
-//                adapter.notifyDataSetChanged();
+                loadMoreFrom--;
+                Animation context_menu_exit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
+                relativeLayoutContextMenu.setVisibility(View.GONE);
+                relativeLayoutContextMenu.startAnimation(context_menu_exit);
+
+                MessageDataManager.getInstance().deleteMessage(arrMessDetail.get(selectedPosition).getId(), getContext());
+                Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
+
+                arrMessDetail.remove(selectedPosition);
+                if (arrMessDetail.size() == 0){
+                    MessageDataManager.getInstance().deleteTopic(topicID, getContext());
+                    textViewOver.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
+                    return;
+                }
+                if (selectedPosition == arrMessDetail.size()){
+                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
+                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
+                    MessageDataManager.getInstance().updateTopic(topic, getContext());
+                }
+                adapter.notifyDataSetChanged();
             }
         });
 

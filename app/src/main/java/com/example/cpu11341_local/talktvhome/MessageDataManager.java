@@ -90,9 +90,9 @@ public class MessageDataManager {
         return arrMessageDetailOfSender;
     }
 
-//    public boolean deleteMessage(int id, Context context) {
-//        return DatabaseHelper.getInstance(context).deleteMessage(id);
-//    }
+    public void deleteMessage(int id, Context context) {
+        DatabaseHelper.getInstance(context).deleteMessage(id);
+    }
 
     public Topic insertMessage(MessageDetail messageDetail, Context context) {
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
@@ -171,35 +171,27 @@ public class MessageDataManager {
     }
 
     public boolean deleteTopic(String topicID, Context context) {
-//        Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
-//        if (topicID.equals("-1")) {
-//            for (Topic t : DatabaseHelper.getInstance(context).getListTopic(false)) {
-//                if (!t.isFollow()) {
-//                    for (String str : splitTopicID(t.getTopicID())) {
-//                        DatabaseHelper.getInstance(context).deleteAllMessage(str, t.getTopicID());
-//                    }
-//                    DatabaseHelper.getInstance(context).deleteTopic(t.getTopicID());
-//                }
-//            }
-//            return DatabaseHelper.getInstance(context).deleteTopic("-1");
-//        }
-//        if (topic.isFollow()) {
-//            for (String str : splitTopicID(topicID)) {
-//                DatabaseHelper.getInstance(context).deleteAllMessage(str, topicID);
-//            }
-//            return DatabaseHelper.getInstance(context).deleteTopic(topicID);
-//        }
-//        if (!topic.isFollow()) {
-//            for (String str : splitTopicID(topicID)) {
-//                DatabaseHelper.getInstance(context).deleteAllMessage(str, topicID);
-//            }
-//            DatabaseHelper.getInstance(context).deleteTopic(topicID);
-//            if (DatabaseHelper.getInstance(context).isEsixtUnfollowTopic()) {
-//                return true;
-//            }
-//        }
-//        return DatabaseHelper.getInstance(context).deleteTopic("-1");
-        return true;
+        Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
+        if (topicID.equals("-1")) {
+            for (Topic t : DatabaseHelper.getInstance(context).getListTopic(false)) {
+                DatabaseHelper.getInstance(context).deleteAllMessage(t.getTopicID());
+                DatabaseHelper.getInstance(context).deleteTopic(t.getTopicID());
+            }
+            return DatabaseHelper.getInstance(context).deleteTopic("-1");
+        }
+        if (topic.isFollow()) {
+            DatabaseHelper.getInstance(context).deleteAllMessage(topicID);
+            return DatabaseHelper.getInstance(context).deleteTopic(topicID);
+        }
+        if (!topic.isFollow()) {
+            DatabaseHelper.getInstance(context).deleteAllMessage(topicID);
+            DatabaseHelper.getInstance(context).deleteTopic(topicID);
+            updateUnfollowTopic(context);
+            if (DatabaseHelper.getInstance(context).isEsixtUnfollowTopic()) {
+                return true;
+            }
+        }
+        return DatabaseHelper.getInstance(context).deleteTopic("-1");
     }
 
     //update unfollowtopic sau khi delete topic

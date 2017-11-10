@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, delay);
 //            }
 //        }, delay);
-//
+
 //        EventMessage eventMessage = new EventMessage(1, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
 //                "Mô tả", Calendar.getInstance().getTimeInMillis(), "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", 1, "Xem chi tiết", "action_extra");
 //        eventMessage.setTopicID("0");
@@ -132,35 +132,48 @@ public class MainActivity extends AppCompatActivity {
 //        simpleMessage.setTopicID("0");
 //        InsertMessageTask insertMessageTask3 = new InsertMessageTask();
 //        insertMessageTask3.execute(simpleMessage);
-//
-//        for (int i=0; i<5; i++) {
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < 5; i++) {
 //            SimpleMessage simpleMessage1 = new SimpleMessage(3, new User("1", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"),
 //                    String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
-//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(simpleMessage1);
 //        }
-//
-//        for (int i=0; i<5; i++) {
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        for (int i = 0; i < 5; i++) {
 //            SimpleMessage simpleMessage1 = new SimpleMessage(3, new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
 //                    String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
-//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(simpleMessage1);
 //        }
+//        try {
+//            Thread.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 //
-//        for (int i=0; i<5; i++) {
+//        for (int i = 0; i < 5; i++) {
 //            SimpleMessage simpleMessage1 = new SimpleMessage(3, new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
 //                    String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
-//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            simpleMessage1.setTopicID(simpleMessage1.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(simpleMessage1);
 //        }
-//
+
 //        for (int i=3; i<150; i++) {
 //            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
 //                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-//            messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//            messageDetail.setTopicID(messageDetail.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(messageDetail);
 //            try {
