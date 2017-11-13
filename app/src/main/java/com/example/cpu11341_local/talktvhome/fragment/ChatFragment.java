@@ -4,11 +4,16 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.icu.util.Calendar;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,7 +39,9 @@ import android.widget.Toast;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
+import com.example.cpu11341_local.talktvhome.adapter.EmoticonsRecyclerAdapter;
 import com.example.cpu11341_local.talktvhome.adapter.MessageDetailRecyclerAdapter;
+import com.example.cpu11341_local.talktvhome.bannerview.ViewPagerAdapter;
 import com.example.cpu11341_local.talktvhome.data.EventMessage;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.RemindMessage;
@@ -60,6 +67,7 @@ public class ChatFragment extends Fragment {
     String toolbarTitle;
     String topicID, userID;
     ImageView imageViewSend;
+    ImageView imageViewEmoticon;
     ArrayList<MessageDetail> arrMessDetail = new ArrayList<>();
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
@@ -72,6 +80,11 @@ public class ChatFragment extends Fragment {
     Topic topic = new Topic();
     RelativeLayout relativeLayoutFollowNoti;
     TalkTextView textViewFollow;
+    TypedArray emoticons_icontitle;
+    ArrayList<Integer> arrEmoticonsCategory = new ArrayList<>();
+    ViewPager emoticonsViewPager;
+    EmoticonsRecyclerAdapter emoticonsRecyclerAdapter;
+    TabLayout tabLayout;
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getName();
@@ -88,9 +101,24 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.chat_fragment, container, false);
+        emoticons_icontitle = getResources().obtainTypedArray(R.array.emoticons_icontitle);
+
+        arrEmoticonsCategory.add(R.array.emoticons_smiley);
+        arrEmoticonsCategory.add(R.array.emoticons_drink);
+        arrEmoticonsCategory.add(R.array.emoticons_animal);
+
+        emoticonsViewPager = (ViewPager) view.findViewById(R.id.emoticons_pager);
+        emoticonsViewPager.setOffscreenPageLimit(3);
+        setupViewPager(emoticonsViewPager);
+
+        tabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+        tabLayout.setupWithViewPager(emoticonsViewPager);
+        setupTabIcons();
+
         textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
         textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
+        imageViewEmoticon = (ImageView) view.findViewById(R.id.imageViewEmoji);
         toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         editText = (EditText) view.findViewById(R.id.editText);
@@ -126,8 +154,18 @@ public class ChatFragment extends Fragment {
                     imageViewSend.setVisibility(View.GONE);
                 }
             }
+
             @Override
             public void afterTextChanged(Editable s) {
+            }
+        });
+
+        editText.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                tabLayout.setVisibility(View.GONE);
+                emoticonsViewPager.setVisibility(View.GONE);
             }
         });
 
@@ -139,10 +177,20 @@ public class ChatFragment extends Fragment {
                         Calendar.getInstance().getTimeInMillis(), false);
                 messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
-                if (MessageDataManager.getInstance().dataListener != null){
+                if (MessageDataManager.getInstance().dataListener != null) {
                     MessageDataManager.getInstance().dataListener.onDataChanged(wrapper.getTopic(), wrapper.getMessageDetail());
                 }
                 editText.setText("");
+            }
+        });
+
+        imageViewEmoticon.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                hideKeyboard(v);
+                tabLayout.setVisibility(View.VISIBLE);
+                emoticonsViewPager.setVisibility(View.VISIBLE);
             }
         });
 
@@ -189,11 +237,11 @@ public class ChatFragment extends Fragment {
         adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (arrMessDetail.get(position).getType() == 1){
+                if (arrMessDetail.get(position).getType() == 1) {
                     Toast.makeText(getContext(), "Event" + ((EventMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (arrMessDetail.get(position).getType() == 2){
+                if (arrMessDetail.get(position).getType() == 2) {
                     Toast.makeText(getContext(), "Remind" + ((RemindMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -203,7 +251,7 @@ public class ChatFragment extends Fragment {
                     Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
                     textViewDate.setVisibility(View.GONE);
                     textViewDate.startAnimation(showOff);
-                    if (arrMessDetail.get(position).getType()==4){
+                    if (arrMessDetail.get(position).getType() == 4) {
                         textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
                     } else {
                         textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
@@ -214,7 +262,7 @@ public class ChatFragment extends Fragment {
                     textViewDate.setVisibility(View.VISIBLE);
                     textViewDate.startAnimation(showUp);
                     textViewMessDetail.startAnimation(slide_down);
-                    if (arrMessDetail.get(position).getType()==4) {
+                    if (arrMessDetail.get(position).getType() == 4) {
                         textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
                     } else {
                         textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
@@ -252,15 +300,18 @@ public class ChatFragment extends Fragment {
 
         messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             float x1, x2;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     x1 = event.getX();
                 }
-                if (event.getAction() == MotionEvent.ACTION_UP){
+                if (event.getAction() == MotionEvent.ACTION_UP) {
                     x2 = event.getX();
-                    if (x1 == x2){
+                    if (x1 == x2) {
                         hideKeyboard(v);
+                        tabLayout.setVisibility(View.GONE);
+                        emoticonsViewPager.setVisibility(View.GONE);
                     }
                 }
                 return false;
@@ -300,15 +351,15 @@ public class ChatFragment extends Fragment {
                 Toast.makeText(getContext(), "Đã xóa", Toast.LENGTH_LONG).show();
 
                 arrMessDetail.remove(selectedPosition);
-                if (arrMessDetail.size() == 0){
+                if (arrMessDetail.size() == 0) {
                     MessageDataManager.getInstance().deleteTopic(topicID, getContext());
                     textViewOver.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
                     return;
                 }
-                if (selectedPosition == arrMessDetail.size()){
-                    topic.setLastMess(arrMessDetail.get(selectedPosition-1).getText());
-                    topic.setDate(arrMessDetail.get(selectedPosition-1).getDatetime());
+                if (selectedPosition == arrMessDetail.size()) {
+                    topic.setLastMess(arrMessDetail.get(selectedPosition - 1).getText());
+                    topic.setDate(arrMessDetail.get(selectedPosition - 1).getDatetime());
                     MessageDataManager.getInstance().updateTopic(topic, getContext());
                 }
                 adapter.notifyDataSetChanged();
@@ -319,7 +370,7 @@ public class ChatFragment extends Fragment {
     }
 
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
@@ -327,7 +378,7 @@ public class ChatFragment extends Fragment {
     public void onResume() {
         super.onResume();
         editText.clearFocus();
-        if (!isResume){
+        if (!isResume) {
             LoadDataTask dataTask = new LoadDataTask();
             dataTask.execute();
         }
@@ -363,7 +414,7 @@ public class ChatFragment extends Fragment {
                     messDetailRecyclerView.scrollToPosition(arrMessDetail.size() - 1);
                     textViewLoading.setVisibility(View.GONE);
                     isResume = true;
-                    if (arrMessDetail.size() == 0){
+                    if (arrMessDetail.size() == 0) {
                         textViewOver.setVisibility(View.VISIBLE);
                     } else {
                         textViewOver.setVisibility(View.GONE);
@@ -395,21 +446,21 @@ public class ChatFragment extends Fragment {
             arrMessDetail.remove(0);
             adapter.notifyItemRemoved(0);
             arrMessDetail.addAll(0, result);
-            adapter.notifyItemRangeInserted(0, result.size()-1);
+            adapter.notifyItemRangeInserted(0, result.size() - 1);
             adapter.setLoaded();
         }
     }
 
-    private class LoadMessageTask extends AsyncTask<MessageDetail, Void, Void>{
+    private class LoadMessageTask extends AsyncTask<MessageDetail, Void, Void> {
         @Override
         protected Void doInBackground(MessageDetail... messageDetails) {
             arrMessDetail.add(messageDetails[0]);
-            if (messageDetails[0].getTopicID().equals(topicID)){
+            if (messageDetails[0].getTopicID().equals(topicID)) {
                 topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
                 topic.setHasNewMessage(false);
                 MessageDataManager.getInstance().updateTopic(topic, getContext());
                 Topic unfollowTopic = MessageDataManager.getInstance().getTopic("-1", getContext());
-                if (!topic.isFollow()){
+                if (!topic.isFollow()) {
                     unfollowTopic.setHasNewMessage(false);
                     MessageDataManager.getInstance().updateTopic(unfollowTopic, getContext());
                 }
@@ -420,21 +471,63 @@ public class ChatFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (arrMessDetail.size() == 0){
+            if (arrMessDetail.size() == 0) {
                 textViewOver.setVisibility(View.VISIBLE);
             } else {
                 textViewOver.setVisibility(View.GONE);
             }
             long t = System.currentTimeMillis();
             if (adapter != null) {
-                adapter.notifyItemRangeChanged(arrMessDetail.size()-2,2);
+                adapter.notifyItemRangeChanged(arrMessDetail.size() - 2, 2);
                 adapter.notifyItemInserted(arrMessDetail.size());
             }
-            if (arrMessDetail.get(arrMessDetail.size()-1).getType() == 4){
+            if (arrMessDetail.get(arrMessDetail.size() - 1).getType() == 4) {
                 messDetailRecyclerView.smoothScrollToPosition(arrMessDetail.size());
             }
             t = System.currentTimeMillis() - t;
             Log.i("Time ", String.valueOf(t));
         }
+    }
+
+    private class CustomAdapter extends FragmentPagerAdapter {
+        private final ArrayList<Fragment> mFragmentList = new ArrayList<>();
+
+        public CustomAdapter(FragmentManager supportFragmentManager) {
+            super(supportFragmentManager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return emoticons_icontitle.length();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            // return null to display only the icon
+            return null;
+        }
+
+        public void addFrag(Fragment fragment) {
+            mFragmentList.add(fragment);
+        }
+    }
+
+    private void setupTabIcons() {
+        for (int i = 0; i < emoticons_icontitle.length(); i++) {
+            tabLayout.getTabAt(i).setIcon(emoticons_icontitle.getDrawable(i));
+        }
+    }
+
+    private void setupViewPager(ViewPager viewPager) {
+        CustomAdapter adapter = new CustomAdapter(getFragmentManager());
+        for (int i = 0; i < arrEmoticonsCategory.size(); i++) {
+            adapter.addFrag(new EmoticonsFragment(arrEmoticonsCategory.get(i)));
+        }
+        viewPager.setAdapter(adapter);
     }
 }

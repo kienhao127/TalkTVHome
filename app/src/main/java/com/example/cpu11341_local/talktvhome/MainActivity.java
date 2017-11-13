@@ -81,17 +81,17 @@ public class MainActivity extends AppCompatActivity {
 
 //        handler.postDelayed(new Runnable(){
 //            int i=0;
-//            public void run(){
+//            public void run() {
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
-//                MessageDetail messageDetail = new MessageDetail(3, MessageDataManager.getInstance().getUser("3", getBaseContext()),
-//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
-//                messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
+//                SimpleMessage simpleMessage1 = new SimpleMessage(3, new User("3", "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
+//                        String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
+//                simpleMessage1.setTopicID(simpleMessage1.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //                i++;
 //
 //                InsertMessageTask insertMessageTask = new InsertMessageTask();
-//                insertMessageTask.execute(messageDetail);
+//                insertMessageTask.execute(simpleMessage1);
 //
 //                handler.postDelayed(this, delay);
 //            }
