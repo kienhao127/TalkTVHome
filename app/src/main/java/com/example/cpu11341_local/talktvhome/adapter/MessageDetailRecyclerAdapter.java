@@ -1,12 +1,17 @@
 package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.icu.text.DateFormat;
 import android.icu.text.SimpleDateFormat;
 import android.net.ParseException;
 import android.provider.ContactsContract;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +40,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 /**
  * Created by CPU11341-local on 9/5/2017.
@@ -112,7 +118,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         .apply(RequestOptions.errorOf(R.drawable.grid_item
                         ))
                         .into(eventHolder.imageViewEvent);
-                eventHolder.textViewDes.setText(arrMessDetail.get(position).getText());
+
+                eventHolder.textViewDes.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case 2:
@@ -120,7 +127,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((RemindMessage)arrMessDetail.get(position)).getEventDatetime()));
                 remindHolder.textViewTitle.setText(((RemindMessage)arrMessDetail.get(position)).getTitle());
-                remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
+                Spanned spRemind = Html.fromHtml(arrMessDetail.get(position).getText());
+                remindHolder.textViewDes.setText(spRemind);
                 remindHolder.textViewViewDetail.setText(((RemindMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case 3:
@@ -163,7 +171,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(messageHolder.imageViewAvatar);
                     messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                Spanned spMessage = Html.fromHtml(arrMessDetail.get(position).getText());
+                messageHolder.textViewMessDetail.setText(spMessage);
                 messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
                 if (messageHolder.textViewMessDetail.getHeight() < (int) pxFromDp(context, 50)){
                     messageHolder.textViewMessDetail.setHeight((int) pxFromDp(context, 50));
@@ -209,7 +218,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(myMessageHolder.imageViewAvatar);
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                myMessageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+                myMessageHolder.textViewMessDetail.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
 
                 if (((SimpleMessage)arrMessDetail.get(position)).isWarning()) {

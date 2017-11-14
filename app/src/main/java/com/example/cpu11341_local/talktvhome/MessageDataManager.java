@@ -37,7 +37,6 @@ import java.util.Map;
 public class MessageDataManager {
     public DataListener dataListener;
     Map<String, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
-    ArrayList<String> followID = new ArrayList<>();
     private static MessageDataManager instance = null;
 
     protected MessageDataManager() throws ParseException {
@@ -64,8 +63,6 @@ public class MessageDataManager {
 
 //        linkedHashMapTopic.put(0, new Topic("https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV", "Nội dung thông báo", dateFormat.parse("18/08/17 10:47:03").getTime(), 1, 0, false));
 //        linkedHashMapTopic.put(1, new Topic("http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi", "Tôi là Thúy Chi", dateFormat.parse("1/09/17 11:47:04").getTime(), 3, 1, false));
-        followID.add("0");
-        followID.add("1");
     }
 
     public static MessageDataManager getInstance() {
@@ -126,7 +123,7 @@ public class MessageDataManager {
             // Cập nhật lại unfollowTopic
             // Tại mới nếu unfollowTopic chưa có.
             topic = new Topic(idol.getAvatar(), idol.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
-            if (isFollow(topic.getTopicID())) {
+            if (isFollow(topic.getTopicID(), context)) {
                 topic.setFollow(true);
                 updateTopic(topic, context);
             } else {
@@ -234,20 +231,21 @@ public class MessageDataManager {
         this.dataListener = dataListener;
     }
 
-    public boolean isFollow(String topicID) {
-        String senderID = splitTopicID(topicID)[0];
-        for (String id : followID) {
-            if (senderID.equals(id)) {
-                return true;
-            }
+    public boolean isFollow(String topicID, Context context) {
+        Topic topic = getTopic(topicID, context);
+        if (topic.getName()!=null && topic.isFollow()){
+            return true;
         }
+        String idolID = splitTopicID(topicID)[0];
+        //Thiếu hàm gọi lên server kiểm tra idol đã được theo dõi chưa
+        //Nếu có return true;
+        //Ngược lại, return false;
         return false;
     }
 
     //-------------ORTHER
     public void followIdol(String IdolID, String userID, Context context) {
         //Gọi lên server, userID theo dõi idolID
-        followID.add(IdolID);
         Topic removedTopic = DatabaseHelper.getInstance(context).getTopic(IdolID + "_" + userID);
         if (removedTopic != null) {
             removedTopic.setFollow(true);

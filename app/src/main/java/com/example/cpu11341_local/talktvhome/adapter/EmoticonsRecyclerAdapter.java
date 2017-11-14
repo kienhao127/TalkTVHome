@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.cpu11341_local.talktvhome.R;
+import com.example.cpu11341_local.talktvhome.fragment.EmoticonsFragment;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,15 +23,16 @@ import java.util.ArrayList;
 public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecyclerAdapter.RecyclerViewHolder> {
     private static ArrayList<String> arrEmoticons = new ArrayList<>();
     private Context context;
-    private OnItemClickListener mItemClickListener;
+    private EmoticonClickListener emoticonClickListener;
 
     public EmoticonsRecyclerAdapter(Context context){
         this.context = context;
     }
 
-    public EmoticonsRecyclerAdapter(Context context, ArrayList<String> arrEmoticons){
+    public EmoticonsRecyclerAdapter(Context context, ArrayList<String> arrEmoticons, EmoticonClickListener emoticonClickListener){
         this.arrEmoticons = arrEmoticons;
         this.context = context;
+        this.emoticonClickListener = emoticonClickListener;
     }
 
     @Override
@@ -56,19 +58,12 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
             e.printStackTrace();
         }
 
-        //BitmapFactory.Options options = new BitmapFactory.Options();
-        //options.inSampleSize = chunks;
-
         Bitmap temp = BitmapFactory.decodeStream(in ,null ,null);
         return temp;
     }
 
-    public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
-    }
-
-    public void SetOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
+    public interface EmoticonClickListener {
+        public void onEmoticonItemClick(View view, final String index);
     }
 
     @Override
@@ -81,13 +76,13 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
         public RecyclerViewHolder(View view){
             super(view);
             emoticon = (ImageView) view.findViewById(R.id.emoticonsItem);
-            view.setOnClickListener(this);
+            emoticon.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            if (mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getAdapterPosition());
+            if (emoticonClickListener != null) {
+                emoticonClickListener.onEmoticonItemClick(v, arrEmoticons.get(getAdapterPosition()));
             }
         }
     }

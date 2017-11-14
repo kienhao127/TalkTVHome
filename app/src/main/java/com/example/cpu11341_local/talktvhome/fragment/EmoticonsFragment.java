@@ -21,12 +21,14 @@ import java.util.ArrayList;
 public class EmoticonsFragment extends Fragment {
     int emoticonsCategory;
     RecyclerView recyclerView;
-    RecyclerView.Adapter adapter;
+    EmoticonsRecyclerAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     TypedArray emotions;
+    EmoticonsRecyclerAdapter.EmoticonClickListener emoticonClickListener;
 
-    public EmoticonsFragment (int emoticonsCategory){
+    public EmoticonsFragment (int emoticonsCategory, EmoticonsRecyclerAdapter.EmoticonClickListener emoticonClickListener){
         this.emoticonsCategory = emoticonsCategory;
+        this.emoticonClickListener = emoticonClickListener;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class EmoticonsFragment extends Fragment {
         for (short i = 0; i < emotions.length(); i++) {
             paths.add(emotions.getString(i) + ".png");
         }
-        adapter = new EmoticonsRecyclerAdapter(getContext(), paths);
+        adapter = new EmoticonsRecyclerAdapter(getContext(), paths, emoticonClickListener);
         layoutManager = new GridLayoutManager(getContext(), 7);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);

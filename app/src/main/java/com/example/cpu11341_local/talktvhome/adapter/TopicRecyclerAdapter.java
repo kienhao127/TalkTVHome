@@ -34,7 +34,6 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private Context context;
     private OnItemClickListener mItemClickListener;
-    private OnItemLongClickListener mItemLongClickListener;
     ArrayList<Topic> arrTopic = new ArrayList<>();
     private int position;
     boolean isLoading;
@@ -130,14 +129,6 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public void SetOnItemClickListener(final TopicRecyclerAdapter.OnItemClickListener mItemClickListener) {
         this.mItemClickListener = mItemClickListener;
-    }
-
-    public interface OnItemLongClickListener {
-        public void onItemLongClick(View view, int position);
-    }
-
-    public void SetOnItemLongClickListener(final TopicRecyclerAdapter.OnItemLongClickListener mItemLongClickListener) {
-        this.mItemLongClickListener = mItemLongClickListener;
     }
 
     @Override

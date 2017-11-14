@@ -5,10 +5,13 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.icu.util.Calendar;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +22,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.Html;
+import android.text.Html.ImageGetter;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -51,12 +60,13 @@ import com.example.cpu11341_local.talktvhome.data.Wrapper;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * Created by CPU11341-local on 9/5/2017.
  */
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.EmoticonClickListener {
 
     RecyclerView messDetailRecyclerView;
     MessageDetailRecyclerAdapter adapter;
@@ -129,7 +139,7 @@ public class ChatFragment extends Fragment {
         relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
         textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
 
-        if (!MessageDataManager.getInstance().isFollow(topicID)) {
+        if (!MessageDataManager.getInstance().isFollow(topicID, getContext())) {
             relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
             textViewFollow.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -173,7 +183,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MessageDetail messageDetail = null;
-                messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), editText.getText().toString().trim(),
+                messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), editText.getText().toString(),
                         Calendar.getInstance().getTimeInMillis(), false);
                 messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
@@ -526,8 +536,27 @@ public class ChatFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
         CustomAdapter adapter = new CustomAdapter(getFragmentManager());
         for (int i = 0; i < arrEmoticonsCategory.size(); i++) {
-            adapter.addFrag(new EmoticonsFragment(arrEmoticonsCategory.get(i)));
+            adapter.addFrag(new EmoticonsFragment(arrEmoticonsCategory.get(i), this));
         }
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onEmoticonItemClick(View v, String index){
+        ImageView imageView = (ImageView) v.findViewById(R.id.emoticonsItem);
+        final Drawable drawable = imageView.getDrawable();
+        addImageBetweentext(drawable, index);
+    }
+    private void addImageBetweentext(Drawable drawable, String index) {
+        drawable .setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+
+        int selectionCursor = editText.getSelectionStart();
+        editText.getText().insert(selectionCursor, index);
+        selectionCursor = editText.getSelectionStart();
+
+        SpannableStringBuilder builder = new SpannableStringBuilder(editText.getText());
+        builder.setSpan(new ImageSpan(drawable), selectionCursor - index.length(), selectionCursor, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        editText.setText(builder);
+        editText.setSelection(selectionCursor);
     }
 }
