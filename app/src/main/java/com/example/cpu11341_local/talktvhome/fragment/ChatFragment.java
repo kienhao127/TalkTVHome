@@ -183,7 +183,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             @Override
             public void onClick(View v) {
                 MessageDetail messageDetail = null;
-                messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), editText.getText().toString(),
+                CharSequence charSequence = editText.getText();
+                messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), charSequence.toString(),
                         Calendar.getInstance().getTimeInMillis(), false);
                 messageDetail.setTopicID(topicID);
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
@@ -548,7 +549,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         addImageBetweentext(drawable, index);
     }
     private void addImageBetweentext(Drawable drawable, String index) {
-        drawable .setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable .setBounds(0, 0, 30, 30);
 
         int selectionCursor = editText.getSelectionStart();
         editText.getText().insert(selectionCursor, index);
@@ -556,7 +557,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
 
         SpannableStringBuilder builder = new SpannableStringBuilder(editText.getText());
         builder.setSpan(new ImageSpan(drawable), selectionCursor - index.length(), selectionCursor, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        editText.setText(builder);
+        CharSequence charSequence = builder;
+        editText.setText(charSequence);
         editText.setSelection(selectionCursor);
     }
 }

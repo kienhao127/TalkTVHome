@@ -10,8 +10,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +29,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
+import com.example.cpu11341_local.talktvhome.EmoticonUtil;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.EventMessage;
@@ -127,8 +130,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((RemindMessage)arrMessDetail.get(position)).getEventDatetime()));
                 remindHolder.textViewTitle.setText(((RemindMessage)arrMessDetail.get(position)).getTitle());
-                Spanned spRemind = Html.fromHtml(arrMessDetail.get(position).getText());
-                remindHolder.textViewDes.setText(spRemind);
+                remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(((RemindMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case 3:
@@ -171,8 +173,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(messageHolder.imageViewAvatar);
                     messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                Spanned spMessage = Html.fromHtml(arrMessDetail.get(position).getText());
-                messageHolder.textViewMessDetail.setText(spMessage);
+                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
                 messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
                 if (messageHolder.textViewMessDetail.getHeight() < (int) pxFromDp(context, 50)){
                     messageHolder.textViewMessDetail.setHeight((int) pxFromDp(context, 50));
@@ -218,7 +219,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(myMessageHolder.imageViewAvatar);
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                myMessageHolder.textViewMessDetail.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
+                Spanned spannedString = EmoticonUtil.getSmiledText(arrMessDetail.get(position).getText(), context);
+                myMessageHolder.textViewMessDetail.setText(spannedString);
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
 
                 if (((SimpleMessage)arrMessDetail.get(position)).isWarning()) {

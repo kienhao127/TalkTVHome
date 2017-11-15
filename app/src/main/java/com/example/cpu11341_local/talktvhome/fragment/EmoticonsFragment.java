@@ -13,6 +13,7 @@ import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.EmoticonsRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by CPU11341-local on 11/13/2017.
@@ -37,11 +38,8 @@ public class EmoticonsFragment extends Fragment {
         emotions = getResources().obtainTypedArray(emoticonsCategory);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        ArrayList<String> paths = new ArrayList<String>();
-        for (short i = 0; i < emotions.length(); i++) {
-            paths.add(emotions.getString(i) + ".png");
-        }
-        adapter = new EmoticonsRecyclerAdapter(getContext(), paths, emoticonClickListener);
+
+        adapter = new EmoticonsRecyclerAdapter(getContext(), emoticonClickListener);
         layoutManager = new GridLayoutManager(getContext(), 7);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);

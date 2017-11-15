@@ -4,24 +4,27 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.example.cpu11341_local.talktvhome.EmoticonUtil;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.fragment.EmoticonsFragment;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by CPU11341-local on 11/13/2017.
  */
 
 public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecyclerAdapter.RecyclerViewHolder> {
-    private static ArrayList<String> arrEmoticons = new ArrayList<>();
     private Context context;
     private EmoticonClickListener emoticonClickListener;
 
@@ -29,8 +32,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
         this.context = context;
     }
 
-    public EmoticonsRecyclerAdapter(Context context, ArrayList<String> arrEmoticons, EmoticonClickListener emoticonClickListener){
-        this.arrEmoticons = arrEmoticons;
+    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener){
         this.context = context;
         this.emoticonClickListener = emoticonClickListener;
     }
@@ -45,7 +47,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
 
     @Override
     public void onBindViewHolder(EmoticonsRecyclerAdapter.RecyclerViewHolder holder, final int position) {
-        holder.emoticon.setImageBitmap(getImage(arrEmoticons.get(position)));
+        holder.emoticon.setImageResource(EmoticonUtil.getSmiley().get(":)"));
     }
 
     private Bitmap getImage (String path) {
@@ -63,12 +65,12 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
     }
 
     public interface EmoticonClickListener {
-        public void onEmoticonItemClick(View view, final String index);
+        public void onEmoticonItemClick(View view, String index);
     }
 
     @Override
     public int getItemCount() {
-        return arrEmoticons.size();
+        return EmoticonUtil.getSmiley().size();
     }
 
     public class RecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -82,7 +84,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
         @Override
         public void onClick(View v) {
             if (emoticonClickListener != null) {
-                emoticonClickListener.onEmoticonItemClick(v, arrEmoticons.get(getAdapterPosition()));
+                emoticonClickListener.onEmoticonItemClick(v, ":)");
             }
         }
     }
