@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
+import com.example.cpu11341_local.talktvhome.EmoticonUtil;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 
@@ -101,7 +103,8 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                         ))
                         .into(recyclerViewHolder.imageViewAvatar);
                 recyclerViewHolder.textViewName.setText(arrTopic.get(position).getName());
-                recyclerViewHolder.textViewLastMess.setText(arrTopic.get(position).getLastMess());
+                Spanned spannedString = EmoticonUtil.getSmiledText(arrTopic.get(position).getLastMess(), context);
+                recyclerViewHolder.textViewLastMess.setText(spannedString);
                 recyclerViewHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
                 if (arrTopic.get(position).isHasNewMessage()) {
                     recyclerViewHolder.imageViewUnreadDot.setVisibility(View.VISIBLE);

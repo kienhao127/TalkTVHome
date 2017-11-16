@@ -45,6 +45,7 @@ import android.widget.TextView;
 import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
+import com.example.cpu11341_local.talktvhome.EmoticonUtil;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
@@ -285,7 +286,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                selectedMsgDetail.setText(arrMessDetail.get(position).getUser().getName() + ": " + arrMessDetail.get(position).getText());
+                Spanned spannedString = EmoticonUtil.getSmiledText(arrMessDetail.get(position).getUser().getName()+ ": " + arrMessDetail.get(position).getText(), getContext());
+                selectedMsgDetail.setText(spannedString);
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
                 relativeLayoutContextMenu.startAnimation(enter_from_bottom);
@@ -542,14 +544,19 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         viewPager.setAdapter(adapter);
     }
 
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
+    }
+
     @Override
-    public void onEmoticonItemClick(View v, String index){
-        ImageView imageView = (ImageView) v.findViewById(R.id.emoticonsItem);
-        final Drawable drawable = imageView.getDrawable();
+    public void onEmoticonItemClick(int id, String index){
+        ImageView imageView = new ImageView(getContext());
+        imageView.setImageResource(id);
+        Drawable drawable = imageView.getDrawable();
         addImageBetweentext(drawable, index);
     }
     private void addImageBetweentext(Drawable drawable, String index) {
-        drawable .setBounds(0, 0, 30, 30);
+        drawable.setBounds(0, 0, (int) pxFromDp(getContext(), 20), (int) pxFromDp(getContext(), 20));
 
         int selectionCursor = editText.getSelectionStart();
         editText.getText().insert(selectionCursor, index);
@@ -557,8 +564,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
 
         SpannableStringBuilder builder = new SpannableStringBuilder(editText.getText());
         builder.setSpan(new ImageSpan(drawable), selectionCursor - index.length(), selectionCursor, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        CharSequence charSequence = builder;
-        editText.setText(charSequence);
+        editText.setText(builder);
         editText.setSelection(selectionCursor);
     }
 }

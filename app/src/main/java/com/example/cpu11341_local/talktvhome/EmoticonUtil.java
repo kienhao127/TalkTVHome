@@ -1,6 +1,7 @@
 package com.example.cpu11341_local.talktvhome;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ImageSpan;
@@ -38,7 +39,9 @@ public class EmoticonUtil {
                         if (index + length > builder.length())
                             continue;
                         if (builder.subSequence(index, index + length).toString().equals(entry.getKey())) {
-                            builder.setSpan(new ImageSpan(context, entry.getValue()), index, index + length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            Drawable drawable = context.getDrawable(entry.getValue());
+                            drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
+                            builder.setSpan(new ImageSpan(drawable), index, index + length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                             index += length - 1;
                             break;
                         }
@@ -47,5 +50,9 @@ public class EmoticonUtil {
             }
         }
         return builder;
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 }
