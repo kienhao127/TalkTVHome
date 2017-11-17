@@ -31,22 +31,17 @@ public class EmoticonUtil {
         getSmiley();
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         if (emoticons.size() > 0) {
-            int index;
-            for (index = 0; index < builder.length(); index++) {
-                if (Character.toString(builder.charAt(index)).equals(":")) {
-                    for (Map.Entry<String, Integer> entry : emoticons.entrySet()) {
-                        int length = entry.getKey().length();
-                        if (index + length > builder.length())
-                            continue;
-                        if (builder.subSequence(index, index + length).toString().equals(entry.getKey())) {
-                            Drawable drawable = context.getDrawable(entry.getValue());
-                            drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
-                            builder.setSpan(new ImageSpan(drawable), index, index + length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            index += length - 1;
-                            break;
-                        }
+            for (String iconString: emoticons.keySet()) {
+                int index = 0;
+                do {
+                    index = text.indexOf(iconString, index);
+                    if (index < 0) {
+                        break;
                     }
-                }
+                    Drawable drawable = context.getDrawable(emoticons.get(iconString));
+                    drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
+                    builder.setSpan(new ImageSpan(drawable), index, index += iconString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } while (index < text.length());
             }
         }
         return builder;

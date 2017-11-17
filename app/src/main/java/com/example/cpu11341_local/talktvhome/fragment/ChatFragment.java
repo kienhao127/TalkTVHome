@@ -94,7 +94,6 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     TypedArray emoticons_icontitle;
     ArrayList<Integer> arrEmoticonsCategory = new ArrayList<>();
     ViewPager emoticonsViewPager;
-    EmoticonsRecyclerAdapter emoticonsRecyclerAdapter;
     TabLayout tabLayout;
 
     public ChatFragment(Topic topic) {
@@ -175,8 +174,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
 
             @Override
             public void onClick(View v) {
-                tabLayout.setVisibility(View.GONE);
-                emoticonsViewPager.setVisibility(View.GONE);
+                hideEmoticonKeyboard();
             }
         });
 
@@ -201,8 +199,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             @Override
             public void onClick(View v) {
                 hideKeyboard(v);
-                tabLayout.setVisibility(View.VISIBLE);
-                emoticonsViewPager.setVisibility(View.VISIBLE);
+                showEmoticonKeyboard();
             }
         });
 
@@ -323,8 +320,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                     x2 = event.getX();
                     if (x1 == x2) {
                         hideKeyboard(v);
-                        tabLayout.setVisibility(View.GONE);
-                        emoticonsViewPager.setVisibility(View.GONE);
+                        hideEmoticonKeyboard();
                     }
                 }
                 return false;
@@ -380,6 +376,18 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
 
         return view;
+    }
+
+    void hideEmoticonKeyboard(){
+        imageViewEmoticon.setImageResource(R.drawable.emoji);
+        tabLayout.setVisibility(View.GONE);
+        emoticonsViewPager.setVisibility(View.GONE);
+    }
+
+    void showEmoticonKeyboard(){
+        imageViewEmoticon.setImageResource(R.drawable.emoji_focus);
+        tabLayout.setVisibility(View.VISIBLE);
+        emoticonsViewPager.setVisibility(View.VISIBLE);
     }
 
     public void hideKeyboard(View view) {
@@ -516,7 +524,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
 
         @Override
         public int getCount() {
-            return emoticons_icontitle.length();
+            return mFragmentList.size();
         }
 
         @Override
@@ -555,6 +563,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         Drawable drawable = imageView.getDrawable();
         addImageBetweentext(drawable, index);
     }
+
     private void addImageBetweentext(Drawable drawable, String index) {
         drawable.setBounds(0, 0, (int) pxFromDp(getContext(), 20), (int) pxFromDp(getContext(), 20));
 

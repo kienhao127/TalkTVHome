@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
         this.context = context;
         this.emoticonClickListener = emoticonClickListener;
         this.emoticonString = new ArrayList<>(EmoticonUtil.getSmiley().keySet());
+        Log.d("Emoticon size", String.valueOf(emoticonString.size()));
     }
 
     @Override

@@ -23,7 +23,7 @@
             android:orientation="horizontal"
             android:visibility="gone">
             <com.example.cpu11341_local.talktvhome.myview.TalkTextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Chưa theo dõi"
                 android:gravity="center_vertical"
@@ -128,16 +128,19 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_below="@id/editText"
             app:tabMode="fixed"
             app:tabGravity="fill"
+            android:background="#eee"
+            style="@style/customTabLayout"
             android:visibility="gone"/>
         <android.support.v4.view.ViewPager
             android:id="@+id/emoticons_pager"
             android:layout_width="match_parent"
             android:layout_height="210dp"
             android:layout_below="@id/tabLayout"
+            android:background="#eee"
             android:visibility="gone">
         </android.support.v4.view.ViewPager>
     </RelativeLayout>
