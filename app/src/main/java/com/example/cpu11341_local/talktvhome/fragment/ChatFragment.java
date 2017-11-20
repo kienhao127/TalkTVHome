@@ -95,6 +95,10 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     ArrayList<Integer> arrEmoticonsCategory = new ArrayList<>();
     ViewPager emoticonsViewPager;
     TabLayout tabLayout;
+    ArrayList<Integer> imageSpanStarts = new ArrayList<>();
+    ArrayList<Integer> imageSpanEnds = new ArrayList<>();
+    int stringLengthBeforeChage = 0;
+    boolean isRemoveLetter = false;
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getName();
@@ -154,6 +158,17 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                imageSpanStarts.clear();
+                imageSpanEnds.clear();
+
+                stringLengthBeforeChage = s.length();
+
+                SpannableStringBuilder stringBuilder = (SpannableStringBuilder) s;
+                ImageSpan[] imageSpans = stringBuilder.getSpans(0, stringBuilder.length(), ImageSpan.class);
+                for (ImageSpan imageSpan : imageSpans){
+                    imageSpanStarts.add(stringBuilder.getSpanStart(imageSpan));
+                    imageSpanEnds.add(stringBuilder.getSpanEnd(imageSpan));
+                }
             }
 
             @Override
@@ -162,6 +177,27 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                     imageViewSend.setVisibility(View.VISIBLE);
                 } else {
                     imageViewSend.setVisibility(View.GONE);
+                }
+
+                Log.d("stringLengthBeforeChage", String.valueOf(stringLengthBeforeChage));
+                Log.d("s.length", String.valueOf(s.length()));
+
+                if (stringLengthBeforeChage > s.length()){
+                    Log.d("editText.getSelection", String.valueOf(editText.getSelectionStart()));
+                    Log.d("s", s.toString());
+                    int cursorPosition = editText.getSelectionStart();
+                    int indexOfImageSpan = imageSpanEnds.indexOf(cursorPosition+1);
+                    if (indexOfImageSpan >= 0){
+                        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+                        try{
+                            stringBuilder.append(s.subSequence(0, imageSpanStarts.get(indexOfImageSpan)));
+                            stringBuilder.append(s.subSequence(imageSpanEnds.get(indexOfImageSpan), s.length()));
+                        } catch (StringIndexOutOfBoundsException e){
+
+                        }
+                        editText.setText(stringBuilder);
+                        editText.setSelection((indexOfImageSpan == 0) ? 0 : imageSpanStarts.get(indexOfImageSpan) - 1);
+                    }
                 }
             }
 
