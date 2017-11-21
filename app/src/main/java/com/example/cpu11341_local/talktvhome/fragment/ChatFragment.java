@@ -95,6 +95,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     ArrayList<Integer> arrEmoticonsCategory = new ArrayList<>();
     ViewPager emoticonsViewPager;
     TabLayout tabLayout;
+    ImageView removeIcon;
     ArrayList<Integer> imageSpanStarts = new ArrayList<>();
     ArrayList<Integer> imageSpanEnds = new ArrayList<>();
     int stringLengthBeforeChage = 0;
@@ -142,6 +143,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         selectedMsgDetail = (TalkTextView) view.findViewById(R.id.seletedMsgDetail);
         relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
         textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
+        removeIcon = (ImageView) view.findViewById(R.id.removeIcon);
 
         if (!MessageDataManager.getInstance().isFollow(topicID, getContext())) {
             relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
@@ -179,24 +181,20 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                     imageViewSend.setVisibility(View.GONE);
                 }
 
-                Log.d("stringLengthBeforeChage", String.valueOf(stringLengthBeforeChage));
-                Log.d("s.length", String.valueOf(s.length()));
-
                 if (stringLengthBeforeChage > s.length()){
-                    Log.d("editText.getSelection", String.valueOf(editText.getSelectionStart()));
-                    Log.d("s", s.toString());
+
                     int cursorPosition = editText.getSelectionStart();
                     int indexOfImageSpan = imageSpanEnds.indexOf(cursorPosition+1);
                     if (indexOfImageSpan >= 0){
-                        SpannableStringBuilder stringBuilder = new SpannableStringBuilder();
+                        SpannableStringBuilder newStringBuilder = new SpannableStringBuilder();
                         try{
-                            stringBuilder.append(s.subSequence(0, imageSpanStarts.get(indexOfImageSpan)));
-                            stringBuilder.append(s.subSequence(imageSpanEnds.get(indexOfImageSpan), s.length()));
+                            newStringBuilder.append(s.subSequence(0, imageSpanStarts.get(indexOfImageSpan)));
+                            newStringBuilder.append(s.subSequence(imageSpanEnds.get(indexOfImageSpan), s.length()));
                         } catch (StringIndexOutOfBoundsException e){
 
                         }
-                        editText.setText(stringBuilder);
-                        editText.setSelection((indexOfImageSpan == 0) ? 0 : imageSpanStarts.get(indexOfImageSpan) - 1);
+                        editText.setText(newStringBuilder);
+                        editText.setSelection((indexOfImageSpan == 0) ? 0 : imageSpanStarts.get(indexOfImageSpan));
                     }
                 }
             }
@@ -236,6 +234,13 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             public void onClick(View v) {
                 hideKeyboard(v);
                 showEmoticonKeyboard();
+            }
+        });
+
+        removeIcon.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
             }
         });
 
@@ -418,12 +423,14 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         imageViewEmoticon.setImageResource(R.drawable.emoji);
         tabLayout.setVisibility(View.GONE);
         emoticonsViewPager.setVisibility(View.GONE);
+        removeIcon.setVisibility(View.GONE);
     }
 
     void showEmoticonKeyboard(){
         imageViewEmoticon.setImageResource(R.drawable.emoji_focus);
         tabLayout.setVisibility(View.VISIBLE);
         emoticonsViewPager.setVisibility(View.VISIBLE);
+        removeIcon.setVisibility(View.VISIBLE);
     }
 
     public void hideKeyboard(View view) {
