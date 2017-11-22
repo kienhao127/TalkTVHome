@@ -2,6 +2,7 @@ package com.example.cpu11341_local.talktvhome.adapter;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
@@ -29,14 +30,16 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
     private Context context;
     private EmoticonClickListener emoticonClickListener;
     private ArrayList<String> emoticonString = new ArrayList<>();
-    public EmoticonsRecyclerAdapter(Context context){
+    TypedArray emotions;
+    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener){
         this.context = context;
     }
 
-    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener){
+    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener, TypedArray emotions){
         this.context = context;
         this.emoticonClickListener = emoticonClickListener;
         this.emoticonString = new ArrayList<>(EmoticonUtil.getSmiley().keySet());
+        this.emotions = emotions;
         Log.d("Emoticon size", String.valueOf(emoticonString.size()));
     }
 
@@ -50,6 +53,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
 
     @Override
     public void onBindViewHolder(EmoticonsRecyclerAdapter.RecyclerViewHolder holder, final int position) {
+        Log.d("emoticonString", String.valueOf(emoticonString.size()));
         holder.emoticon.setImageResource(EmoticonUtil.getSmiley().get(emoticonString.get(position)));
     }
 

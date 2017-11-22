@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -30,6 +31,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -113,23 +115,9 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.chat_fragment, container, false);
-        emoticons_icontitle = getResources().obtainTypedArray(R.array.emoticons_icontitle);
-
-        arrEmoticonsCategory.add(R.array.emoticons_smiley);
-        arrEmoticonsCategory.add(R.array.emoticons_drink);
-        arrEmoticonsCategory.add(R.array.emoticons_animal);
-
+    void init(View view){
         emoticonsViewPager = (ViewPager) view.findViewById(R.id.emoticons_pager);
-        emoticonsViewPager.setOffscreenPageLimit(3);
-        setupViewPager(emoticonsViewPager);
-
         tabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
-        tabLayout.setupWithViewPager(emoticonsViewPager);
-        setupTabIcons();
-
         textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
         textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
@@ -144,6 +132,25 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
         textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
         removeIcon = (ImageView) view.findViewById(R.id.removeIcon);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.chat_fragment, container, false);
+        init(view);
+        emoticons_icontitle = getResources().obtainTypedArray(R.array.emoticons_icontitle);
+
+        arrEmoticonsCategory.add(R.array.emoticons_smiley);
+        arrEmoticonsCategory.add(R.array.emoticons_drink);
+        arrEmoticonsCategory.add(R.array.emoticons_animal);
+
+        emoticonsViewPager.setOffscreenPageLimit(3);
+        setupViewPager(emoticonsViewPager);
+
+
+        tabLayout.setupWithViewPager(emoticonsViewPager);
+        setupTabIcons();
+
 
         if (!MessageDataManager.getInstance().isFollow(topicID, getContext())) {
             relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
@@ -238,9 +245,11 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
 
         removeIcon.setOnClickListener(new View.OnClickListener(){
-
             @Override
             public void onClick(View v) {
+                KeyEvent event = new KeyEvent(
+                        0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
+                editText.dispatchKeyEvent(event);
             }
         });
 
@@ -320,6 +329,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 }
             }
         });
+
         adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
@@ -588,7 +598,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        CustomAdapter adapter = new CustomAdapter(getFragmentManager());
+        CustomAdapter adapter = new CustomAdapter(getChildFragmentManager());
         for (int i = 0; i < arrEmoticonsCategory.size(); i++) {
             adapter.addFrag(new EmoticonsFragment(arrEmoticonsCategory.get(i), this));
         }

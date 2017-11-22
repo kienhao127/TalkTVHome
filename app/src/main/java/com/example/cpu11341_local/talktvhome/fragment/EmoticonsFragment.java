@@ -29,18 +29,20 @@ public class EmoticonsFragment extends Fragment {
     EmoticonsRecyclerAdapter.EmoticonClickListener emoticonClickListener;
 
     public EmoticonsFragment (int emoticonsCategory, EmoticonsRecyclerAdapter.EmoticonClickListener emoticonClickListener){
+        Log.d("EmoticonsFragment", "EmoticonsFragment");
         this.emoticonsCategory = emoticonsCategory;
         this.emoticonClickListener = emoticonClickListener;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("EmoticonsFragment", "onCreateView");
         View view = inflater.inflate(R.layout.emoticons_fragment, container, false);
         emotions = getResources().obtainTypedArray(emoticonsCategory);
 
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
-        adapter = new EmoticonsRecyclerAdapter(getContext(), emoticonClickListener);
+        adapter = new EmoticonsRecyclerAdapter(getContext(), emoticonClickListener, emotions);
         layoutManager = new GridLayoutManager(getContext(), 7);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);

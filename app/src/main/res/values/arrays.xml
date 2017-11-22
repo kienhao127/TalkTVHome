@@ -7,41 +7,41 @@
     </integer-array>
 
     <string-array name="emoticons_smiley">
-        <item>smiley_0</item>
-        <item>smiley_1</item>
-        <item>smiley_2</item>
-        <item>smiley_3</item>
-        <item>smiley_4</item>
-        <item>smiley_5</item>
-        <item>smiley_6</item>
-        <item>smiley_7</item>
-        <item>smiley_8</item>
-        <item>smiley_9</item>
+        <item>@drawable/smiley_0</item>
+        <item>@drawable/smiley_1</item>
+        <item>@drawable/smiley_2</item>
+        <item>@drawable/smiley_3</item>
+        <item>@drawable/smiley_4</item>
+        <item>@drawable/smiley_5</item>
+        <item>@drawable/smiley_6</item>
+        <item>@drawable/smiley_7</item>
+        <item>@drawable/smiley_8</item>
+        <item>@drawable/smiley_9</item>
     </string-array>
 
     <string-array name="emoticons_drink">
-        <item>smiley_1</item>
-        <item>smiley_0</item>
-        <item>smiley_2</item>
-        <item>smiley_3</item>
-        <item>smiley_4</item>
-        <item>smiley_5</item>
-        <item>smiley_6</item>
-        <item>smiley_7</item>
-        <item>smiley_8</item>
-        <item>smiley_9</item>
+        <item>@drawable/smiley_1</item>
+        <item>@drawable/smiley_0</item>
+        <item>@drawable/smiley_2</item>
+        <item>@drawable/smiley_3</item>
+        <item>@drawable/smiley_4</item>
+        <item>@drawable/smiley_5</item>
+        <item>@drawable/smiley_6</item>
+        <item>@drawable/smiley_7</item>
+        <item>@drawable/smiley_8</item>
+        <item>@drawable/smiley_9</item>
     </string-array>
 
-    <string-array name="emoticons_animal">
-        <item>smiley_2</item>
-        <item>smiley_1</item>
-        <item>smiley_0</item>
-        <item>smiley_3</item>
-        <item>smiley_4</item>
-        <item>smiley_5</item>
-        <item>smiley_6</item>
-        <item>smiley_7</item>
-        <item>smiley_8</item>
-        <item>smiley_9</item>
-    </string-array>
+    <integer-array name="emoticons_animal">
+        <item>@drawable/smiley_2</item>
+        <item>@drawable/smiley_1</item>
+        <item>@drawable/smiley_0</item>
+        <item>@drawable/smiley_3</item>
+        <item>@drawable/smiley_4</item>
+        <item>@drawable/smiley_5</item>
+        <item>@drawable/smiley_6</item>
+        <item>@drawable/smiley_7</item>
+        <item>@drawable/smiley_8</item>
+        <item>@drawable/smiley_9</item>
+    </integer-array>
 </resources>

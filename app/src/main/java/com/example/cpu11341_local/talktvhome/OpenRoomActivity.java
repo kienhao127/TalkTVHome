@@ -1,10 +1,13 @@
 package com.example.cpu11341_local.talktvhome;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -20,7 +23,10 @@ public class OpenRoomActivity extends AppCompatActivity {
     boolean isLayoutGone = true;
     boolean isMessShowed = false;
     TopicFragment messFragment;
+    ImageView imageViewEmoticon;
     String idolID;
+    FrameLayout frameLayout;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,15 +53,15 @@ public class OpenRoomActivity extends AppCompatActivity {
                 }
             }
         });
+        frameLayout = (FrameLayout) findViewById(R.id.fragment_container);
 
         imageView = (ImageView) findViewById(R.id.messageShow);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 isLayoutGone = false;
-                FrameLayout fl = (FrameLayout) findViewById(R.id.fragment_container);
-                fl.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2;
-                fl.setVisibility(fl.VISIBLE);
+
+                frameLayout.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2;
 
                 if (findViewById(R.id.fragment_container) != null) {
 
@@ -83,6 +89,10 @@ public class OpenRoomActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 
     @Override
