@@ -196,7 +196,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                             } else {
                                 ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
                             }
-                            ft.add(R.id.fragment_container, topicFragment, "MessFrag")
+                            ft.add(R.id.fragment_container, topicFragment, "UnfollowTopicGroupFrag")
                                     .addToBackStack(null)
                                     .commit();
 

@@ -219,7 +219,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(myMessageHolder.imageViewAvatar);
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                Spanned spannedString = EmoticonUtil.getSmiledText(arrMessDetail.get(position).getText(), context);
+                Spanned spannedString = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
                 myMessageHolder.textViewMessDetail.setText(spannedString);
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
 

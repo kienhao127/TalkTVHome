@@ -104,21 +104,16 @@ public class OpenRoomActivity extends AppCompatActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
-                    .add(R.id.fragment_container, messFragment)
+                    .add(R.id.fragment_container, messFragment, "TopicFrag")
                     .addToBackStack(null)
                     .commit();
             isMessShowed = false;
         } else {
-            Log.i("asd", String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
-            if (getSupportFragmentManager().getBackStackEntryCount() > 0){
-                getSupportFragmentManager().popBackStack();
-            } else {
-                super.onBackPressed();
-            }
+            super.onBackPressed();
             if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-                TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
-                if (topicFragment != null){
-                    topicFragment.onResume();
+                TopicFragment unfollowTopicGroupFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
+                if (unfollowTopicGroupFragment != null){
+                    unfollowTopicGroupFragment.onResume();
                 }
             } else {
                 this.onResume();

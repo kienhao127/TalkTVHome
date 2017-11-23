@@ -20,6 +20,7 @@ import com.example.cpu11341_local.talktvhome.fragment.EmoticonsFragment;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,16 +31,16 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
     private Context context;
     private EmoticonClickListener emoticonClickListener;
     private ArrayList<String> emoticonString = new ArrayList<>();
-    TypedArray emotions;
+    private LinkedHashMap<String, Integer> emoticons = new LinkedHashMap<>();
     public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener){
         this.context = context;
     }
 
-    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener, TypedArray emotions){
+    public EmoticonsRecyclerAdapter(Context context, EmoticonClickListener emoticonClickListener, LinkedHashMap<String, Integer> emotions){
         this.context = context;
         this.emoticonClickListener = emoticonClickListener;
-        this.emoticonString = new ArrayList<>(EmoticonUtil.getSmiley().keySet());
-        this.emotions = emotions;
+        this.emoticonString = new ArrayList<>(emotions.keySet());
+        this.emoticons = emotions;
         Log.d("Emoticon size", String.valueOf(emoticonString.size()));
     }
 
@@ -54,7 +55,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
     @Override
     public void onBindViewHolder(EmoticonsRecyclerAdapter.RecyclerViewHolder holder, final int position) {
         Log.d("emoticonString", String.valueOf(emoticonString.size()));
-        holder.emoticon.setImageResource(EmoticonUtil.getSmiley().get(emoticonString.get(position)));
+        holder.emoticon.setImageResource(emoticons.get(emoticonString.get(position)));
     }
 
     public interface EmoticonClickListener {
@@ -77,7 +78,7 @@ public class EmoticonsRecyclerAdapter extends RecyclerView.Adapter<EmoticonsRecy
         @Override
         public void onClick(View v) {
             if (emoticonClickListener != null) {
-                emoticonClickListener.onEmoticonItemClick(EmoticonUtil.getSmiley().get(emoticonString.get(getAdapterPosition())), emoticonString.get(getAdapterPosition()));
+                emoticonClickListener.onEmoticonItemClick(emoticons.get(emoticonString.get(getAdapterPosition())), emoticonString.get(getAdapterPosition()));
             }
         }
     }

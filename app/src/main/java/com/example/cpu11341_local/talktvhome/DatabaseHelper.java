@@ -344,7 +344,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     public boolean deleteTopic(String topicID){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_TOPICID + "='" + topicID + "'", null) > 0;
+        return db.delete(TOPIC_TABLE_NAME, TOPIC_COLUMN_NAME_TOPICID + "='" + topicID +"'", null) > 0;
     }
 
     public boolean isEsixtUnfollowTopic(){

@@ -29,7 +29,7 @@ public class MessageActivity extends AppCompatActivity {
 
             // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, messFragment)
+                    .add(R.id.fragment_container, messFragment, "TopicFrag")
                     .commit();
         }
     }
@@ -44,7 +44,7 @@ public class MessageActivity extends AppCompatActivity {
         }
         overridePendingTransition(0, R.anim.exit_to_right);
         if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-            TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("MessFrag");
+            TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
             if (topicFragment != null){
                 topicFragment.onResume();
             }

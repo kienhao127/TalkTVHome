@@ -103,7 +103,7 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                         ))
                         .into(recyclerViewHolder.imageViewAvatar);
                 recyclerViewHolder.textViewName.setText(arrTopic.get(position).getName());
-                Spanned spannedString = EmoticonUtil.getSmiledText(arrTopic.get(position).getLastMess(), context);
+                Spanned spannedString = EmoticonUtil.getInstance().getSmiledText(arrTopic.get(position).getLastMess(), context);
                 recyclerViewHolder.textViewLastMess.setText(spannedString);
                 recyclerViewHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));
                 if (arrTopic.get(position).isHasNewMessage()) {

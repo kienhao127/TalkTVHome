@@ -36,6 +36,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -93,8 +94,6 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     Topic topic = new Topic();
     RelativeLayout relativeLayoutFollowNoti;
     TalkTextView textViewFollow;
-    TypedArray emoticons_icontitle;
-    ArrayList<Integer> arrEmoticonsCategory = new ArrayList<>();
     ViewPager emoticonsViewPager;
     TabLayout tabLayout;
     ImageView removeIcon;
@@ -138,11 +137,6 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.chat_fragment, container, false);
         init(view);
-        emoticons_icontitle = getResources().obtainTypedArray(R.array.emoticons_icontitle);
-
-        arrEmoticonsCategory.add(R.array.emoticons_smiley);
-        arrEmoticonsCategory.add(R.array.emoticons_drink);
-        arrEmoticonsCategory.add(R.array.emoticons_animal);
 
         emoticonsViewPager.setOffscreenPageLimit(3);
         setupViewPager(emoticonsViewPager);
@@ -189,7 +183,6 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 }
 
                 if (stringLengthBeforeChage > s.length()){
-
                     int cursorPosition = editText.getSelectionStart();
                     int indexOfImageSpan = imageSpanEnds.indexOf(cursorPosition+1);
                     if (indexOfImageSpan >= 0){
@@ -334,7 +327,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             @Override
             public void onItemLongClick(View view, int position) {
                 selectedPosition = position;
-                Spanned spannedString = EmoticonUtil.getSmiledText(arrMessDetail.get(position).getUser().getName()+ ": " + arrMessDetail.get(position).getText(), getContext());
+                Spanned spannedString = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getUser().getName()+ ": " + arrMessDetail.get(position).getText(), getContext());
                 selectedMsgDetail.setText(spannedString);
                 Animation enter_from_bottom = AnimationUtils.loadAnimation(getContext(), R.anim.enter_from_bottom);
                 relativeLayoutContextMenu.setVisibility(View.VISIBLE);
@@ -592,15 +585,15 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     private void setupTabIcons() {
-        for (int i = 0; i < emoticons_icontitle.length(); i++) {
-            tabLayout.getTabAt(i).setIcon(emoticons_icontitle.getDrawable(i));
+        for (int i = 0; i < EmoticonUtil.getInstance().emoticonsTitle.size(); i++) {
+            tabLayout.getTabAt(i).setIcon(EmoticonUtil.getInstance().emoticonsTitle.get(i));
         }
     }
 
     private void setupViewPager(ViewPager viewPager) {
         CustomAdapter adapter = new CustomAdapter(getChildFragmentManager());
-        for (int i = 0; i < arrEmoticonsCategory.size(); i++) {
-            adapter.addFrag(new EmoticonsFragment(arrEmoticonsCategory.get(i), this));
+        for (int i = 0; i < EmoticonUtil.getInstance().emoticonsList.size(); i++) {
+            adapter.addFrag(new EmoticonsFragment(i, this));
         }
         viewPager.setAdapter(adapter);
     }

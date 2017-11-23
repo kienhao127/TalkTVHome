@@ -247,7 +247,7 @@ public class MessageDataManager {
     public void followIdol(String IdolID, String userID, Context context) {
         //Gọi lên server, userID theo dõi idolID
         Topic removedTopic = DatabaseHelper.getInstance(context).getTopic(IdolID + "_" + userID);
-        if (removedTopic != null) {
+        if (removedTopic.getName() != null) {
             removedTopic.setFollow(true);
             DatabaseHelper.getInstance(context).updateTopic(removedTopic);
             if (!DatabaseHelper.getInstance(context).isEsixtUnfollowTopic()) {
