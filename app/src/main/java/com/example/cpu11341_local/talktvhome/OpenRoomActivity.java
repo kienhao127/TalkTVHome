@@ -95,28 +95,42 @@ public class OpenRoomActivity extends AppCompatActivity {
         return dp * context.getResources().getDisplayMetrics().density;
     }
 
+    protected OnBackPressedListener onBackPressedListener;
+
+    public interface OnBackPressedListener {
+        void doBack();
+    }
+
+    public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
+        this.onBackPressedListener = onBackPressedListener;
+    }
+
     @Override
     public void onBackPressed() {
-        if (isMessShowed) {
-            getSupportFragmentManager().popBackStack();
-
-            messFragment = new TopicFragment("Tin nhắn", true, getClass().getName());
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
-                    .add(R.id.fragment_container, messFragment, "TopicFrag")
-                    .addToBackStack(null)
-                    .commit();
-            isMessShowed = false;
+        if (onBackPressedListener != null) {
+            onBackPressedListener.doBack();
         } else {
-            super.onBackPressed();
-            if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-                TopicFragment unfollowTopicGroupFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
-                if (unfollowTopicGroupFragment != null){
-                    unfollowTopicGroupFragment.onResume();
-                }
+            if (isMessShowed) {
+                getSupportFragmentManager().popBackStack();
+
+                messFragment = new TopicFragment("Tin nhắn", true, getClass().getName());
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom)
+                        .add(R.id.fragment_container, messFragment, "TopicFrag")
+                        .addToBackStack(null)
+                        .commit();
+                isMessShowed = false;
             } else {
-                this.onResume();
+                super.onBackPressed();
+                if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+                    TopicFragment unfollowTopicGroupFragment = (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
+                    if (unfollowTopicGroupFragment != null) {
+                        unfollowTopicGroupFragment.onResume();
+                    }
+                } else {
+                    this.onResume();
+                }
             }
         }
     }

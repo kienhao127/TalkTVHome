@@ -34,22 +34,35 @@ public class MessageActivity extends AppCompatActivity {
         }
     }
 
+    protected OnBackPressedListener onBackPressedListener;
+
+    public interface OnBackPressedListener {
+        void doBack();
+    }
+
+    public void setOnBackPressedListener(OnBackPressedListener onBackPressedListener) {
+        this.onBackPressedListener = onBackPressedListener;
+    }
+
     @Override
     public void onBackPressed() {
-//        MessageDataManager.getInstance().clearMsgDetail();
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0){
-            getSupportFragmentManager().popBackStack();
+        if (onBackPressedListener != null) {
+            onBackPressedListener.doBack();
         } else {
-            super.onBackPressed();
-        }
-        overridePendingTransition(0, R.anim.exit_to_right);
-        if (getSupportFragmentManager().getBackStackEntryCount() > 1){
-            TopicFragment topicFragment =  (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
-            if (topicFragment != null){
-                topicFragment.onResume();
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                getSupportFragmentManager().popBackStack();
+            } else {
+                super.onBackPressed();
             }
-        } else {
-            this.onResume();
+            overridePendingTransition(0, R.anim.exit_to_right);
+            if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+                TopicFragment topicFragment = (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
+                if (topicFragment != null) {
+                    topicFragment.onResume();
+                }
+            } else {
+                this.onResume();
+            }
         }
     }
 

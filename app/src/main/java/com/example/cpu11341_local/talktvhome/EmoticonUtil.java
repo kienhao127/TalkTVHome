@@ -28,16 +28,16 @@ public class EmoticonUtil {
         emoticonsTitle.add(R.drawable.smiley_1);
 
         LinkedHashMap<String, Integer> smileyEmoticons = new LinkedHashMap<>();
-        smileyEmoticons.put(":-o", R.drawable.smiley_3);
-        smileyEmoticons.put(":-8", R.drawable.smiley_4);
-        smileyEmoticons.put(":((", R.drawable.smiley_5);
+        smileyEmoticons.put(":-o:", R.drawable.smiley_3);
+        smileyEmoticons.put(":-8:", R.drawable.smiley_4);
+        smileyEmoticons.put(":((:", R.drawable.smiley_5);
         emoticonsList.add(smileyEmoticons);
 
         LinkedHashMap<String, Integer> drinkEmoticons = new LinkedHashMap<>();
-        drinkEmoticons.put(":)", R.drawable.smiley_6);
-        drinkEmoticons.put(":-x", R.drawable.smiley_7);
-        drinkEmoticons.put(":-z", R.drawable.smiley_8);
-        drinkEmoticons.put(":-(", R.drawable.smiley_9);
+        drinkEmoticons.put(":):", R.drawable.smiley_6);
+        drinkEmoticons.put(":-x:", R.drawable.smiley_7);
+        drinkEmoticons.put(":-z:", R.drawable.smiley_8);
+        drinkEmoticons.put(":-(:", R.drawable.smiley_9);
         emoticonsList.add(drinkEmoticons);
     }
 
@@ -60,7 +60,7 @@ public class EmoticonUtil {
         ArrayList<Integer> starts = new ArrayList<>();
         ArrayList<Integer> ends = new ArrayList<>();
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
-        String regex = "\\:[^;: ][^;: ]?";
+        String regex = "\\:[^;: ]{0,3}\\:";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(text);
         while (matcher.find()){
