@@ -18,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,6 +33,7 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,6 +47,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.support.v4.app.Fragment;
@@ -67,6 +70,7 @@ import com.example.cpu11341_local.talktvhome.data.Wrapper;
 import com.example.cpu11341_local.talktvhome.myview.TalkTextView;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
 /**
@@ -106,6 +110,9 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     int stringLengthBeforeChage = 0;
     boolean isEmoticonKeyboardShowing = false;
     RelativeLayout emoticonKeyboard;
+    EmoticonFragmentAdapter emoticonFragAdapter;
+    PopupWindow mPopupWindow;
+    View view;
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getName();
@@ -122,6 +129,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     void init(View view){
         emoticonsViewPager = (ViewPager) view.findViewById(R.id.emoticons_pager);
         tabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
+        removeIcon = (ImageView) view.findViewById(R.id.removeIcon);
         textViewLoading = (TalkTextView) view.findViewById(R.id.textViewLoading);
         textViewOver = (TalkTextView) view.findViewById(R.id.textViewOver);
         imageViewSend = (ImageView) view.findViewById(R.id.imageViewSend);
@@ -135,14 +143,13 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         selectedMsgDetail = (TalkTextView) view.findViewById(R.id.seletedMsgDetail);
         relativeLayoutFollowNoti = (RelativeLayout) view.findViewById(R.id.relativeLayoutFollowNoti);
         textViewFollow = (TalkTextView) view.findViewById(R.id.textViewFollow);
-        removeIcon = (ImageView) view.findViewById(R.id.removeIcon);
         frameLayoutFragmentContainer = (FrameLayout) getActivity().findViewById(R.id.fragment_container);
         emoticonKeyboard = (RelativeLayout) view.findViewById(R.id.emoticonKeyboard);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, final Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.chat_fragment, container, false);
+        view = inflater.inflate(R.layout.chat_fragment, container, false);
         init(view);
 
         emoticonsViewPager.setOffscreenPageLimit(3);
@@ -211,12 +218,15 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
-        editText.setOnClickListener(new View.OnClickListener(){
+        editText.setOnTouchListener(new View.OnTouchListener(){
 
             @Override
-            public void onClick(View v) {
-                Log.e("Clicked edittext", "true");
-                hideEmoticonKeyboard();
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    hideEmoticonKeyboard();
+                    editText.requestFocus(editText.getText().length());
+                }
+                return false;
             }
         });
 
@@ -237,13 +247,19 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
 
         imageViewEmoticon.setOnClickListener(new View.OnClickListener(){
-
             @Override
             public void onClick(View v) {
                 hideKeyboard(v);
-                showEmoticonKeyboard();
+                final Handler handler = new Handler();
+                final int delay = 100; //milliseconds
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        showEmoticonKeyboard();
+                    }
+                }, delay);
             }
         });
+
 
         removeIcon.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -447,6 +463,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
 
     void showEmoticonKeyboard(){
         imageViewEmoticon.setImageResource(R.drawable.emoji_focus);
+
         emoticonKeyboard.setVisibility(View.VISIBLE);
         isEmoticonKeyboardShowing = true;
         if (getActivity() instanceof OpenRoomActivity) {
@@ -589,15 +606,20 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         }
     }
 
-    private class CustomAdapter extends FragmentPagerAdapter {
-        private final ArrayList<Fragment> mFragmentList = new ArrayList<>();
+    private class EmoticonFragmentAdapter extends FragmentPagerAdapter {
+        private final ArrayList<EmoticonsFragment> mFragmentList = new ArrayList<>();
 
-        public CustomAdapter(FragmentManager supportFragmentManager) {
+        public EmoticonFragmentAdapter(FragmentManager supportFragmentManager) {
             super(supportFragmentManager);
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public EmoticonsFragment getItem(int position) {
             return mFragmentList.get(position);
         }
 
@@ -612,7 +634,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             return null;
         }
 
-        public void addFrag(Fragment fragment) {
+        public void addFrag(EmoticonsFragment fragment) {
             mFragmentList.add(fragment);
         }
     }
@@ -624,11 +646,12 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        CustomAdapter adapter = new CustomAdapter(getChildFragmentManager());
+        emoticonFragAdapter = new EmoticonFragmentAdapter(getChildFragmentManager());
         for (int i = 0; i < EmoticonUtil.getInstance().emoticonsList.size(); i++) {
-            adapter.addFrag(new EmoticonsFragment(i, this));
+            emoticonFragAdapter.addFrag(new EmoticonsFragment(i, this));
         }
-        viewPager.setAdapter(adapter);
+
+        viewPager.setAdapter(emoticonFragAdapter);
     }
 
     public static float pxFromDp(final Context context, final float dp) {
@@ -636,11 +659,14 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     @Override
-    public void onEmoticonItemClick(int id, String index){
+    public void onEmoticonItemClick(int value, String key){
         ImageView imageView = new ImageView(getContext());
-        imageView.setImageResource(id);
+        imageView.setImageResource(value);
+        MessageDataManager.getInstance().insertRecentEmoticon(key, value, getContext());
+        emoticonFragAdapter.notifyDataSetChanged();
+        setupTabIcons();
         Drawable drawable = imageView.getDrawable();
-        addImageBetweentext(drawable, index);
+        addImageBetweentext(drawable, key);
     }
 
     private void addImageBetweentext(Drawable drawable, String index) {

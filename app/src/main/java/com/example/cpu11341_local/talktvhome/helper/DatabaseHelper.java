@@ -1,4 +1,4 @@
-package com.example.cpu11341_local.talktvhome;
+package com.example.cpu11341_local.talktvhome.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,10 +14,8 @@ import com.example.cpu11341_local.talktvhome.data.SimpleMessage;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Created by CPU11341-local on 9/7/2017.
@@ -69,6 +67,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String USER_COLUMN_NAME_USERID = "userid";
     public static final String USER_COLUMN_NAME_NAME = "name";
     public static final String USER_COLUMN_NAME_AVATAR = "avatar";
+
+    public static final String RECENT_EMOTICON_NAME = "recentemotionname";
+    public static final String RECENT_EMOTICON_COLUMN_ID = "recentid";
+    public static final String RECENT_EMOTICON_COLUMN_KEY = "recentkey";
+    public static final String RECENT_EMOTICON_COLUMN_VALUE = "recentvalue";
+
+    private static final String RECENT_EMOTICON_TABLE_CREATE =
+            "CREATE TABLE " + RECENT_EMOTICON_NAME + " (" +
+                    RECENT_EMOTICON_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    RECENT_EMOTICON_COLUMN_VALUE + " INTEGER, " +
+                    RECENT_EMOTICON_COLUMN_KEY + " TEXT UNIQUE" +
+                    ");";
 
     private static final String MESSAGE_TABLE_CREATE =
             "CREATE TABLE " + MESSAGE_TABLE_NAME + " (" +
@@ -150,6 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(SIMPLE_MESSAGE_TABLE_CREATE);
         db.execSQL(TOPIC_TABLE_CREATE);
         db.execSQL(USER_TABLE_CREATE);
+        db.execSQL(RECENT_EMOTICON_TABLE_CREATE);
     }
 
     @Override
@@ -160,7 +171,52 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS" + SIMPLE_MESSAGE_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS" + TOPIC_TABLE_CREATE);
         db.execSQL("DROP TABLE IF EXISTS" + USER_TABLE_CREATE);
+        db.execSQL("DROP TABLE IF EXISTS" + RECENT_EMOTICON_TABLE_CREATE);
         onCreate(db);
+    }
+
+    //Emoticon--------------
+    public boolean insertRecentEmoticon(String key, int value){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(RECENT_EMOTICON_COLUMN_KEY, key);
+        values.put(RECENT_EMOTICON_COLUMN_VALUE, value);
+        long result = db.insert(RECENT_EMOTICON_NAME, null, values);
+        if (result == -1){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean deleteRecentEmoticonFrom(int position){
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.delete(RECENT_EMOTICON_NAME, RECENT_EMOTICON_COLUMN_ID + "<=" + position, null) > 0;
+    }
+
+    public LinkedHashMap<String, Integer> getListRecentEmoticon() {
+        LinkedHashMap<String, Integer> emoticons = new LinkedHashMap<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT *" +
+                " FROM " + RECENT_EMOTICON_NAME;
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                emoticons.put(c.getString(c.getColumnIndex(RECENT_EMOTICON_COLUMN_KEY)), c.getInt(c.getColumnIndex(RECENT_EMOTICON_COLUMN_VALUE)));
+            } while (c.moveToNext());
+        }
+        return emoticons;
+    }
+
+    public int maxIdInRecentEmoticonTable(){
+        int lastID = 0;
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selectQuery = "SELECT MAX(recentid) FROM " + RECENT_EMOTICON_NAME;
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            lastID = c.getInt(0);
+        }
+        return lastID;
     }
 
     //USER------------------

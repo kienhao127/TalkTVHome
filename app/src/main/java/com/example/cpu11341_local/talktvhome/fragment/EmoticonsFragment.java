@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.cpu11341_local.talktvhome.EmoticonUtil;
+import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;
 import com.example.cpu11341_local.talktvhome.adapter.EmoticonsRecyclerAdapter;
 
@@ -25,7 +26,7 @@ import java.util.LinkedHashMap;
 public class EmoticonsFragment extends Fragment {
     int emoticonsCategory;
     RecyclerView recyclerView;
-    EmoticonsRecyclerAdapter adapter;
+    public EmoticonsRecyclerAdapter adapter;
     RecyclerView.LayoutManager layoutManager;
     LinkedHashMap<String, Integer> emotions;
     EmoticonsRecyclerAdapter.EmoticonClickListener emoticonClickListener;
@@ -41,8 +42,11 @@ public class EmoticonsFragment extends Fragment {
         Log.d("EmoticonsFragment", "onCreateView");
         View view = inflater.inflate(R.layout.emoticons_fragment, container, false);
 
-        emotions = EmoticonUtil.getInstance().getEmoticons(emoticonsCategory);
-
+        if (emoticonsCategory != 0) {
+            emotions = EmoticonUtil.getInstance().getEmoticons(emoticonsCategory);
+        } else {
+            emotions = MessageDataManager.getInstance().getListRecentEmoticon(getContext());
+        }
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
 
         adapter = new EmoticonsRecyclerAdapter(getContext(), emoticonClickListener, emotions);

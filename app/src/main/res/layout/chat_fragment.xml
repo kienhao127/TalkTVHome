@@ -125,36 +125,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
-        <RelativeLayout
-            android:id="@+id/emoticonKeyboard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/editText"
-            android:visibility="gone">
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabLayout"
-                style="@style/customTabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_toLeftOf="@+id/removeIcon"
-                android:layout_toStartOf="@+id/removeIcon"
-                android:background="#eee"/>
-            <ImageView
-                android:id="@+id/removeIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:background="#eee"
-                android:src="@drawable/emoji_x"/>
-            <android.support.v4.view.ViewPager
-                android:id="@+id/emoticons_pager"
-                android:layout_width="match_parent"
-                android:layout_height="210dp"
-                android:layout_below="@id/tabLayout"
-                android:background="#e2e6e7">
-            </android.support.v4.view.ViewPager>
-        </RelativeLayout>
+        <include layout="@layout/emoticon_keyboard"/>
     </RelativeLayout>
     <include layout="@layout/context_menu_layout"/>
 

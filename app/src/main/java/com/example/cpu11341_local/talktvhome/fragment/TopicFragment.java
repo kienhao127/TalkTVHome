@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.cpu11341_local.talktvhome.DatabaseHelper;
 import com.example.cpu11341_local.talktvhome.MessageActivity;
 import com.example.cpu11341_local.talktvhome.MessageDataManager;
 import com.example.cpu11341_local.talktvhome.R;

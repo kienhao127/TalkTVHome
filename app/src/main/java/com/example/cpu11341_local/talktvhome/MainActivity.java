@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        MessageDataManager.getInstance().insertUser( new User(0, "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"), getApplicationContext());
 //        MessageDataManager.getInstance().insertUser( new User(1, "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Thúy Chi"), getApplicationContext());
-//        MessageDataManager.getInstance().insertUser( new User(2, "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"), getApplicationContext());
+        MessageDataManager.getInstance().insertUser( new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"), getApplicationContext());
 //        MessageDataManager.getInstance().insertUser( new User(5, "http://is2.mzstatic.com/image/thumb/Purple127/v4/95/75/d9/9575d99b-8854-11cc-25ef-4aa4b4bb6dc3/source/1200x630bb.jpg", "Tui"), getApplicationContext());
 
         final Random r = new Random();

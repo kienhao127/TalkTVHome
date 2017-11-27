@@ -1,33 +1,15 @@
 package com.example.cpu11341_local.talktvhome;
 
-import android.app.Fragment;
 import android.content.Context;
-import android.icu.text.DateFormat;
-import android.icu.text.SimpleDateFormat;
-import android.provider.ContactsContract;
-import android.support.v4.app.FragmentManager;
-import android.text.format.DateUtils;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.example.cpu11341_local.talktvhome.data.EventMessage;
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
-import com.example.cpu11341_local.talktvhome.data.RemindMessage;
-import com.example.cpu11341_local.talktvhome.data.SimpleMessage;
 import com.example.cpu11341_local.talktvhome.data.Topic;
 import com.example.cpu11341_local.talktvhome.data.User;
-import com.example.cpu11341_local.talktvhome.fragment.ChatFragment;
-import com.example.cpu11341_local.talktvhome.fragment.TopicFragment;
+import com.example.cpu11341_local.talktvhome.helper.DatabaseHelper;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -76,7 +58,21 @@ public class MessageDataManager {
         return instance;
     }
 
+    //-----------RECENT EMOTICON
+    public void insertRecentEmoticon(String key, int value, Context context){
+        DatabaseHelper.getInstance(context).insertRecentEmoticon(key, value);
+    }
 
+    public void deleteRecentEmoticon(Context context){
+        int deletePosition = DatabaseHelper.getInstance(context).maxIdInRecentEmoticonTable() - 45;
+        if (deletePosition >= 1) {
+            DatabaseHelper.getInstance(context).deleteRecentEmoticonFrom(deletePosition);
+        }
+    }
+
+    public LinkedHashMap<String, Integer> getListRecentEmoticon(Context context){
+        return DatabaseHelper.getInstance(context).getListRecentEmoticon();
+    }
     //-----------MESSAGE
     public ArrayList<MessageDetail> getListMessageFromDB(String topicID, Context context, int loadMoreFrom) {
         ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
@@ -100,6 +96,9 @@ public class MessageDataManager {
         if (messageDetail.getType() == 4) {
             strText = "Bạn: " + messageDetail.getText();
             idol = MessageDataManager.getInstance().getUser(idolID, context);
+            if (idol.getName() == null){
+                //Get idol từ server
+            }
         } else {
             idol = messageDetail.getUser();
             strText = messageDetail.getText();
@@ -204,10 +203,10 @@ public class MessageDataManager {
 
     //------------USER
 
-//    public boolean insertUser(User user, Context context){
-//        DatabaseHelper.getInstance(context).insertUser(user);
-//        return true;
-//    }
+    public boolean insertUser(User user, Context context){
+        DatabaseHelper.getInstance(context).insertUser(user);
+        return true;
+    }
 //
 //    public User getUser(String userID, Context context) {
 //        return DatabaseHelper.getInstance(context).getUser(userID);
