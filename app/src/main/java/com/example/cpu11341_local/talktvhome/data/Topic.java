@@ -7,8 +7,7 @@ import java.util.Date;
  */
 
 public class Topic {
-    String avatar;
-    String name;
+    User user;
     String lastMess;
     long date;
     int action_type; //1: system, 2: not follow, 3: Chat
@@ -16,9 +15,8 @@ public class Topic {
     boolean hasNewMessage;
     boolean isFollow;
 
-    public Topic(String avatar, String name, String lastMess, long date, int action_type, String topicID, boolean hasNewMessage, boolean isFollow) {
-        this.avatar = avatar;
-        this.name = name;
+    public Topic(User user, String lastMess, long date, int action_type, String topicID, boolean hasNewMessage, boolean isFollow) {
+        this.user = user;
         this.lastMess = lastMess;
         this.date = date;
         this.action_type = action_type;
@@ -30,20 +28,12 @@ public class Topic {
     public Topic() {
     }
 
-    public String getAvatar() {
-        return avatar;
+    public User getUser() {
+        return user;
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getLastMess() {

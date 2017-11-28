@@ -37,6 +37,9 @@ import java.util.Comparator;
  */
 
 public class TopicFragment extends android.support.v4.app.Fragment {
+    static final int SYSTEM_TYPE = 1;
+    static final int UNFOLLOWGROUP_TYPE = 2;
+    static final int CHAT_TYPE = 3;
 
     RecyclerView topicRecyclerView;
     TopicRecyclerAdapter adapter;
@@ -174,8 +177,8 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                     MessageDataManager.getInstance().updateTopic(arrTopic.get(position), getContext());
                     adapter.notifyDataSetChanged();
                     switch (arrTopic.get(position).getAction_type()) {
-                        case 1:
-                        case 3:
+                        case SYSTEM_TYPE:
+                        case CHAT_TYPE:
                             ChatFragment chatFragment = new ChatFragment(arrTopic.get(position));
                             FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
@@ -187,7 +190,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                                     .addToBackStack(null)
                                     .commit();
                             break;
-                        case 2:
+                        case UNFOLLOWGROUP_TYPE:
                             TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName);
                             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                             if (getActivity() instanceof MessageActivity) {
@@ -201,6 +204,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
 
                             break;
                     }
+
                 }
             });
 
@@ -258,7 +262,7 @@ public class TopicFragment extends android.support.v4.app.Fragment {
                 arrTopic.remove(pos);
                 break;
             case R.id.mnBlock:
-                Toast.makeText(getContext(), "Chặn" + arrTopic.get(pos).getName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Chặn" + arrTopic.get(pos).getUser().getName(), Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onContextItemSelected(item);

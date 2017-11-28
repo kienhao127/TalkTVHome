@@ -50,6 +50,10 @@ import java.util.StringTokenizer;
  */
 
 public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    static final int EVENT = 1;
+    static final int REMIND = 2;
+    static final int SIMPLEMESSAGE = 3;
+    static final int MY_SIMPLEMESSAGE = 4;
 
     private Context context;
     private OnItemClickListener mItemClickListener;
@@ -89,16 +93,16 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
-            case 1:{
+            case EVENT:{
                 return new EventHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_event_layout,parent,false));
             }
-            case 2:{
+            case REMIND:{
                 return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
             }
-            case 3:{
+            case SIMPLEMESSAGE:{
                 return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
             }
-            case 4:{
+            case MY_SIMPLEMESSAGE:{
                 return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
             }
             default:{
@@ -110,7 +114,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
-            case 1:
+            case EVENT:
                 EventHolder eventHolder = (EventHolder) holder;
                 eventHolder.textViewTitle.setText(((EventMessage)arrMessDetail.get(position)).getTitle());
                 eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
@@ -125,7 +129,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 eventHolder.textViewDes.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
                 break;
-            case 2:
+            case REMIND:
                 RemindHolder remindHolder = (RemindHolder) holder;
                 remindHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 remindHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((RemindMessage)arrMessDetail.get(position)).getEventDatetime()));
@@ -133,7 +137,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewDes.setText(arrMessDetail.get(position).getText());
                 remindHolder.textViewViewDetail.setText(((RemindMessage)arrMessDetail.get(position)).getAction_title());
                 break;
-            case 3:
+            case SIMPLEMESSAGE:
                 MessageHolder messageHolder = (MessageHolder) holder;
                 if (position == 0){
                     messageHolder.textViewDate.setVisibility(View.VISIBLE);
@@ -179,7 +183,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     messageHolder.textViewMessDetail.setHeight((int) pxFromDp(context, 50));
                 }
                 break;
-            case 4:
+            case MY_SIMPLEMESSAGE:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
                 if (position == 0){
                     myMessageHolder.textViewDate.setVisibility(View.VISIBLE);

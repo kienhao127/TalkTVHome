@@ -130,18 +130,13 @@ public class EmoticonUtil {
     }
 
     public Spannable getSmiledText(String text, Context context) {
-        ArrayList<Integer> starts = new ArrayList<>();
-        ArrayList<Integer> ends = new ArrayList<>();
         SpannableStringBuilder builder = new SpannableStringBuilder(text);
         String regex = "\\:[^;: ]{1,3}\\:";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(text);
         while (matcher.find()){
-            starts.add(matcher.start());
-            ends.add(matcher.end());
-        }
-        for (int i=0; i < starts.size(); i++){
-            String iconKey = text.substring(starts.get(i), ends.get(i));
+
+            String iconKey = matcher.group();
             Drawable drawable = null;
             int iconValue = 0;
             for (LinkedHashMap<String, Integer> emoticons : emoticonsList) {
@@ -154,10 +149,9 @@ public class EmoticonUtil {
             }
             if (drawable != null) {
                 drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
-                builder.setSpan(new ImageSpan(drawable), starts.get(i), ends.get(i), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(new ImageSpan(drawable), matcher.start(), matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
-        MessageDataManager.getInstance().deleteRecentEmoticon(context);
         return builder;
     }
 

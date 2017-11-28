@@ -76,8 +76,8 @@ public class OpenRoomActivity extends AppCompatActivity {
                     User user = new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady");
                     String topidID = user.getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId();
                     Topic topic = MessageDataManager.getInstance().getTopic(topidID, getApplicationContext());
-                    if (topic.getName() == null) {
-                        topic = new Topic(user.getAvatar(), user.getName(), "", 0, 3, topidID, false, false);
+                    if (topic.getUser() == null) {
+                        topic = new Topic(user, "", 0, 3, topidID, false, false);
                     }
                     ChatFragment chatFragment = new ChatFragment(topic);
                     getSupportFragmentManager().beginTransaction()

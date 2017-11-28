@@ -55,8 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String TOPIC_TABLE_NAME = "topic";
     public static final String TOPIC_COLUMN_NAME_TOPICID = "topicid";
-    public static final String TOPIC_COLUMN_NAME_NAME = "name";
-    public static final String TOPIC_COLUMN_NAME_AVATAR = "avatar";
+    public static final String TOPIC_COLUMN_NAME_USERID = "userid";
     public static final String TOPIC_COLUMN_NAME_LASTMSG = "lastmsg";
     public static final String TOPIC_COLUMN_NAME_DATETIME = "datetime";
     public static final String TOPIC_COLUMN_NAME_ACTIONTYPE = "actiontype";
@@ -68,16 +67,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String USER_COLUMN_NAME_NAME = "name";
     public static final String USER_COLUMN_NAME_AVATAR = "avatar";
 
-    public static final String RECENT_EMOTICON_NAME = "recentemotionname";
+    public static final String RECENT_EMOTICON_TABLE_NAME = "recentemotionname";
     public static final String RECENT_EMOTICON_COLUMN_ID = "recentid";
     public static final String RECENT_EMOTICON_COLUMN_KEY = "recentkey";
     public static final String RECENT_EMOTICON_COLUMN_VALUE = "recentvalue";
+    public static final String RECENT_EMOTICON_COLUMN_DATE = "recentdate";
 
     private static final String RECENT_EMOTICON_TABLE_CREATE =
-            "CREATE TABLE " + RECENT_EMOTICON_NAME + " (" +
+            "CREATE TABLE " + RECENT_EMOTICON_TABLE_NAME + " (" +
                     RECENT_EMOTICON_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     RECENT_EMOTICON_COLUMN_VALUE + " INTEGER, " +
-                    RECENT_EMOTICON_COLUMN_KEY + " TEXT UNIQUE" +
+                    RECENT_EMOTICON_COLUMN_KEY + " TEXT UNIQUE, " +
+                    RECENT_EMOTICON_COLUMN_DATE + " TEXT" +
                     ");";
 
     private static final String MESSAGE_TABLE_CREATE =
@@ -123,9 +124,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TOPIC_TABLE_CREATE =
             "CREATE TABLE " + TOPIC_TABLE_NAME + " (" +
                     TOPIC_COLUMN_NAME_TOPICID + " TEXT PRIMARY KEY, " +
-                    TOPIC_COLUMN_NAME_NAME + " TEXT, " +
+                    TOPIC_COLUMN_NAME_USERID + " TEXT, " +
                     TOPIC_COLUMN_NAME_LASTMSG + " TEXT, " +
-                    TOPIC_COLUMN_NAME_AVATAR + " TEXT, " +
                     TOPIC_COLUMN_NAME_ACTIONTYPE + " INTEGER, " +
                     TOPIC_COLUMN_NAME_DATETIME + " TEXT, " +
                     TOPIC_COLUMN_NAME_HASNEWMSG + " INTEGER, " +
@@ -176,12 +176,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Emoticon--------------
-    public boolean insertRecentEmoticon(String key, int value){
+    public boolean insertRecentEmoticon(String key, int value, long date){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(RECENT_EMOTICON_COLUMN_KEY, key);
         values.put(RECENT_EMOTICON_COLUMN_VALUE, value);
-        long result = db.insert(RECENT_EMOTICON_NAME, null, values);
+        values.put(RECENT_EMOTICON_COLUMN_DATE, date);
+        long result = db.insert(RECENT_EMOTICON_TABLE_NAME, null, values);
         if (result == -1){
             return false;
         } else {
@@ -189,16 +190,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean deleteRecentEmoticonFrom(int position){
+    public boolean deleteRecentEmoticon(int rowNum){
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.delete(RECENT_EMOTICON_NAME, RECENT_EMOTICON_COLUMN_ID + "<=" + position, null) > 0;
+        String deleteWhere = RECENT_EMOTICON_COLUMN_ID + " in " +
+                                    "(SELECT " + RECENT_EMOTICON_COLUMN_ID +
+                                    " FROM " + RECENT_EMOTICON_TABLE_NAME +
+                                    " ORDER BY " + RECENT_EMOTICON_COLUMN_DATE + " LIMIT " + rowNum + " )";
+        long deletedRow = db.delete(RECENT_EMOTICON_TABLE_NAME, deleteWhere, null);
+        if (deletedRow > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean updateRecentEmoticon(String key, long date){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(RECENT_EMOTICON_COLUMN_DATE, date);
+
+        long result = db.update(RECENT_EMOTICON_TABLE_NAME, values, RECENT_EMOTICON_COLUMN_KEY + " = ?", new String[] {key});
+
+        if (result > 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public LinkedHashMap<String, Integer> getListRecentEmoticon() {
         LinkedHashMap<String, Integer> emoticons = new LinkedHashMap<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String selectQuery = "SELECT *" +
-                " FROM " + RECENT_EMOTICON_NAME;
+                " FROM " + RECENT_EMOTICON_TABLE_NAME +
+                " ORDER BY " + RECENT_EMOTICON_COLUMN_DATE + " DESC";
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
@@ -208,15 +233,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return emoticons;
     }
 
-    public int maxIdInRecentEmoticonTable(){
-        int lastID = 0;
+    public int totalRowInRecentEmoticonTable(){
+        int totalRow = 0;
         SQLiteDatabase db = this.getReadableDatabase();
-        String selectQuery = "SELECT MAX(recentid) FROM " + RECENT_EMOTICON_NAME;
+        String selectQuery = "SELECT COUNT(*) FROM " + RECENT_EMOTICON_TABLE_NAME;
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
-            lastID = c.getInt(0);
+            totalRow = c.getInt(0);
         }
-        return lastID;
+        return totalRow;
     }
 
     //USER------------------
@@ -255,11 +280,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TOPIC_COLUMN_NAME_ACTIONTYPE, topic.getAction_type());
-        values.put(TOPIC_COLUMN_NAME_AVATAR, topic.getAvatar());
+        values.put(TOPIC_COLUMN_NAME_USERID, topic.getUser().getId());
         values.put(TOPIC_COLUMN_NAME_DATETIME, topic.getDate());
         values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
-        values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
         values.put(TOPIC_COLUMN_NAME_TOPICID, topic.getTopicID());
         values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
         long result = db.insert(TOPIC_TABLE_NAME, null, values);
@@ -274,12 +298,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TOPIC_COLUMN_NAME_ACTIONTYPE, topic.getAction_type());
-        values.put(TOPIC_COLUMN_NAME_AVATAR, topic.getAvatar());
         values.put(TOPIC_COLUMN_NAME_DATETIME, topic.getDate());
         values.put(TOPIC_COLUMN_NAME_HASNEWMSG, (topic.isHasNewMessage())?1:0);
         values.put(TOPIC_COLUMN_NAME_LASTMSG, topic.getLastMess());
-        values.put(TOPIC_COLUMN_NAME_NAME, topic.getName());
-        values.put(TOPIC_COLUMN_NAME_TOPICID, topic.getTopicID());
         values.put(TOPIC_COLUMN_NAME_ISFOLLOW, (topic.isFollow())?1:0);
 
         long result = db.update(TOPIC_TABLE_NAME, values, TOPIC_COLUMN_NAME_TOPICID + " = ?", new String[] {topic.getTopicID()});
@@ -313,13 +334,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Topic topic = new Topic();
                 topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-                topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
-                topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
                 topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
                 topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
                 topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
                 topic.setDate(cTopic.getLong(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_DATETIME)));
                 topic.setFollow((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ISFOLLOW)) == 1)?true:false);
+                topic.setUser(getUser(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID))));
                 arrTopic.add(topic);
             } while (cTopic.moveToNext());
         }
@@ -337,8 +357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Topic topic = new Topic();
                 topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-                topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
-                topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+                topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
                 topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
                 topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
                 topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
@@ -360,8 +379,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
             topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-            topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
-            topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+            topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
             topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
             topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
@@ -385,8 +403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
             topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-            topic.setAvatar(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_AVATAR)));
-            topic.setName(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_NAME)));
+            topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
             topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
             topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));

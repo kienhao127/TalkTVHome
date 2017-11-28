@@ -115,7 +115,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     View view;
 
     public ChatFragment(Topic topic) {
-        this.toolbarTitle = topic.getName();
+        this.toolbarTitle = topic.getUser().getName();
         this.topicID = topic.getTopicID();
         this.userID = MessageDataManager.getInstance().splitTopicID(topicID)[0];
         this.topic = topic;
@@ -238,6 +238,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 messageDetail = new SimpleMessage(4, MessageDataManager.getInstance().getCurrentUser(getContext()), charSequence.toString(),
                         Calendar.getInstance().getTimeInMillis(), false);
                 messageDetail.setTopicID(topicID);
+                MessageDataManager.getInstance().insertUser(topic.getUser(), getContext());
                 Wrapper wrapper = new Wrapper(MessageDataManager.getInstance().insertMessage(messageDetail, getContext()), messageDetail);
                 if (MessageDataManager.getInstance().dataListener != null) {
                     MessageDataManager.getInstance().dataListener.onDataChanged(wrapper.getTopic(), wrapper.getMessageDetail());
@@ -283,7 +284,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 getActivity().onBackPressed();
                 if (getActivity() instanceof MessageActivity) {
                     if (getActivity().getSupportFragmentManager().getBackStackEntryCount() != 0) {
-                        TopicFragment topicFragment = (TopicFragment) getFragmentManager().findFragmentByTag("MessFrag");
+                        TopicFragment topicFragment = (TopicFragment) getFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
                         topicFragment.onResume();
                     }
                 }

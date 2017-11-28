@@ -96,13 +96,13 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
             case 0:
                 RecyclerViewHolder recyclerViewHolder = (RecyclerViewHolder) holder;
                 Glide.with(context)
-                        .load(arrTopic.get(position).getAvatar())
+                        .load(arrTopic.get(position).getUser().getAvatar())
                         .apply(RequestOptions.circleCropTransform())
                         .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
                         .apply(RequestOptions.errorOf(R.drawable.grid_item
                         ))
                         .into(recyclerViewHolder.imageViewAvatar);
-                recyclerViewHolder.textViewName.setText(arrTopic.get(position).getName());
+                recyclerViewHolder.textViewName.setText(arrTopic.get(position).getUser().getName());
                 Spanned spannedString = EmoticonUtil.getInstance().getSmiledText(arrTopic.get(position).getLastMess(), context);
                 recyclerViewHolder.textViewLastMess.setText(spannedString);
                 recyclerViewHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrTopic.get(position).getDate()));

@@ -60,13 +60,17 @@ public class MessageDataManager {
 
     //-----------RECENT EMOTICON
     public void insertRecentEmoticon(String key, int value, Context context){
-        DatabaseHelper.getInstance(context).insertRecentEmoticon(key, value);
+        long t = System.currentTimeMillis();
+        if (!DatabaseHelper.getInstance(context).updateRecentEmoticon(key, t)){
+            DatabaseHelper.getInstance(context).insertRecentEmoticon(key, value, t);
+            deleteRecentEmoticon(context);
+        }
     }
 
     public void deleteRecentEmoticon(Context context){
-        int deletePosition = DatabaseHelper.getInstance(context).maxIdInRecentEmoticonTable() - 45;
-        if (deletePosition >= 1) {
-            DatabaseHelper.getInstance(context).deleteRecentEmoticonFrom(deletePosition);
+        int deleteRow = DatabaseHelper.getInstance(context).totalRowInRecentEmoticonTable() - 45;
+        if (deleteRow >= 1) {
+            DatabaseHelper.getInstance(context).deleteRecentEmoticon(deleteRow);
         }
     }
 
@@ -89,6 +93,8 @@ public class MessageDataManager {
 
     public Topic insertMessage(MessageDetail messageDetail, Context context) {
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
+        insertUser(messageDetail.getUser(), context);
+
         String topicID = messageDetail.getTopicID();
         String idolID = splitTopicID(topicID)[0];
         String strText = "";
@@ -96,9 +102,6 @@ public class MessageDataManager {
         if (messageDetail.getType() == 4) {
             strText = "Bạn: " + messageDetail.getText();
             idol = MessageDataManager.getInstance().getUser(idolID, context);
-            if (idol.getName() == null){
-                //Get idol từ server
-            }
         } else {
             idol = messageDetail.getUser();
             strText = messageDetail.getText();
@@ -107,7 +110,7 @@ public class MessageDataManager {
         // Nếu topic đã tồn tại và chưa theo dõi,
         // Cập nhật lại unfollowTopic
         // Tại mới nếu unfollowTopic chưa có.
-        if (topic.getName() != null) {
+        if (topic.getUser() != null) {
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
             topic.setHasNewMessage(true);
@@ -121,7 +124,7 @@ public class MessageDataManager {
             // Nếu topic chưa theo dõi
             // Cập nhật lại unfollowTopic
             // Tại mới nếu unfollowTopic chưa có.
-            topic = new Topic(idol.getAvatar(), idol.getName(), strText, messageDetail.getDatetime(), 3, topicID, true, false);
+            topic = new Topic(idol, strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (isFollow(topic.getTopicID(), context)) {
                 topic.setFollow(true);
                 updateTopic(topic, context);
@@ -136,13 +139,15 @@ public class MessageDataManager {
 
     //update unfollowTopic sau khi insert
     void updateUnfollowTopic(Topic unfollowTopic, MessageDetail messageDetail, Context context, String topicName, String strText) {
-        if (unfollowTopic.getName() != null) {
+        if (unfollowTopic.getUser() != null) {
             unfollowTopic.setLastMess(topicName + ": " + strText);
             unfollowTopic.setDate(messageDetail.getDatetime());
             unfollowTopic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
         } else {
-            unfollowTopic = new Topic("http://i.imgur.com/xFdNVDs.png", "Tin nhắn",
+            User tempUser = new User ("-1", "http://i.imgur.com/xFdNVDs.png", "Tin nhắn");
+            DatabaseHelper.getInstance(context).insertUser(tempUser);
+            unfollowTopic = new Topic(tempUser,
                     topicName + ": " + strText,
                     messageDetail.getDatetime(), 2, "-1", true, true);
             DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
@@ -194,9 +199,9 @@ public class MessageDataManager {
     void updateUnfollowTopic(Context context) {
         Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
         Topic newestUnfollowTopic = DatabaseHelper.getInstance(context).getNewestUnfollowTopic();
-        if (newestUnfollowTopic.getName() != null) {
+        if (newestUnfollowTopic.getUser() != null) {
             unfollowTopic.setDate(newestUnfollowTopic.getDate());
-            unfollowTopic.setLastMess(newestUnfollowTopic.getName() + ": " + newestUnfollowTopic.getLastMess());
+            unfollowTopic.setLastMess(newestUnfollowTopic.getUser().getName() + ": " + newestUnfollowTopic.getLastMess());
             DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
         }
     }
@@ -232,7 +237,7 @@ public class MessageDataManager {
 
     public boolean isFollow(String topicID, Context context) {
         Topic topic = getTopic(topicID, context);
-        if (topic.getName()!=null && topic.isFollow()){
+        if (topic.getUser() !=null && topic.isFollow()){
             return true;
         }
         String idolID = splitTopicID(topicID)[0];
@@ -246,7 +251,7 @@ public class MessageDataManager {
     public void followIdol(String IdolID, String userID, Context context) {
         //Gọi lên server, userID theo dõi idolID
         Topic removedTopic = DatabaseHelper.getInstance(context).getTopic(IdolID + "_" + userID);
-        if (removedTopic.getName() != null) {
+        if (removedTopic.getUser() != null) {
             removedTopic.setFollow(true);
             DatabaseHelper.getInstance(context).updateTopic(removedTopic);
             if (!DatabaseHelper.getInstance(context).isEsixtUnfollowTopic()) {
