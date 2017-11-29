@@ -47,6 +47,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -98,7 +99,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     RelativeLayout relativeLayoutContextMenu;
     int selectedPosition;
     Button btnCopy, btnDelete;
-    Topic topic = new Topic();
+    Topic topic;
     RelativeLayout relativeLayoutFollowNoti;
     FrameLayout frameLayoutFragmentContainer;
     TalkTextView textViewFollow;
@@ -111,8 +112,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     boolean isEmoticonKeyboardShowing = false;
     RelativeLayout emoticonKeyboard;
     EmoticonFragmentAdapter emoticonFragAdapter;
-    PopupWindow mPopupWindow;
     View view;
+    LinearLayout newMsgNotice;
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getUser().getName();
@@ -127,6 +128,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     void init(View view){
+        newMsgNotice = (LinearLayout) view.findViewById(R.id.newMsgNotice);
         emoticonsViewPager = (ViewPager) view.findViewById(R.id.emoticons_pager);
         tabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
         removeIcon = (ImageView) view.findViewById(R.id.removeIcon);
@@ -377,6 +379,18 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        messDetailRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int lastVisibleItem = ((LinearLayoutManager) messDetailRecyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                if (lastVisibleItem == arrMessDetail.size()-1){
+                    newMsgNotice.setVisibility(View.GONE);
+                }
+            }
+        });
+
         messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             float x1, x2;
 
@@ -444,15 +458,22 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        newMsgNotice.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                messDetailRecyclerView.scrollToPosition(arrMessDetail.size()-1);
+                newMsgNotice.setVisibility(View.GONE);
+            }
+        });
+
         return view;
     }
 
     void hideEmoticonKeyboard(){
+        isEmoticonKeyboardShowing = false;
         imageViewEmoticon.setImageResource(R.drawable.emoji);
         emoticonKeyboard.setVisibility(View.GONE);
-        Animation emoticonKeyboardExit = AnimationUtils.loadAnimation(getContext(), R.anim.context_menu_exit);
-        emoticonKeyboard.startAnimation(emoticonKeyboardExit);
-        isEmoticonKeyboardShowing = false;
         if (getActivity() instanceof OpenRoomActivity) {
             frameLayoutFragmentContainer.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2;
             ((OpenRoomActivity) getActivity()).setOnBackPressedListener(null);
@@ -463,10 +484,9 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     void showEmoticonKeyboard(){
-        imageViewEmoticon.setImageResource(R.drawable.emoji_focus);
-
-        emoticonKeyboard.setVisibility(View.VISIBLE);
         isEmoticonKeyboardShowing = true;
+        imageViewEmoticon.setImageResource(R.drawable.emoji_focus);
+        emoticonKeyboard.setVisibility(View.VISIBLE);
         if (getActivity() instanceof OpenRoomActivity) {
             frameLayoutFragmentContainer.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2 + (int) pxFromDp(getContext(), 250);
             ((OpenRoomActivity) getActivity()).setOnBackPressedListener(this);
@@ -569,9 +589,9 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         }
     }
 
-    private class LoadMessageTask extends AsyncTask<MessageDetail, Void, Void> {
+    private class LoadMessageTask extends AsyncTask<MessageDetail, Void, MessageDetail> {
         @Override
-        protected Void doInBackground(MessageDetail... messageDetails) {
+        protected MessageDetail doInBackground(MessageDetail... messageDetails) {
             arrMessDetail.add(messageDetails[0]);
             if (messageDetails[0].getTopicID().equals(topicID)) {
                 topic = MessageDataManager.getInstance().getTopic(topicID, getContext());
@@ -584,11 +604,19 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 }
 
             }
-            return null;
+            return messageDetails[0];
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(MessageDetail messageDetail) {
+            if (messageDetail.getTopicID().equals(topicID)) {
+                int positionView = ((LinearLayoutManager) messDetailRecyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                if (positionView < arrMessDetail.size()){
+                    newMsgNotice.setVisibility(View.VISIBLE);
+                } else {
+                    newMsgNotice.setVisibility(View.GONE);
+                }
+            }
             if (arrMessDetail.size() == 0) {
                 textViewOver.setVisibility(View.VISIBLE);
             } else {

@@ -103,15 +103,15 @@ public class MainActivity extends AppCompatActivity {
 //                DateFormat df = new SimpleDateFormat("d/MM/yyyy HH:mm:ss");
 //                String date = df.format(Calendar.getInstance().getTime());
 //
-//                MessageDetail messageDetail = new MessageDetail(3, new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
-//                        Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//                SimpleMessage messageDetail = new SimpleMessage(3, new User("2", "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
+//                        String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
 //                messageDetail.setTopicID(messageDetail.getUser().getId() +"_"+MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //                i++;
 //
 //                InsertMessageTask insertMessageTask = new InsertMessageTask();
 //                insertMessageTask.execute(messageDetail);
 //
-//                handler.postDelayed(this, delay);
+//                handler.postDelayed(this, 3000);
 //            }
 //        }, delay);
 

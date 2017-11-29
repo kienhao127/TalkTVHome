@@ -124,9 +124,33 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
-
         <include layout="@layout/emoticon_keyboard"/>
     </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/newMsgNotice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/textInputLayout"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corner"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:layout_marginBottom="7dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Có tin nhắn mới"
+            android:textSize="15dp"
+            android:textColor="@color/colorPrimary"
+            android:paddingRight="5dp"/>
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/ic_circled_chevron_down"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
     <include layout="@layout/context_menu_layout"/>
 
 </RelativeLayout>

@@ -50,6 +50,7 @@ public class OpenRoomActivity extends AppCompatActivity {
                 if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                     getSupportFragmentManager().popBackStack();
                     MessageDataManager.getInstance().setDataListener(null);
+                    isMessShowed = false;
                 }
             }
         });
@@ -91,10 +92,6 @@ public class OpenRoomActivity extends AppCompatActivity {
         });
     }
 
-    public static float pxFromDp(final Context context, final float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
-    }
-
     protected OnBackPressedListener onBackPressedListener;
 
     public interface OnBackPressedListener {
@@ -109,6 +106,7 @@ public class OpenRoomActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (onBackPressedListener != null) {
             onBackPressedListener.doBack();
+            super.onBackPressed();
         } else {
             if (isMessShowed) {
                 getSupportFragmentManager().popBackStack();

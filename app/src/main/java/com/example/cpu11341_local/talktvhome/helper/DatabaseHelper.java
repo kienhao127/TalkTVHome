@@ -357,7 +357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Topic topic = new Topic();
                 topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-                topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
+                topic.setUser(getUser(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID))));
                 topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
                 topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
                 topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
@@ -379,7 +379,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
             topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-            topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
+            topic.setUser(getUser(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID))));
             topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
             topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));
@@ -403,7 +403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
             topic.setTopicID(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_TOPICID)));
-            topic.setUser(getUser(TOPIC_COLUMN_NAME_USERID));
+            topic.setUser(getUser(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_USERID))));
             topic.setLastMess(cTopic.getString(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_LASTMSG)));
             topic.setHasNewMessage((cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_HASNEWMSG)) == 1)?true:false);
             topic.setAction_type(cTopic.getInt(cTopic.getColumnIndex(TOPIC_COLUMN_NAME_ACTIONTYPE)));

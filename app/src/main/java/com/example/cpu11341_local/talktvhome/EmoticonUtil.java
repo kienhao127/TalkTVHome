@@ -138,18 +138,15 @@ public class EmoticonUtil {
 
             String iconKey = matcher.group();
             Drawable drawable = null;
-            int iconValue = 0;
+            Integer iconValue = 0;
             for (LinkedHashMap<String, Integer> emoticons : emoticonsList) {
-                try {
-                    iconValue = emoticons.get(iconKey);
+                iconValue = emoticons.get(iconKey);
+                if (iconValue != null){
                     drawable = context.getDrawable(iconValue);
-                } catch (NullPointerException e) {
-
+                    drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
+                    builder.setSpan(new ImageSpan(drawable), matcher.start(), matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    break;
                 }
-            }
-            if (drawable != null) {
-                drawable.setBounds(0, 0, (int) pxFromDp(context, 20), (int) pxFromDp(context, 20));
-                builder.setSpan(new ImageSpan(drawable), matcher.start(), matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
         return builder;
