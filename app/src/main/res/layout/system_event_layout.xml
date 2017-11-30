@@ -41,10 +41,9 @@
             android:id="@+id/imageViewEvent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_below="@+id/textViewEventDateTime"
             android:layout_marginBottom="5dp"
-            android:src="@drawable/nobanner"
-            android:layout_below="@+id/textViewEventDateTime"/>
+            android:layout_marginTop="5dp"/>
 
         <com.example.cpu11341_local.talktvhome.myview.TalkTextView
             android:id="@+id/textViewDes"
@@ -73,21 +72,12 @@
             android:text="Xem chi tiết"
             android:textSize="15dp"
             android:textColor="#000"
+            android:drawableRight="@drawable/ic_chevron_right"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:layout_below="@+id/line"/>
-
-
-        <ImageView
-            android:id="@+id/imageViewChervonRight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/textViewViewDetail"
-            android:layout_alignRight="@+id/textViewViewDetail"
-            android:layout_alignTop="@+id/textViewViewDetail"
-            android:src="@mipmap/ic_chervon_right" />
 
 
     </RelativeLayout>

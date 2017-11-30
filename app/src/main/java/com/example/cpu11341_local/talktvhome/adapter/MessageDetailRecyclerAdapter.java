@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.cpu11341_local.talktvhome.ElapsedTime;
 import com.example.cpu11341_local.talktvhome.EmoticonUtil;
@@ -115,17 +116,17 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case EVENT:
+                Log.d("Load event holder", "Image view");
                 EventHolder eventHolder = (EventHolder) holder;
                 eventHolder.textViewTitle.setText(((EventMessage)arrMessDetail.get(position)).getTitle());
                 eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 eventHolder.textViewEventDatetime.setText(ElapsedTime.getRelativeTimeSpanString(((EventMessage)arrMessDetail.get(position)).getEventDatetime()));
                 Glide.with(context)
                         .load(((EventMessage)arrMessDetail.get(position)).getImageURL())
-                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                        .apply(RequestOptions.errorOf(R.drawable.grid_item
-                        ))
+                        .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
+                        .apply(RequestOptions.errorOf(R.drawable.nobanner))
+                        .apply(RequestOptions.fitCenterTransform())
                         .into(eventHolder.imageViewEvent);
-
                 eventHolder.textViewDes.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
                 break;

@@ -109,7 +109,7 @@ public class MessageDataManager {
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
         // Nếu topic đã tồn tại và chưa theo dõi,
         // Cập nhật lại unfollowTopic
-        // Tại mới nếu unfollowTopic chưa có.
+        // Tạo mới nếu unfollowTopic chưa có.
         if (topic.getUser() != null) {
             topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
@@ -123,14 +123,18 @@ public class MessageDataManager {
             // Nếu topic chưa tồn tại => tạo mới,
             // Nếu topic chưa theo dõi
             // Cập nhật lại unfollowTopic
-            // Tại mới nếu unfollowTopic chưa có.
+            // Tạo mới nếu unfollowTopic chưa có.
             topic = new Topic(idol, strText, messageDetail.getDatetime(), 3, topicID, true, false);
-            if (isFollow(topic.getTopicID(), context)) {
+            if (messageDetail.getUser().getId() == "0"){
                 topic.setFollow(true);
-                updateTopic(topic, context);
             } else {
-                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
-                updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
+                if (isFollow(topic.getTopicID(), context)) {
+                    topic.setFollow(true);
+                    updateTopic(topic, context);
+                } else {
+                    Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
+                    updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
+                }
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
         }

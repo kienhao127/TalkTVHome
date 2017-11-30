@@ -114,24 +114,25 @@ public class MainActivity extends AppCompatActivity {
 //                handler.postDelayed(this, 3000);
 //            }
 //        }, delay);
-
-//        EventMessage eventMessage = new EventMessage(1, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-//                "Mô tả", Calendar.getInstance().getTimeInMillis(), "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", 1, "Xem chi tiết", "action_extra");
-//        eventMessage.setTopicID("0");
-//        InsertMessageTask insertMessageTask = new InsertMessageTask();
-//        insertMessageTask.execute(eventMessage);
+//        for (int i = 0; i < 10; i++) {
+//            EventMessage eventMessage = new EventMessage(1, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+//                    "Mô tả", Calendar.getInstance().getTimeInMillis(), "Tên event 1", Calendar.getInstance().getTimeInMillis(), "http://talktv.vcdn.vn/talk/mobile/banner/ad_banner_75.jpg", 1, "Xem chi tiết", "action_extra");
+//            eventMessage.setTopicID("0");
+//            InsertMessageTask insertMessageTask = new InsertMessageTask();
+//            insertMessageTask.execute(eventMessage);
 //
-//        RemindMessage remindMessage = new RemindMessage(2, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-//                "Nội dung nhắc nhở", Calendar.getInstance().getTimeInMillis(), "Nhắc nhở 1", Calendar.getInstance().getTimeInMillis(), 1, "Xem chi tiết", "action_extra");
-//        remindMessage.setTopicID("0");
-//        InsertMessageTask insertMessageTask2 = new InsertMessageTask();
-//        insertMessageTask2.execute(remindMessage);
+//            RemindMessage remindMessage = new RemindMessage(2, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+//                    "Nội dung nhắc nhở", Calendar.getInstance().getTimeInMillis(), "Nhắc nhở 1", Calendar.getInstance().getTimeInMillis(), 1, "Xem chi tiết", "action_extra");
+//            remindMessage.setTopicID("0");
+//            InsertMessageTask insertMessageTask2 = new InsertMessageTask();
+//            insertMessageTask2.execute(remindMessage);
 //
-//        SimpleMessage simpleMessage = new SimpleMessage(3, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
-//                "Nội dung thông báo", Calendar.getInstance().getTimeInMillis(), false);
-//        simpleMessage.setTopicID("0");
-//        InsertMessageTask insertMessageTask3 = new InsertMessageTask();
-//        insertMessageTask3.execute(simpleMessage);
+//            SimpleMessage simpleMessage = new SimpleMessage(3, new User("0", "https://img14.androidappsapk.co/300/6/7/8/vn.com.vng.talktv.png", "TalkTV"),
+//                    "Nội dung thông báo", Calendar.getInstance().getTimeInMillis(), false);
+//            simpleMessage.setTopicID("0");
+//            InsertMessageTask insertMessageTask3 = new InsertMessageTask();
+//            insertMessageTask3.execute(simpleMessage);
+//        }
 //        try {
 //            Thread.sleep(10);
 //        } catch (InterruptedException e) {

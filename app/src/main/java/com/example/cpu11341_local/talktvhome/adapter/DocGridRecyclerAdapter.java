@@ -44,7 +44,7 @@ public class DocGridRecyclerAdapter extends RecyclerView.Adapter<DocGridRecycler
         holder.gridRecyclerAdapter.setData(arrDocGridWithTitle.get(position).getarrDocGrid());
         holder.textView.setText(arrDocGridWithTitle.get(position).getDocTitle().getTitle());
         if (!arrDocGridWithTitle.get(position).getDocTitle().getTitle().equals("Nổi bật")){
-            holder.imageView.setImageResource(R.mipmap.ic_chervon_right);
+            holder.imageView.setImageResource(R.drawable.ic_chevron_right);
             holder.textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

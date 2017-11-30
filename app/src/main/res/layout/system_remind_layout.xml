@@ -68,18 +68,8 @@
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_below="@+id/line"/>
-
-
-        <ImageView
-            android:id="@+id/imageViewChervonRight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/textViewViewDetail"
-            android:layout_alignRight="@+id/textViewViewDetail"
-            android:layout_alignTop="@+id/textViewViewDetail"
-            android:src="@mipmap/ic_chervon_right" />
-
+            android:layout_below="@+id/line"
+            android:drawableRight="@drawable/ic_chevron_right"/>
 
     </RelativeLayout>
 </LinearLayout>
