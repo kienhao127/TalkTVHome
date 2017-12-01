@@ -220,15 +220,16 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
-        editText.setOnTouchListener(new View.OnTouchListener(){
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener(){
 
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN){
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
                     hideEmoticonKeyboard();
                     editText.requestFocus(editText.getText().length());
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
                 }
-                return false;
             }
         });
 
@@ -252,14 +253,19 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         imageViewEmoticon.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                hideKeyboard(v);
-                final Handler handler = new Handler();
-                final int delay = 100; //milliseconds
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        showEmoticonKeyboard();
-                    }
-                }, delay);
+                if (isEmoticonKeyboardShowing){
+                    editText.requestFocus(editText.getText().length());
+                } else {
+                    hideKeyboard(v);
+                    editText.clearFocus();
+                    final Handler handler = new Handler();
+                    final int delay = 100; //milliseconds
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            showEmoticonKeyboard();
+                        }
+                    }, delay);
+                }
             }
         });
 
@@ -406,7 +412,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                         hideEmoticonKeyboard();
                     }
                 }
-                return false;
+                return true;
             }
         });
 

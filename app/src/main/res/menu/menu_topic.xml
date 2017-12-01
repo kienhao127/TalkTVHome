@@ -3,8 +3,4 @@
     <group android:id="@+id/grp1">
         <item android:id="@+id/mnDelete" android:title="Xóa"/>
     </group>
-    <group android:id="@+id/grp2">
-        <item android:id="@+id/mnBlock" android:title="Chặn" />
-    </group>
-
 </menu>
