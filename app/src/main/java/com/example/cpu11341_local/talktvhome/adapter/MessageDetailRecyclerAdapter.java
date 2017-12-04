@@ -116,6 +116,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case EVENT:
+                Log.d("Load event holder", "Image view");
                 EventHolder eventHolder = (EventHolder) holder;
                 eventHolder.textViewTitle.setText(((EventMessage)arrMessDetail.get(position)).getTitle());
                 eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));

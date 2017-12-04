@@ -92,43 +92,39 @@ public class MessageDataManager {
     }
 
     public Topic insertMessage(MessageDetail messageDetail, Context context) {
-        //insert vào DB
         DatabaseHelper.getInstance(context).insertMessage(messageDetail);
         insertUser(messageDetail.getUser(), context);
 
-        //Tạo chuỗi last message
         String topicID = messageDetail.getTopicID();
         String idolID = splitTopicID(topicID)[0];
-        String lastMessage = "";
+        String strText = "";
         User idol = new User();
         if (messageDetail.getType() == 4) {
-            lastMessage = "Bạn: " + messageDetail.getText();
+            strText = "Bạn: " + messageDetail.getText();
             idol = MessageDataManager.getInstance().getUser(idolID, context);
         } else {
             idol = messageDetail.getUser();
-            lastMessage = messageDetail.getText();
+            strText = messageDetail.getText();
         }
-
-        //Tìm kiếm topic theo ID
         Topic topic = DatabaseHelper.getInstance(context).getTopic(topicID);
-
         // Nếu topic đã tồn tại và chưa theo dõi,
         // Cập nhật lại unfollowTopic
         // Tạo mới nếu unfollowTopic chưa có.
         if (topic.getUser() != null) {
-            topic.setLastMess(lastMessage);
+            topic.setLastMess(strText);
             topic.setDate(messageDetail.getDatetime());
             topic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(topic);
             if (!topic.isFollow()) {
-                updateUnfollowTopic(messageDetail, context, idol.getName(), lastMessage);
+                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
+                updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
             }
         } else {
             // Nếu topic chưa tồn tại => tạo mới,
             // Nếu topic chưa theo dõi
             // Cập nhật lại unfollowTopic
             // Tạo mới nếu unfollowTopic chưa có.
-            topic = new Topic(idol, lastMessage, messageDetail.getDatetime(), 3, topicID, true, false);
+            topic = new Topic(idol, strText, messageDetail.getDatetime(), 3, topicID, true, false);
             if (messageDetail.getUser().getId() == "0"){
                 topic.setFollow(true);
             } else {
@@ -136,7 +132,8 @@ public class MessageDataManager {
                     topic.setFollow(true);
                     updateTopic(topic, context);
                 } else {
-                    updateUnfollowTopic(messageDetail, context, idol.getName(), lastMessage);
+                    Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
+                    updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
                 }
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
@@ -145,10 +142,9 @@ public class MessageDataManager {
     }
 
     //update unfollowTopic sau khi insert
-    void updateUnfollowTopic(MessageDetail messageDetail, Context context, String topicName, String lastMessage) {
-        Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
+    void updateUnfollowTopic(Topic unfollowTopic, MessageDetail messageDetail, Context context, String topicName, String strText) {
         if (unfollowTopic.getUser() != null) {
-            unfollowTopic.setLastMess(topicName + ": " + lastMessage);
+            unfollowTopic.setLastMess(topicName + ": " + strText);
             unfollowTopic.setDate(messageDetail.getDatetime());
             unfollowTopic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(unfollowTopic);
@@ -156,7 +152,7 @@ public class MessageDataManager {
             User tempUser = new User ("-1", "http://i.imgur.com/xFdNVDs.png", "Tin nhắn");
             DatabaseHelper.getInstance(context).insertUser(tempUser);
             unfollowTopic = new Topic(tempUser,
-                    topicName + ": " + lastMessage,
+                    topicName + ": " + strText,
                     messageDetail.getDatetime(), 2, "-1", true, true);
             DatabaseHelper.getInstance(context).insertTopic(unfollowTopic);
         }

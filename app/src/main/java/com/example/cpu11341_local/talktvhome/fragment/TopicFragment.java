@@ -36,7 +36,7 @@ import java.util.Comparator;
  * Created by CPU11341-local on 9/1/2017.
  */
 
-public class TopicFragment extends android.support.v4.app.Fragment implements TopicRecyclerAdapter.OnItemClickListener{
+public class TopicFragment extends android.support.v4.app.Fragment {
     static final int SYSTEM_TYPE = 1;
     static final int UNFOLLOWGROUP_TYPE = 2;
     static final int CHAT_TYPE = 3;
@@ -170,7 +170,43 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
             adapter = new TopicRecyclerAdapter(getContext(), arrTopic, topicRecyclerView);
             topicRecyclerView.setAdapter(adapter);
 
-            adapter.SetOnItemClickListener(this);
+            adapter.SetOnItemClickListener(new TopicRecyclerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    arrTopic.get(position).setHasNewMessage(false);
+                    MessageDataManager.getInstance().updateTopic(arrTopic.get(position), getContext());
+                    adapter.notifyDataSetChanged();
+                    switch (arrTopic.get(position).getAction_type()) {
+                        case SYSTEM_TYPE:
+                        case CHAT_TYPE:
+                            ChatFragment chatFragment = new ChatFragment(arrTopic.get(position));
+                            FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
+                            if (getActivity() instanceof MessageActivity) {
+                                Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                            } else {
+                                Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                            }
+                            Chatft.add(R.id.fragment_container, chatFragment, "ChatFragment")
+                                    .addToBackStack(null)
+                                    .commit();
+                            break;
+                        case UNFOLLOWGROUP_TYPE:
+                            TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName);
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            if (getActivity() instanceof MessageActivity) {
+                                ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
+                            } else {
+                                ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
+                            }
+                            ft.add(R.id.fragment_container, topicFragment, "UnfollowTopicGroupFrag")
+                                    .addToBackStack(null)
+                                    .commit();
+
+                            break;
+                    }
+
+                }
+            });
 
             adapter.setOnLoadMoreListener(new TopicRecyclerAdapter.OnLoadMoreListener() {
                 @Override
@@ -225,6 +261,9 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
                 deleteTopicTask.execute(arrTopic.get(pos).getTopicID());
                 arrTopic.remove(pos);
                 break;
+            case R.id.mnBlock:
+                Toast.makeText(getContext(), "Chặn" + arrTopic.get(pos).getUser().getName(), Toast.LENGTH_SHORT).show();
+                break;
         }
         return super.onContextItemSelected(item);
     }
@@ -232,7 +271,6 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
     @Override
     public void onResume() {
         super.onResume();
-        adapter.SetOnItemClickListener(this);
         LoadTopicTask loadTopicTask = new LoadTopicTask();
         loadTopicTask.execute();
 
@@ -268,42 +306,6 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
                 }
             }
         });
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        adapter.SetOnItemClickListener(null);
-        arrTopic.get(position).setHasNewMessage(false);
-        MessageDataManager.getInstance().updateTopic(arrTopic.get(position), getContext());
-        adapter.notifyDataSetChanged();
-        switch (arrTopic.get(position).getAction_type()) {
-            case SYSTEM_TYPE:
-            case CHAT_TYPE:
-                ChatFragment chatFragment = new ChatFragment(arrTopic.get(position));
-                FragmentTransaction Chatft = getActivity().getSupportFragmentManager().beginTransaction();
-                if (getActivity() instanceof MessageActivity) {
-                    Chatft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
-                } else {
-                    Chatft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
-                }
-                Chatft.add(R.id.fragment_container, chatFragment, "ChatFragment")
-                        .addToBackStack(null)
-                        .commit();
-                break;
-            case UNFOLLOWGROUP_TYPE:
-                TopicFragment topicFragment = new TopicFragment("Tin nhắn chưa theo dõi", false, activityName);
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                if (getActivity() instanceof MessageActivity) {
-                    ft.setCustomAnimations(R.anim.enter_from_right, 0, 0, R.anim.exit_to_right);
-                } else {
-                    ft.setCustomAnimations(R.anim.enter_from_bottom, 0, 0, R.anim.exit_to_bottom);
-                }
-                ft.add(R.id.fragment_container, topicFragment, "UnfollowTopicGroupFrag")
-                        .addToBackStack(null)
-                        .commit();
-
-                break;
-        }
     }
 
     private class LoadTopicTask extends AsyncTask<String, Void, ArrayList<Topic>> {
@@ -376,6 +378,7 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
             adapter.setLoaded();
         }
     }
+
 
     private class DeleteTopicTask extends AsyncTask<String, Void, Void> {
         @Override
