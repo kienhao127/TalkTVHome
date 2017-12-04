@@ -116,8 +116,7 @@ public class MessageDataManager {
             topic.setHasNewMessage(true);
             DatabaseHelper.getInstance(context).updateTopic(topic);
             if (!topic.isFollow()) {
-                Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
-                updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
+                updateUnfollowTopic(messageDetail, context, idol.getName(), strText);
             }
         } else {
             // Nếu topic chưa tồn tại => tạo mới,
@@ -132,8 +131,7 @@ public class MessageDataManager {
                     topic.setFollow(true);
                     updateTopic(topic, context);
                 } else {
-                    Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
-                    updateUnfollowTopic(unfollowTopic, messageDetail, context, idol.getName(), strText);
+                    updateUnfollowTopic(messageDetail, context, idol.getName(), strText);
                 }
             }
             DatabaseHelper.getInstance(context).insertTopic(topic);
@@ -142,7 +140,8 @@ public class MessageDataManager {
     }
 
     //update unfollowTopic sau khi insert
-    void updateUnfollowTopic(Topic unfollowTopic, MessageDetail messageDetail, Context context, String topicName, String strText) {
+    void updateUnfollowTopic(MessageDetail messageDetail, Context context, String topicName, String strText) {
+        Topic unfollowTopic = DatabaseHelper.getInstance(context).getTopic("-1");
         if (unfollowTopic.getUser() != null) {
             unfollowTopic.setLastMess(topicName + ": " + strText);
             unfollowTopic.setDate(messageDetail.getDatetime());

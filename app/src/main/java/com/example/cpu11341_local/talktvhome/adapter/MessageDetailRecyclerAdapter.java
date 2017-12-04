@@ -125,7 +125,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         .load(((EventMessage)arrMessDetail.get(position)).getImageURL())
                         .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
                         .apply(RequestOptions.errorOf(R.drawable.nobanner))
-                        .apply(RequestOptions.fitCenterTransform())
                         .into(eventHolder.imageViewEvent);
                 eventHolder.textViewDes.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
