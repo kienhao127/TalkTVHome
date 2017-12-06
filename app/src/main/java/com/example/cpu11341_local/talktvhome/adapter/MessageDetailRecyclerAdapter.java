@@ -116,7 +116,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case EVENT:
-                Log.d("Load event holder", "Image view");
                 EventHolder eventHolder = (EventHolder) holder;
                 eventHolder.textViewTitle.setText(((EventMessage)arrMessDetail.get(position)).getTitle());
                 eventHolder.textViewDateTime.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
@@ -125,6 +124,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         .load(((EventMessage)arrMessDetail.get(position)).getImageURL())
                         .apply(RequestOptions.placeholderOf(R.drawable.nobanner))
                         .apply(RequestOptions.errorOf(R.drawable.nobanner))
+                        .apply(RequestOptions.centerInsideTransform())
                         .into(eventHolder.imageViewEvent);
                 eventHolder.textViewDes.setText(new SpannableStringBuilder(arrMessDetail.get(position).getText()));
                 eventHolder.textViewViewDetail.setText(((EventMessage)arrMessDetail.get(position)).getAction_title());
@@ -144,7 +144,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 } else {
                     if (arrMessDetail.get(position - 1) != null){
-                        if (ElapsedTime.getDayOfDate(arrMessDetail.get(position).getDatetime()) != ElapsedTime.getDayOfDate(arrMessDetail.get(position - 1).getDatetime())) {
+                        if (ElapsedTime.CompareDate(arrMessDetail.get(position-1).getDatetime(), arrMessDetail.get(position).getDatetime(), 15)){
                             messageHolder.textViewDate.setVisibility(View.VISIBLE);
                             messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                         } else {
@@ -177,11 +177,10 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(messageHolder.imageViewAvatar);
                     messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                messageHolder.textViewMessDetail.setText(arrMessDetail.get(position).getText());
+
+                Spanned spannedMessage = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
+                messageHolder.textViewMessDetail.setText(spannedMessage);
                 messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
-                if (messageHolder.textViewMessDetail.getHeight() < (int) pxFromDp(context, 50)){
-                    messageHolder.textViewMessDetail.setHeight((int) pxFromDp(context, 50));
-                }
                 break;
             case MY_SIMPLEMESSAGE:
                 MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
@@ -190,7 +189,7 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                 } else {
                     if (arrMessDetail.get(position - 1) != null){
-                        if (ElapsedTime.getDayOfDate(arrMessDetail.get(position).getDatetime()) != ElapsedTime.getDayOfDate(arrMessDetail.get(position - 1).getDatetime())) {
+                        if (ElapsedTime.CompareDate(arrMessDetail.get(position-1).getDatetime(), arrMessDetail.get(position).getDatetime(), 15)){
                             myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
                             myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
                         } else {
@@ -223,8 +222,8 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                             .into(myMessageHolder.imageViewAvatar);
                     myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
                 }
-                Spanned spannedString = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
-                myMessageHolder.textViewMessDetail.setText(spannedString);
+                Spanned spannedMyMessage = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
+                myMessageHolder.textViewMessDetail.setText(spannedMyMessage);
                 myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
 
                 if (((SimpleMessage)arrMessDetail.get(position)).isWarning()) {
@@ -239,10 +238,6 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 break;
             }
         }
-    }
-
-    public static float pxFromDp(final Context context, final float dp) {
-        return dp * context.getResources().getDisplayMetrics().density;
     }
 
     public interface OnItemClickListener {

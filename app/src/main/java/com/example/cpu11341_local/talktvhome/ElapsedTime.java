@@ -54,9 +54,11 @@ public class ElapsedTime {
         return df.format(date);
     }
 
-    public static int getDayOfDate(long date){
-        SimpleDateFormat df = new SimpleDateFormat("d");
-        df.setTimeZone(TimeZone.getTimeZone("GMT+7:00"));
-        return Integer.valueOf(df.format(date));
+    public static boolean CompareDate(long data1, long data2, int mins){
+        long millis = mins * 60 * 1000;
+        if (data2 - data1 > millis){
+            return true;
+        }
+        return false;
     }
 }

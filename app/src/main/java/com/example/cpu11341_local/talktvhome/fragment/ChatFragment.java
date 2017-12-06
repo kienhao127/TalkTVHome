@@ -79,6 +79,10 @@ import java.util.StringTokenizer;
  */
 
 public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.EmoticonClickListener, OpenRoomActivity.OnBackPressedListener, MessageActivity.OnBackPressedListener {
+    static final int EVENT = 1;
+    static final int REMIND = 2;
+    static final int SIMPLEMESSAGE = 3;
+    static final int MY_SIMPLEMESSAGE = 4;
 
     RecyclerView messDetailRecyclerView;
     MessageDetailRecyclerAdapter adapter;
@@ -114,6 +118,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     EmoticonFragmentAdapter emoticonFragAdapter;
     View view;
     LinearLayout newMsgNotice;
+    TalkTextView typingNotice;
 
     public ChatFragment(Topic topic) {
         this.toolbarTitle = topic.getUser().getName();
@@ -128,6 +133,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
     }
 
     void init(View view){
+        typingNotice = (TalkTextView) view.findViewById(R.id.typingNotice);
         newMsgNotice = (LinearLayout) view.findViewById(R.id.newMsgNotice);
         emoticonsViewPager = (ViewPager) view.findViewById(R.id.emoticons_pager);
         tabLayout = (TabLayout) view.findViewById(R.id.tabLayout);
@@ -191,9 +197,13 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() > 0 && !("".equals(s.toString().trim()))) {
+                    typingNotice.setVisibility(View.VISIBLE);
+                    String notiString = toolbarTitle + " đang gõ tin nhắn...";
+                    typingNotice.setText(notiString);
                     imageViewSend.setVisibility(View.VISIBLE);
                 } else {
                     imageViewSend.setVisibility(View.GONE);
+                    typingNotice.setVisibility(View.INVISIBLE);
                 }
 
                 editText.setSelection(s.length());
@@ -321,36 +331,44 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (arrMessDetail.get(position).getType() == 1) {
-                    Toast.makeText(getContext(), "Event" + ((EventMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (arrMessDetail.get(position).getType() == 2) {
-                    Toast.makeText(getContext(), "Remind" + ((RemindMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 TalkTextView textViewDate = (TalkTextView) view.findViewById(R.id.textViewDateTime);
                 TalkTextView textViewMessDetail = (TalkTextView) view.findViewById(R.id.textViewMessDetail);
-                if (textViewDate.getVisibility() == View.VISIBLE) {
-                    Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
-                    textViewDate.setVisibility(View.GONE);
-                    textViewDate.startAnimation(showOff);
-                    if (arrMessDetail.get(position).getType() == 4) {
-                        textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
-                    } else {
-                        textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
-                    }
-                } else {
-                    Animation showUp = AnimationUtils.loadAnimation(getContext(), R.anim.show_up);
-                    Animation slide_down = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
-                    textViewDate.setVisibility(View.VISIBLE);
-                    textViewDate.startAnimation(showUp);
-                    textViewMessDetail.startAnimation(slide_down);
-                    if (arrMessDetail.get(position).getType() == 4) {
-                        textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
-                    } else {
-                        textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
-                    }
+
+                switch (arrMessDetail.get(position).getType()) {
+                    case EVENT:
+                        Toast.makeText(getContext(), "Event" + ((EventMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
+                        break;
+                    case REMIND:
+                        Toast.makeText(getContext(), "Remind" + ((RemindMessage) arrMessDetail.get(position)).getAction_extra(), Toast.LENGTH_SHORT).show();
+                        break;
+                    case SIMPLEMESSAGE:
+                        if (textViewMessDetail.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.rounded_corner).getConstantState())
+                                && textViewDate.getVisibility() == View.VISIBLE) {
+                            break;
+                        } else {
+                            if (textViewDate.getVisibility() == View.VISIBLE) {
+                                hideDate(textViewDate);
+                                textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
+                            } else {
+                                showDate(textViewDate, textViewMessDetail);
+                                textViewMessDetail.setBackgroundResource(R.drawable.selected_msg_box);
+                            }
+                        }
+                        break;
+                    case MY_SIMPLEMESSAGE:
+                        if (textViewMessDetail.getBackground().getConstantState().equals(getResources().getDrawable(R.drawable.my_message_box).getConstantState())
+                                && textViewDate.getVisibility() == View.VISIBLE) {
+                            break;
+                        } else {
+                            if (textViewDate.getVisibility() == View.VISIBLE) {
+                                hideDate(textViewDate);
+                                textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
+                            } else {
+                                showDate(textViewDate, textViewMessDetail);
+                                textViewMessDetail.setBackgroundResource(R.drawable.selected_my_msg_box);
+                            }
+                        }
+                        break;
                 }
             }
         });
@@ -473,6 +491,20 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
 
         return view;
+    }
+
+    void showDate(TalkTextView textViewDate, TalkTextView textViewMessDetail) {
+        Animation showUp = AnimationUtils.loadAnimation(getContext(), R.anim.show_up);
+        Animation slide_down = AnimationUtils.loadAnimation(getContext(), R.anim.slide_down);
+        textViewDate.setVisibility(View.VISIBLE);
+        textViewDate.startAnimation(showUp);
+        textViewMessDetail.startAnimation(slide_down);
+    }
+
+    void hideDate(TalkTextView textViewDate){
+        Animation showOff = AnimationUtils.loadAnimation(getContext(), R.anim.show_off);
+        textViewDate.setVisibility(View.GONE);
+        textViewDate.startAnimation(showOff);
     }
 
     void hideEmoticonKeyboard(){
