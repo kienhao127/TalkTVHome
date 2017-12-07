@@ -101,10 +101,10 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 return new RemindHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.system_remind_layout,parent,false));
             }
             case SIMPLEMESSAGE:{
-                return new MessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
+                return new SimpleMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.message_detail_item_layout,parent,false));
             }
             case MY_SIMPLEMESSAGE:{
-                return new MyMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
+                return new SimpleMessageHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.my_message_detail_item_layout,parent,false));
             }
             default:{
                 return new LoadingHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_layout,parent,false));
@@ -138,93 +138,12 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 remindHolder.textViewViewDetail.setText(((RemindMessage)arrMessDetail.get(position)).getAction_title());
                 break;
             case SIMPLEMESSAGE:
-                MessageHolder messageHolder = (MessageHolder) holder;
-                if (position == 0){
-                    messageHolder.textViewDate.setVisibility(View.VISIBLE);
-                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                } else {
-                    if (arrMessDetail.get(position - 1) != null){
-                        if (ElapsedTime.CompareDate(arrMessDetail.get(position-1).getDatetime(), arrMessDetail.get(position).getDatetime(), 15)){
-                            messageHolder.textViewDate.setVisibility(View.VISIBLE);
-                            messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                        } else {
-                            messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                            messageHolder.textViewDate.setVisibility(View.GONE);
-                        }
-                    }
-                }
-
-                if (position < arrMessDetail.size() - 1){
-                    if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
-                        messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                        Glide.with(context)
-                                .load(arrMessDetail.get(position).getUser().getAvatar())
-                                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                                .apply(RequestOptions.errorOf(R.drawable.grid_item))
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(messageHolder.imageViewAvatar);
-                        messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    Glide.with(context)
-                            .load(arrMessDetail.get(position).getUser().getAvatar())
-                            .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                            .apply(RequestOptions.errorOf(R.drawable.grid_item))
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(messageHolder.imageViewAvatar);
-                    messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                }
-
-                Spanned spannedMessage = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
-                messageHolder.textViewMessDetail.setText(spannedMessage);
-                messageHolder.textViewMessDetail.setBackgroundResource(R.drawable.rounded_corner);
+                SimpleMessageHolder messageHolder = (SimpleMessageHolder) holder;
+                onBindSimpleMessage(messageHolder, position, R.drawable.rounded_corner);
                 break;
             case MY_SIMPLEMESSAGE:
-                MyMessageHolder myMessageHolder = (MyMessageHolder) holder;
-                if (position == 0){
-                    myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
-                    myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                } else {
-                    if (arrMessDetail.get(position - 1) != null){
-                        if (ElapsedTime.CompareDate(arrMessDetail.get(position-1).getDatetime(), arrMessDetail.get(position).getDatetime(), 15)){
-                            myMessageHolder.textViewDate.setVisibility(View.VISIBLE);
-                            myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                        } else {
-                            myMessageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
-                            myMessageHolder.textViewDate.setVisibility(View.GONE);
-                        }
-                    }
-                }
-
-                if (position < arrMessDetail.size() - 1){
-                    if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
-                        myMessageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                        Glide.with(context)
-                                .load(MessageDataManager.getInstance().getCurrentUser(context).getAvatar())
-                                .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                                .apply(RequestOptions.errorOf(R.drawable.grid_item))
-                                .apply(RequestOptions.circleCropTransform())
-                                .into(myMessageHolder.imageViewAvatar);
-                        myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                    Glide.with(context)
-                            .load(MessageDataManager.getInstance().getCurrentUser(context).getAvatar())
-                            .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
-                            .apply(RequestOptions.errorOf(R.drawable.grid_item))
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(myMessageHolder.imageViewAvatar);
-                    myMessageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
-                }
-                Spanned spannedMyMessage = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
-                myMessageHolder.textViewMessDetail.setText(spannedMyMessage);
-                myMessageHolder.textViewMessDetail.setBackgroundResource(R.drawable.my_message_box);
+                SimpleMessageHolder myMessageHolder = (SimpleMessageHolder) holder;
+                onBindSimpleMessage(myMessageHolder, position, R.drawable.my_message_box);
 
                 if (((SimpleMessage)arrMessDetail.get(position)).isWarning()) {
                     myMessageHolder.imageViewWarningDot.setVisibility(View.VISIBLE);
@@ -238,6 +157,51 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 break;
             }
         }
+    }
+
+    void onBindSimpleMessage(SimpleMessageHolder messageHolder, int position, int backgroundResource){
+        if (position == 0){
+            messageHolder.textViewDate.setVisibility(View.VISIBLE);
+            messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+        } else {
+            if (arrMessDetail.get(position - 1) != null){
+                if (ElapsedTime.CompareDate(arrMessDetail.get(position-1).getDatetime(), arrMessDetail.get(position).getDatetime(), 15)){
+                    messageHolder.textViewDate.setVisibility(View.VISIBLE);
+                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                } else {
+                    messageHolder.textViewDate.setText(ElapsedTime.getRelativeTimeSpanString(arrMessDetail.get(position).getDatetime()));
+                    messageHolder.textViewDate.setVisibility(View.GONE);
+                }
+            }
+        }
+
+        if (position < arrMessDetail.size() - 1){
+            if (arrMessDetail.get(position).getType() == arrMessDetail.get(position + 1).getType()){
+                messageHolder.imageViewAvatar.setVisibility(View.INVISIBLE);
+            } else {
+                messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+                Glide.with(context)
+                        .load(arrMessDetail.get(position).getUser().getAvatar())
+                        .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                        .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(messageHolder.imageViewAvatar);
+                messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+            }
+        } else {
+            messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+            Glide.with(context)
+                    .load(arrMessDetail.get(position).getUser().getAvatar())
+                    .apply(RequestOptions.placeholderOf(R.drawable.grid_item))
+                    .apply(RequestOptions.errorOf(R.drawable.grid_item))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(messageHolder.imageViewAvatar);
+            messageHolder.imageViewAvatar.setVisibility(View.VISIBLE);
+        }
+
+        Spanned spannedMessage = EmoticonUtil.getInstance().getSmiledText(arrMessDetail.get(position).getText(), context);
+        messageHolder.textViewMessDetail.setText(spannedMessage);
+        messageHolder.textViewMessDetail.setBackgroundResource(backgroundResource);
     }
 
     public interface OnItemClickListener {
@@ -335,43 +299,13 @@ public class MessageDetailRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         }
     }
 
-    public class MessageHolder extends RecyclerView.ViewHolder {
+    public class SimpleMessageHolder extends RecyclerView.ViewHolder{
         ImageView imageViewAvatar;
         TextView textViewMessDetail;
         TextView textViewDate;
         ImageView imageViewWarningDot;
-        public MessageHolder(final View view){
-            super(view);
-            imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
-            textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);
-            textViewDate = (TextView) view.findViewById(R.id.textViewDateTime);
-            imageViewWarningDot = (ImageView) view.findViewById(R.id.imageViewWarningDot);
-            textViewMessDetail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mItemClickListener != null){
-                        mItemClickListener.onItemClick(view, getAdapterPosition());
-                    }
-                }
-            });
-            textViewMessDetail.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    if (mItemLongClickListener!=null){
-                        mItemLongClickListener.onItemLongClick(view, getAdapterPosition());
-                    }
-                    return true;
-                }
-            });
-        }
-    }
 
-    public class MyMessageHolder extends RecyclerView.ViewHolder {
-        ImageView imageViewAvatar;
-        TextView textViewMessDetail;
-        TextView textViewDate;
-        ImageView imageViewWarningDot;
-        public MyMessageHolder(final View view){
+        public SimpleMessageHolder(final View view){
             super(view);
             imageViewAvatar = (ImageView) view.findViewById(R.id.imageViewAvatar);
             textViewMessDetail = (TextView) view.findViewById(R.id.textViewMessDetail);

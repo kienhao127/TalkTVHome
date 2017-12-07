@@ -106,7 +106,7 @@ public class OpenRoomActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (onBackPressedListener != null) {
             onBackPressedListener.doBack();
-            super.onBackPressed();
+//            super.onBackPressed();
         } else {
             if (isMessShowed) {
                 getSupportFragmentManager().popBackStack();
@@ -119,16 +119,9 @@ public class OpenRoomActivity extends AppCompatActivity {
                         .addToBackStack(null)
                         .commit();
                 isMessShowed = false;
-            } else {
+            }
+            else {
                 super.onBackPressed();
-                if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
-                    TopicFragment unfollowTopicGroupFragment = (TopicFragment) getSupportFragmentManager().findFragmentByTag("UnfollowTopicGroupFrag");
-                    if (unfollowTopicGroupFragment != null) {
-                        unfollowTopicGroupFragment.onResume();
-                    }
-                } else {
-                    this.onResume();
-                }
             }
         }
     }

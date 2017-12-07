@@ -79,11 +79,7 @@ public class MessageDataManager {
     }
     //-----------MESSAGE
     public ArrayList<MessageDetail> getListMessageFromDB(String topicID, Context context, int loadMoreFrom) {
-        ArrayList<MessageDetail> arrMessageDetailOfSender = new ArrayList<>();
-        long t = System.currentTimeMillis();
-        arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(topicID, loadMoreFrom);
-        ArrayList<MessageDetail> arrMsgDetail = new ArrayList<>();
-        long d = System.currentTimeMillis() - t;
+        ArrayList<MessageDetail> arrMessageDetailOfSender = DatabaseHelper.getInstance(context).getListMessage(topicID, loadMoreFrom);
         return arrMessageDetailOfSender;
     }
 

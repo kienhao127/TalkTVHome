@@ -166,6 +166,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         tabLayout.setupWithViewPager(emoticonsViewPager);
         setupTabIcons();
 
+
+        //Hiển thị thanh thông bao Theo dõi
         if (!MessageDataManager.getInstance().isFollow(topicID, getContext())) {
             relativeLayoutFollowNoti.setVisibility(View.VISIBLE);
             textViewFollow.setOnClickListener(new View.OnClickListener() {
@@ -203,7 +205,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                     imageViewSend.setVisibility(View.VISIBLE);
                 } else {
                     imageViewSend.setVisibility(View.GONE);
-                    typingNotice.setVisibility(View.INVISIBLE);
+                    typingNotice.setVisibility(View.GONE);
                 }
 
                 editText.setSelection(s.length());
@@ -328,6 +330,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
 
         messDetailRecyclerView.setAdapter(adapter);
+
+        //Click để xem thông tin tin nhắn
         adapter.SetOnItemClickListener(new MessageDetailRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
@@ -373,6 +377,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        //LongClick để xóa hoặc copy tin nhắn
         adapter.SetOnItemLongClickListener(new MessageDetailRecyclerAdapter.OnItemLongClickListener() {
             @Override
             public void onItemLongClick(View view, int position) {
@@ -414,6 +419,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        //Tap ngoài editext sẽ ẩn bàn phím
         messDetailRecyclerView.setOnTouchListener(new View.OnTouchListener() {
             float x1, x2;
 
@@ -444,6 +450,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        //Copy tin nhắn
         btnCopy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -454,6 +461,7 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
             }
         });
 
+        //Xóa tin nhắn
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -557,17 +565,17 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         });
     }
 
+
+    //Khi nhấn back
+    //Nếu bàn phím Emoticon đang hiện => ẩn
     @Override
     public void doBack() {
         if (isEmoticonKeyboardShowing){
             hideEmoticonKeyboard();
-        } else {
-            if (getActivity() instanceof OpenRoomActivity){
-                frameLayoutFragmentContainer.getLayoutParams().height = Resources.getSystem().getDisplayMetrics().heightPixels / 2;
-            }
         }
     }
 
+    //Đỗ dữ liệu từ db
     private class LoadDataTask extends AsyncTask<String, Void, ArrayList<MessageDetail>> {
         @Override
         protected ArrayList<MessageDetail> doInBackground(String... urls) {
@@ -626,6 +634,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         }
     }
 
+
+    //Thêm tin nhắn khi có tin nhắn mới
     private class LoadMessageTask extends AsyncTask<MessageDetail, Void, MessageDetail> {
         @Override
         protected MessageDetail doInBackground(MessageDetail... messageDetails) {
