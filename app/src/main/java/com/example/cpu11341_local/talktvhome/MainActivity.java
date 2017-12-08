@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 //        for (int i=3; i<150; i++) {
-//            MessageDetail messageDetail = new MessageDetail(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/305561959?t=1485278568", "Lady Gaga"),
-//                    Calendar.getInstance().getTimeInMillis(), String.valueOf(i), false);
+//            SimpleMessage messageDetail = new SimpleMessage(3, new User(String.valueOf(i), "http://avatar1.cctalk.vn/csmtalk_user3/450425623?t=1502078349", "Trang Lady"),
+//                        String.valueOf(i), Calendar.getInstance().getTimeInMillis(), false);
 //            messageDetail.setTopicID(messageDetail.getUser().getId() + "_" + MessageDataManager.getInstance().getCurrentUser(getApplicationContext()).getId());
 //            InsertMessageTask insertMessageTask4 = new InsertMessageTask();
 //            insertMessageTask4.execute(messageDetail);

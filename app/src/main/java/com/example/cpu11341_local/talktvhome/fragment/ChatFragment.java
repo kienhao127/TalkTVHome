@@ -683,6 +683,8 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         }
     }
 
+
+    //--------------Emoticon
     private class EmoticonFragmentAdapter extends FragmentPagerAdapter {
         private final ArrayList<EmoticonsFragment> mFragmentList = new ArrayList<>();
 

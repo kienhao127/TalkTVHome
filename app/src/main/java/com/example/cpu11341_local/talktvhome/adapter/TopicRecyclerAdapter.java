@@ -49,17 +49,15 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged (RecyclerView recyclerView, int newState){
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == SCROLL_STATE_DRAGGING){
-                    if (linearLayoutManager != null){
-                        lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                        if (!isLoading && lastVisibleItem > getItemCount()-5) {
-                            if (onLoadMoreListener != null) {
-                                onLoadMoreListener.onLoadMore();
-                            }
-                            isLoading = true;
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (linearLayoutManager != null){
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && lastVisibleItem > getItemCount() - 5) {
+                        if (onLoadMoreListener != null) {
+                            onLoadMoreListener.onLoadMore();
                         }
+                        isLoading = true;
                     }
                 }
             }

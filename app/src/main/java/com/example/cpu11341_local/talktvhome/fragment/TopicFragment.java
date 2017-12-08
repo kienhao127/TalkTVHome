@@ -269,9 +269,10 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
     public void onResume() {
         super.onResume();
         adapter.SetOnItemClickListener(this);
-        LoadTopicTask loadTopicTask = new LoadTopicTask();
-        loadTopicTask.execute();
-
+        if (!isResume) {
+            LoadTopicTask loadTopicTask = new LoadTopicTask();
+            loadTopicTask.execute();
+        }
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
