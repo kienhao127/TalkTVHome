@@ -41,8 +41,9 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     boolean isLoading;
     private int lastVisibleItem;
     RecyclerView recyclerView;
+    static boolean isFristTime = true;
 
-    public TopicRecyclerAdapter(Context context, ArrayList<Topic> arrTopic, RecyclerView recyclerView){
+    public TopicRecyclerAdapter(final Context context, ArrayList<Topic> arrTopic, RecyclerView recyclerView){
         this.context = context;
         this.arrTopic = arrTopic;
         this.recyclerView = recyclerView;
@@ -53,11 +54,13 @@ public class TopicRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
                 super.onScrolled(recyclerView, dx, dy);
                 if (linearLayoutManager != null){
                     lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (!isLoading && lastVisibleItem > getItemCount() - 5) {
+                    if (!isLoading && lastVisibleItem > getItemCount() - 5 && !isFristTime) {
                         if (onLoadMoreListener != null) {
                             onLoadMoreListener.onLoadMore();
                         }
                         isLoading = true;
+                    } else {
+                        Toast.makeText(context, "Đã load hết tin nhắn", Toast.LENGTH_SHORT).show();
                     }
                 }
             }

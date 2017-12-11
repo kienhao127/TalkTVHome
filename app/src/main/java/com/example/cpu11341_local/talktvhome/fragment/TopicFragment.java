@@ -55,9 +55,10 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
     int loadMoreFrom = 30;
     int followLoadMoreFrom = 30;
     int unfollowLoadMoreFrom = 30;
-    boolean isAllMsg = false, isResume = false;
+    boolean isAllMsg = false;
     int i = 0;
     ProgressDialog progressDialog;
+
     public TopicFragment(String toolbarTitle, boolean isFollow, String activityName) {
         this.toolbarTitle = toolbarTitle;
         this.isFollow = isFollow;
@@ -177,7 +178,7 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
                     if (!isAllMsg) {
                         new LoadMoreDataTask().execute();
                     } else {
-                        Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Đã load hết tin nhắn", Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -269,10 +270,10 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
     public void onResume() {
         super.onResume();
         adapter.SetOnItemClickListener(this);
-        if (!isResume) {
-            LoadTopicTask loadTopicTask = new LoadTopicTask();
-            loadTopicTask.execute();
-        }
+
+        LoadTopicTask loadTopicTask = new LoadTopicTask();
+        loadTopicTask.execute();
+
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
             public void onDataChanged(Topic topic, MessageDetail messageDetail) {
@@ -297,7 +298,7 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
                     loadMoreFrom++;
                     arrTopic.add(topic);
                 }
-                sortTopic(arrTopic, getContext());
+                sortTopic(arrTopic);
                 textViewOver.setVisibility(View.GONE);
 
                 if (adapter != null) {
@@ -331,7 +332,6 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
-            isResume = true;
             textViewLoading.setVisibility(View.GONE);
             if (arrTopic.size() == 0) {
                 textViewOver.setVisibility(View.VISIBLE);
@@ -356,7 +356,8 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
-            int pos = arrTopic.size() - 1;
+            Log.d("Topic size", String.valueOf(arrTopic.size()));
+            int pos = arrTopic.size()-1;
             arrTopic.remove(pos);
             adapter.notifyItemRemoved(pos);
             if (result != null) {
@@ -406,7 +407,7 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
         }
     }
 
-    public static void sortTopic(ArrayList<Topic> arrTopic, Context context) {
+    void sortTopic(ArrayList<Topic> arrTopic) {
         Topic systemTopic = null, unFollowTopic = null;
 
         int i = 0;

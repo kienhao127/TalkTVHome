@@ -69,7 +69,6 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("Get list topic", "MsgActivity");
         messFragment.onResume();
     }
 }
