@@ -21,7 +21,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CategoryDetailActivity" />
-        <activity android:name=".OpenRoomActivity" />
+        <activity android:name=".OpenRoomActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"></activity>
         <activity android:name=".MessageActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"></activity>
     </application>

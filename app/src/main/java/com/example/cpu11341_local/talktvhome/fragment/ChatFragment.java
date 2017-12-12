@@ -758,6 +758,5 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
         SpannableStringBuilder builder = new SpannableStringBuilder(editText.getText());
         builder.setSpan(new ImageSpan(drawable), selectionCursor - index.length(), selectionCursor, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         editText.setText(builder);
-        editText.requestFocus(selectionCursor);
     }
 }
