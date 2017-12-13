@@ -626,10 +626,12 @@ public class ChatFragment extends Fragment implements EmoticonsRecyclerAdapter.E
                 isAllMsg = true;
             }
             loadMoreFrom += result.size();
-            arrMessDetail.remove(0);
-            adapter.notifyItemRemoved(0);
+            if (arrMessDetail.get(0) == null){
+                arrMessDetail.remove(0);
+                adapter.notifyItemRemoved(0);
+            }
             arrMessDetail.addAll(0, result);
-            adapter.notifyItemRangeInserted(0, result.size() - 1);
+            adapter.notifyItemRangeInserted(0, result.size());
             adapter.setLoaded();
         }
     }

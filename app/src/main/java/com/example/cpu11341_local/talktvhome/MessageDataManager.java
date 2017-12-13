@@ -1,6 +1,7 @@
 package com.example.cpu11341_local.talktvhome;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.example.cpu11341_local.talktvhome.data.MessageDetail;
 import com.example.cpu11341_local.talktvhome.data.Topic;
@@ -18,7 +19,6 @@ import java.util.Map;
 
 public class MessageDataManager {
     public DataListener dataListener;
-    Map<String, ArrayList<MessageDetail>> linkedHashMapMsgDetail = new LinkedHashMap<>();
     private static MessageDataManager instance = null;
 
     protected MessageDataManager() throws ParseException {
@@ -132,10 +132,11 @@ public class MessageDataManager {
 
     //----------------TOPIC
     public ArrayList<Topic> getListTopic(boolean isFollow, Context context, int loadFrom) {
-        if (DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow).size() == 0) {
-            return null;
-        }
-        return DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow);
+        return DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow, 60);
+    }
+
+    public ArrayList<Topic> loadMoreTopic(boolean isFollow, Context context, int loadFrom) {
+        return DatabaseHelper.getInstance(context).getListTopic(loadFrom, isFollow, 60);
     }
 
     public Topic getTopic(String topicID, Context context) {

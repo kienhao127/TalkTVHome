@@ -52,11 +52,11 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
     String activityName;
     TalkTextView textViewLoading;
     TalkTextView textViewOver;
-    int loadMoreFrom = 30;
-    int followLoadMoreFrom = 30;
-    int unfollowLoadMoreFrom = 30;
+    int loadMoreFrom = 60;
+    int followLoadMoreFrom = 60;
+    int unfollowLoadMoreFrom = 60;
     boolean isAllMsg = false;
-    int i = 0;
+    boolean isResume = false;
     ProgressDialog progressDialog;
 
     public TopicFragment(String toolbarTitle, boolean isFollow, String activityName) {
@@ -271,8 +271,10 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
         super.onResume();
         adapter.SetOnItemClickListener(this);
 
-        LoadTopicTask loadTopicTask = new LoadTopicTask();
-        loadTopicTask.execute();
+        if (!isResume){
+            LoadTopicTask loadTopicTask = new LoadTopicTask();
+            loadTopicTask.execute();
+        }
 
         MessageDataManager.getInstance().setDataListener(new MessageDataManager.DataListener() {
             @Override
@@ -338,6 +340,7 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
             } else {
                 textViewOver.setVisibility(View.GONE);
             }
+            isResume = true;
         }
     }
 
@@ -350,16 +353,18 @@ public class TopicFragment extends android.support.v4.app.Fragment implements To
 
         @Override
         protected ArrayList<Topic> doInBackground(String... urls) {
-            ArrayList<Topic> arrNewTopic = MessageDataManager.getInstance().getListTopic(isFollow, getContext(), loadMoreFrom);
+            ArrayList<Topic> arrNewTopic = MessageDataManager.getInstance().loadMoreTopic(isFollow, getContext(), loadMoreFrom);
             return arrNewTopic;
         }
 
         @Override
         protected void onPostExecute(final ArrayList<Topic> result) {
-            Log.d("Topic size", String.valueOf(arrTopic.size()));
             int pos = arrTopic.size()-1;
-            arrTopic.remove(pos);
-            adapter.notifyItemRemoved(pos);
+            if (arrTopic.get(pos) == null){
+                arrTopic.remove(pos);
+                adapter.notifyItemRemoved(pos);
+            }
+
             if (result != null) {
                 if (isFollow){
                     followLoadMoreFrom += result.size();

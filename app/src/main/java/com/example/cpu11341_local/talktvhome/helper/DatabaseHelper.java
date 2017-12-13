@@ -311,14 +311,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<Topic> getListTopic(int loadFrom, boolean isFollow){
+    public ArrayList<Topic> getListTopic(int loadFrom, boolean isFollow, int count){
         ArrayList<Topic> arrTopic = new ArrayList<>();
         String selectQuery = "SELECT *" +
                 " FROM ( SELECT * " +
                         " FROM " + TOPIC_TABLE_NAME +
                         " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) + " and (" + TOPIC_COLUMN_NAME_TOPICID + " = '-1' or " + TOPIC_COLUMN_NAME_TOPICID + " = '0')" +
                         " ORDER BY " + TOPIC_COLUMN_NAME_TOPICID + " DESC" +
-                        " LIMIT 30 OFFSET " + loadFrom + " )" +
+                        " LIMIT " + count + " OFFSET " + loadFrom + " )" +
 
                 " UNION ALL" +
 
@@ -327,7 +327,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         " FROM " + TOPIC_TABLE_NAME +
                         " WHERE " + TOPIC_COLUMN_NAME_ISFOLLOW + " = " + ((isFollow)?1:0) + " and " + TOPIC_COLUMN_NAME_TOPICID + " <> '-1' and " + TOPIC_COLUMN_NAME_TOPICID + " <> '0'" +
                         " ORDER BY " + TOPIC_COLUMN_NAME_DATETIME + " DESC" +
-                        " LIMIT 30 OFFSET " + loadFrom + " )";
+                        " LIMIT " + count + " OFFSET " + loadFrom + " )";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cTopic = db.rawQuery(selectQuery, null);
         if (cTopic.moveToFirst()) {
